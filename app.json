@@ -11,6 +11,11 @@
     "ios": {
       "supportsTablet": true
     },
+        "splash": {
+      "image": "./assets/images/splashScreen.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#000000"
+    },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
