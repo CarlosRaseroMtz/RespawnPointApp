@@ -7,6 +7,7 @@ const [shortDimension, longDimension] =
     ? [SCREEN_WIDTH, SCREEN_HEIGHT]
     : [SCREEN_HEIGHT, SCREEN_WIDTH];
 
+//Basado en moviles de 5"
 const guidelineBaseWidth = 375;
 const guidelineBaseHeight = 812;
 
