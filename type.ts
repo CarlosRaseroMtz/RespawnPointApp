@@ -1,7 +1,12 @@
 // Tipos base de React Native y React
-import { Timestamp } from 'firebase/firestore';
-import { ReactNode, RefObject } from 'react';
-import { TextInputProps, TextStyle, TouchableOpacityProps, ViewStyle } from 'react-native';
+import { Timestamp } from "firebase/firestore";
+import { ReactNode, RefObject } from "react";
+import {
+  TextInputProps,
+  TextStyle,
+  TouchableOpacityProps,
+  ViewStyle,
+} from "react-native";
 
 // Usuario gamer
 export type UserType = {
@@ -13,7 +18,7 @@ export type UserType = {
   generoFavorito?: string;
   reputacion: number;
   nivel?: number;
-  rol: 'usuario' | 'moderador' | 'admin';
+  rol: "usuario" | "moderador" | "admin";
   comunidades: string[];
   createdAt: Timestamp;
 };
@@ -24,7 +29,7 @@ export type PostType = {
   userId: string;
   contenido: string;
   mediaUrl?: string;
-  likes: string[];              // IDs de usuarios
+  likes: string[]; // IDs de usuarios
   timestamp: Date;
   comunidadId?: string;
 };
@@ -58,7 +63,7 @@ export type NotificationType = {
 // 💬 Chat y mensajes
 export type ChatType = {
   chatId: string;
-  tipo: 'privado' | 'grupo';
+  tipo: "privado" | "grupo";
   participantes: string[];
   notifydate: Timestamp;
 };
@@ -70,7 +75,6 @@ export type MessageType = {
   leidoPor: string[];
 };
 
-
 export type TournamentType = {
   id: string;
   titulo: string;
@@ -78,7 +82,6 @@ export type TournamentType = {
   fecha: Timestamp;
   participantes: string[];
 };
-
 
 // 🧾 Prop para botones personalizados
 export interface CustomButtonProps extends TouchableOpacityProps {
