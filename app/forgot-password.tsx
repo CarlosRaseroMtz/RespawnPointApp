@@ -26,7 +26,10 @@ export default function ForgotPasswordScreen() {
 
   return (
     <View style={styles.container}>
-      <Image source={require("../assets/images/logo.png")} style={styles.logo} />
+      <Image
+        source={require("../assets/images/logo.png")}
+        style={styles.logo}
+      />
 
       <Text style={styles.title}>Recuperar contraseña</Text>
 
@@ -48,9 +51,12 @@ export default function ForgotPasswordScreen() {
         <View style={styles.line} />
       </View>
 
-      <TouchableOpacity onPress={() => router.push("/register")}>
-        <Text style={styles.linkText}>Si aún no tienes cuenta, <Text style={styles.pink}>pulsa aquí para registrarte</Text></Text>
-      </TouchableOpacity>
+      <Text style={styles.linkText}>
+        Si aún no tienes cuenta,{" "}
+        <Text style={styles.pink} onPress={() => router.push("/register")}>
+          pulsa aquí para registrarte
+        </Text>
+      </Text>
 
       <Text style={styles.terms}>
         Al hacer click en continuar, aceptas nuestros{" "}

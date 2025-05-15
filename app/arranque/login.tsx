@@ -4,6 +4,7 @@ import { useState } from "react";
 import {
   Dimensions,
   Image,
+  Linking,
   StyleSheet,
   Text,
   TextInput,
@@ -17,6 +18,7 @@ export default function LoginScreen() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = () => {
     alert("Login aún no implementado.");
@@ -24,12 +26,13 @@ export default function LoginScreen() {
 
   return (
     <View style={styles.container}>
-      {/* Fondo personalizado en diagonal */}
       <View style={styles.background} />
 
-      {/* Contenido */}
       <View style={styles.inner}>
-        <Image source={require("../../assets/images/logo.png")} style={styles.logo} />
+        <Image
+          source={require("../../assets/images/logo.png")}
+          style={styles.logo}
+        />
 
         <Text style={styles.title}>Inicio de sesión</Text>
 
@@ -48,16 +51,31 @@ export default function LoginScreen() {
             style={styles.input}
             placeholder="Contraseña"
             placeholderTextColor="#888"
-            secureTextEntry
+            secureTextEntry={!showPassword}
             value={password}
             onChangeText={setPassword}
           />
-          <AntDesign name="eyeo" size={20} color="#888" style={styles.eyeIcon} />
+          <TouchableOpacity
+            style={styles.eyeIcon}
+            onPress={() => setShowPassword(!showPassword)}
+          >
+            <AntDesign
+              name={showPassword ? "eye" : "eyeo"}
+              size={20}
+              color="#888"
+            />
+          </TouchableOpacity>
         </View>
 
-        <TouchableOpacity onPress={() => router.push("/forgot-password")}>
-          <Text style={styles.linkText}>Si has olvidado la contraseña, <Text style={styles.pink}>pulsa aquí</Text></Text>
-        </TouchableOpacity>
+        <Text style={styles.linkText}>
+          Si has olvidado la contraseña,{" "}
+          <Text
+            style={styles.pink}
+            onPress={() => router.push("/forgot-password")}
+          >
+            pulsa aquí
+          </Text>
+        </Text>
 
         <TouchableOpacity style={styles.primaryButton} onPress={handleLogin}>
           <Text style={styles.primaryButtonText}>Continuar</Text>
@@ -74,12 +92,31 @@ export default function LoginScreen() {
           <View style={styles.line} />
         </View>
 
-        <TouchableOpacity onPress={() => router.push("/register")}>
-          <Text style={styles.linkText}>Si aún no tienes cuenta, <Text style={styles.pink}>pulsa aquí para registrarte</Text></Text>
-        </TouchableOpacity>
+        <Text style={styles.linkText}>
+          Si aún no tienes cuenta,{" "}
+          <Text style={styles.pink} onPress={() => router.push("/register")}>
+            pulsa aquí para registrarte
+          </Text>
+        </Text>
 
         <Text style={styles.terms}>
-          Al hacer click en continuar, aceptas nuestros <Text style={styles.linkBlue}>Términos de servicio</Text> y <Text style={styles.linkBlue}>Política de privacidad</Text>.
+          Al hacer click en continuar, aceptas nuestros{" "}
+          <Text
+            style={styles.linkBlue}
+            onPress={() => Linking.openURL("https://www.ejemplo.com/terminos")}
+          >
+            Términos de servicio
+          </Text>{" "}
+          y{" "}
+          <Text
+            style={styles.linkBlue}
+            onPress={() =>
+              Linking.openURL("https://www.ejemplo.com/privacidad")
+            }
+          >
+            Política de privacidad
+          </Text>
+          .
         </Text>
       </View>
     </View>
