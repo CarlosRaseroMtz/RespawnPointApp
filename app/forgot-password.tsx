@@ -1,40 +1,134 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
-import { Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import {
+    Alert,
+    Image,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
+} from "react-native";
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
   const [email, setEmail] = useState("");
 
-  const handleReset = () => {
+  const handleRecovery = () => {
     if (!email) {
       Alert.alert("Error", "Introduce tu correo.");
       return;
     }
-    // Aquí iría Firebase sendPasswordResetEmail
-    alert("Recuperación no implementada aún.");
+    // Aquí irá Firebase sendPasswordResetEmail más adelante
+    Alert.alert("Recuperación enviada", "Revisa tu bandeja de entrada.");
     router.replace("/arranque/login");
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Recuperar Contraseña</Text>
-      <TextInput style={styles.input} placeholder="Correo electrónico" value={email} onChangeText={setEmail} />
-      <TouchableOpacity style={styles.button} onPress={handleReset}>
-        <Text style={styles.buttonText}>Enviar correo</Text>
+      <Image source={require("../assets/images/logo.png")} style={styles.logo} />
+
+      <Text style={styles.title}>Recuperar contraseña</Text>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Correo electrónico"
+        placeholderTextColor="#888"
+        value={email}
+        onChangeText={setEmail}
+      />
+
+      <TouchableOpacity style={styles.primaryButton} onPress={handleRecovery}>
+        <Text style={styles.primaryButtonText}>Enviar recuperación</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={() => router.replace("/arranque/login")}>
-        <Text style={styles.link}>Volver al inicio de sesión</Text>
+
+      <View style={styles.separator}>
+        <View style={styles.line} />
+        <Text style={styles.separatorText}>o</Text>
+        <View style={styles.line} />
+      </View>
+
+      <TouchableOpacity onPress={() => router.push("/register")}>
+        <Text style={styles.linkText}>Si aún no tienes cuenta, <Text style={styles.pink}>pulsa aquí para registrarte</Text></Text>
       </TouchableOpacity>
+
+      <Text style={styles.terms}>
+        Al hacer click en continuar, aceptas nuestros{" "}
+        <Text style={styles.linkBlue}>Términos de servicio</Text> y{" "}
+        <Text style={styles.linkBlue}>Política de privacidad</Text>.
+      </Text>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F5F5F5", justifyContent: "center", padding: 20 },
-  title: { fontSize: 24, fontWeight: "bold", marginBottom: 20, textAlign: "center", color: "#000" },
-  input: { backgroundColor: "#fff", borderRadius: 8, padding: 12, marginBottom: 12 },
-  button: { backgroundColor: "#42BAFF", padding: 15, borderRadius: 8, alignItems: "center" },
-  buttonText: { color: "#fff", fontWeight: "bold" },
-  link: { marginTop: 10, color: "#FF66C4", textAlign: "center" },
+  container: {
+    padding: 20,
+    backgroundColor: "#fff",
+    flex: 1,
+    justifyContent: "center",
+  },
+  logo: {
+    width: 180,
+    height: 180,
+    alignSelf: "center",
+    resizeMode: "contain",
+    marginBottom: 10,
+  },
+  title: {
+    fontSize: 22,
+    fontWeight: "bold",
+    textAlign: "center",
+    marginBottom: 25,
+  },
+  input: {
+    backgroundColor: "#fff",
+    borderColor: "#ccc",
+    borderWidth: 1,
+    borderRadius: 12,
+    padding: 12,
+    marginBottom: 20,
+  },
+  primaryButton: {
+    backgroundColor: "#000",
+    padding: 15,
+    borderRadius: 10,
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  primaryButtonText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+  separator: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginVertical: 10,
+  },
+  line: {
+    flex: 1,
+    height: 1,
+    backgroundColor: "#ccc",
+  },
+  separatorText: {
+    marginHorizontal: 10,
+    color: "#888",
+  },
+  linkText: {
+    fontSize: 13,
+    color: "#000",
+    marginBottom: 15,
+  },
+  pink: {
+    color: "#FF66C4",
+  },
+  terms: {
+    fontSize: 12,
+    textAlign: "center",
+    marginTop: 10,
+    color: "#888",
+  },
+  linkBlue: {
+    color: "#42BAFF",
+  },
 });
