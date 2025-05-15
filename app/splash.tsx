@@ -1,16 +1,41 @@
 // app/splash.tsx
-import { useRouter } from 'expo-router';
-import React, { useEffect } from 'react';
-import { Image, StyleSheet, View } from 'react-native';
+import { useRouter } from "expo-router";
+import React, { useEffect, useRef } from "react";
+import {
+    Animated,
+    Dimensions,
+    Easing,
+    Image,
+    StyleSheet,
+    View
+} from "react-native";
+
+const { width, height } = Dimensions.get("window");
 
 export default function Splash() {
   const router = useRouter();
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(0.8)).current;
 
   useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 1500,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        friction: 4,
+        tension: 100,
+        useNativeDriver: true
+      })
+    ]).start();
+
     const timer = setTimeout(() => {
-      // Aquí podrías comprobar si hay sesión iniciada
-      router.replace("/"); // redirige al index.tsx
-    }, 2000); // 2 segundos de duración
+      router.replace("/home/login"); // Ruta a tu pantalla principal
+    }, 2500);
 
     return () => clearTimeout(timer);
   }, []);
@@ -18,8 +43,13 @@ export default function Splash() {
   return (
     <View style={styles.container}>
       <Image
-        source={require('../assets/images/splashScreen.png')}
-        style={styles.image}
+        source={require("../assets/images/fondoSplashScreen.png")}
+        style={styles.background}
+        resizeMode="cover"
+      />
+      <Animated.Image
+        source={require("../assets/images/logo.png")}
+        style={[styles.logo, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}
         resizeMode="contain"
       />
     </View>
@@ -28,13 +58,17 @@ export default function Splash() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#000",
-    alignItems: "center",
-    justifyContent: "center"
+    flex: 1
   },
-  image: {
-    width: "80%",
-    height: "80%"
+  background: {
+    width,
+    height,
+    position: "absolute"
+  },
+  logo: {
+    width: "60%",
+    height: "30%",
+    alignSelf: "center",
+    marginTop: height * 0.35
   }
 });
