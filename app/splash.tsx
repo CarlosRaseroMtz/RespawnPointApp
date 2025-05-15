@@ -34,7 +34,7 @@ export default function Splash() {
     ]).start();
 
     const timer = setTimeout(() => {
-      router.replace("/home/login"); // Ruta a tu pantalla principal
+      router.replace("/arranque/login"); // Ruta a tu pantalla principal
     }, 2500);
 
     return () => clearTimeout(timer);

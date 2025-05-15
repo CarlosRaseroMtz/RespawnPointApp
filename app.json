@@ -12,7 +12,7 @@
       "supportsTablet": true
     },
         "splash": {
-      "image": "./assets/images/splashScreen.png",
+      "image": "./assets/images/logo.png",
       "resizeMode": "contain",
       "backgroundColor": "#000000"
     },
