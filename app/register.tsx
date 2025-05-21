@@ -3,14 +3,14 @@ import { Picker } from "@react-native-picker/picker";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
-    Alert,
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 const platforms = [
@@ -59,7 +59,7 @@ export default function RegisterScreen() {
     }
     // Aquí irá el registro con Firebase más adelante
     Alert.alert("Registro exitoso", "Ahora puedes iniciar sesión.");
-    router.replace("/arranque/login");
+    router.replace("/login");
   };
 
   return (

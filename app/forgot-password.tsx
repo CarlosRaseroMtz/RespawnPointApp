@@ -1,13 +1,13 @@
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
-    Alert,
-    Image,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  Image,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 export default function ForgotPasswordScreen() {
@@ -21,7 +21,7 @@ export default function ForgotPasswordScreen() {
     }
     // Aquí irá Firebase sendPasswordResetEmail más adelante
     Alert.alert("Recuperación enviada", "Revisa tu bandeja de entrada.");
-    router.replace("/arranque/login");
+    router.replace("/login");
   };
 
   return (

@@ -1,19 +1,22 @@
-// app/splash.tsx
-import { useRouter } from "expo-router";
+import { useRootNavigationState, useRouter } from "expo-router";
 import React, { useEffect, useRef } from "react";
 import {
-    Animated,
-    Dimensions,
-    Easing,
-    Image,
-    StyleSheet,
-    View
+  Animated,
+  Dimensions,
+  Easing,
+  Image,
+  StyleSheet,
+  View
 } from "react-native";
+import { useAuth } from "../hooks/useAuth"; // ← importar tu hook
 
 const { width, height } = Dimensions.get("window");
 
 export default function Splash() {
   const router = useRouter();
+  const navState = useRootNavigationState();
+  const { user, loading } = useAuth(); // ← usar estado de auth
+
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
 
@@ -32,13 +35,21 @@ export default function Splash() {
         useNativeDriver: true
       })
     ]).start();
+  }, []);
+
+  useEffect(() => {
+    if (!navState?.key || loading) return;
 
     const timer = setTimeout(() => {
-      router.replace("/arranque/login"); // Ruta a tu pantalla principal
+      if (user) {
+        router.replace("/home");
+      } else {
+        router.replace("/login");
+      }
     }, 2500);
 
     return () => clearTimeout(timer);
-  }, []);
+  }, [navState, loading, user]);
 
   return (
     <View style={styles.container}>

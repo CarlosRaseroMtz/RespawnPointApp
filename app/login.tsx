@@ -1,5 +1,6 @@
 import { AntDesign } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import {
   Dimensions,
@@ -11,18 +12,44 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { auth } from "../config/firebase-config";
+
 
 const { width } = Dimensions.get("window");
 
 export default function LoginScreen() {
+  
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const handleLogin = () => {
-    alert("Login aún no implementado.");
-  };
+const handleLogin = async () => {
+  if (!email || !password) {
+    alert("Por favor, completa todos los campos.");
+    return;
+  }
+
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+    alert("Has iniciado sesión correctamente.");
+    router.replace("/home"); // ✅ Cambia esto si tu ruta inicial es otra
+  } catch (error: any) {
+    let message = "Error al iniciar sesión.";
+    switch (error.code) {
+      case "auth/user-not-found":
+        message = "Este usuario no existe.";
+        break;
+      case "auth/wrong-password":
+        message = "Contraseña incorrecta.";
+        break;
+      case "auth/invalid-email":
+        message = "El correo electrónico no es válido.";
+        break;
+    }
+    alert(message);
+  }
+};
 
   return (
     <View style={styles.container}>
@@ -30,7 +57,7 @@ export default function LoginScreen() {
 
       <View style={styles.inner}>
         <Image
-          source={require("../../assets/images/logo.png")}
+          source={require("../assets/images/logo.png")}
           style={styles.logo}
         />
 
