@@ -1,7 +1,10 @@
 import { AntDesign } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { useRouter } from "expo-router";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { useState } from "react";
+import { auth } from "../config/firebase-config";
+
 import {
   Alert,
   Image,
@@ -52,15 +55,38 @@ export default function RegisterScreen() {
     }
   };
 
-  const handleRegister = () => {
-    if (!email || !password || !fullName || !username || selectedGenres.length === 0) {
-      Alert.alert("Campos incompletos", "Por favor completa todos los campos.");
-      return;
-    }
-    // Aquí irá el registro con Firebase más adelante
+const handleRegister = async () => {
+  if (!email || !password || !fullName || !username || selectedGenres.length === 0) {
+    Alert.alert("Campos incompletos", "Por favor completa todos los campos.");
+    return;
+  }
+
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
+    const user = userCredential.user;
+
+    // Guarda el nombre completo como displayName (opcional)
+    await updateProfile(user, {
+      displayName: fullName,
+    });
+
+    console.log("✅ Usuario creado:", user.email);
+
     Alert.alert("Registro exitoso", "Ahora puedes iniciar sesión.");
     router.replace("/login");
-  };
+  } catch (error: any) {
+    console.error("❌ Error al registrar:", error);
+    let message = "Ocurrió un error.";
+    if (error.code === "auth/email-already-in-use") {
+      message = "El correo ya está registrado.";
+    } else if (error.code === "auth/invalid-email") {
+      message = "Correo inválido.";
+    } else if (error.code === "auth/weak-password") {
+      message = "La contraseña debe tener al menos 6 caracteres.";
+    }
+    Alert.alert("Error de registro", message);
+  }
+};
 
   return (
     <ScrollView contentContainerStyle={styles.container}>

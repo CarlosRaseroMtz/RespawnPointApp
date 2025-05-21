@@ -18,38 +18,38 @@ import { auth } from "../config/firebase-config";
 const { width } = Dimensions.get("window");
 
 export default function LoginScreen() {
-  
+
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-const handleLogin = async () => {
-  if (!email || !password) {
-    alert("Por favor, completa todos los campos.");
-    return;
-  }
-
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-    alert("Has iniciado sesión correctamente.");
-    router.replace("/home"); // ✅ Cambia esto si tu ruta inicial es otra
-  } catch (error: any) {
-    let message = "Error al iniciar sesión.";
-    switch (error.code) {
-      case "auth/user-not-found":
-        message = "Este usuario no existe.";
-        break;
-      case "auth/wrong-password":
-        message = "Contraseña incorrecta.";
-        break;
-      case "auth/invalid-email":
-        message = "El correo electrónico no es válido.";
-        break;
+  const handleLogin = async () => {
+    if (!email || !password) {
+      alert("Por favor, completa todos los campos.");
+      return;
     }
-    alert(message);
-  }
-};
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      alert("Has iniciado sesión correctamente.");
+      router.replace("/home"); // ✅ Cambia esto si tu ruta inicial es otra
+    } catch (error: any) {
+      let message = "Error al iniciar sesión.";
+      switch (error.code) {
+        case "auth/user-not-found":
+          message = "Este usuario no existe.";
+          break;
+        case "auth/wrong-password":
+          message = "Contraseña incorrecta.";
+          break;
+        case "auth/invalid-email":
+          message = "El correo electrónico no es válido.";
+          break;
+      }
+      alert(message);
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -108,10 +108,19 @@ const handleLogin = async () => {
           <Text style={styles.primaryButtonText}>Continuar</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.googleButton}>
-          <AntDesign name="google" size={20} color="black" />
-          <Text style={styles.googleButtonText}>Continuar con Google</Text>
+        <TouchableOpacity
+          style={[
+            styles.googleButton,
+            { opacity: 0.5 }, // apariencia deshabilitada
+          ]}
+          disabled={true} // evita interacción
+        >
+          <AntDesign name="google" size={20} color="#999" />
+          <Text style={[styles.googleButtonText, { color: "#999" }]}>
+            Google (deshabilitado)
+          </Text>
         </TouchableOpacity>
+
 
         <View style={styles.separator}>
           <View style={styles.line} />
