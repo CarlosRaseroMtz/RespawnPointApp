@@ -6,39 +6,37 @@ import {
   Easing,
   Image,
   StyleSheet,
-  View,
+  View
 } from "react-native";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../hooks/useAuth"; // ← importar tu hook
 
 const { width, height } = Dimensions.get("window");
 
 export default function Splash() {
   const router = useRouter();
   const navState = useRootNavigationState();
-  const { user, loading } = useAuth();
+  const { user, loading } = useAuth(); // ← usar estado de auth
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
 
-  // Animación de entrada
   useEffect(() => {
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
         duration: 1500,
         easing: Easing.out(Easing.ease),
-        useNativeDriver: true,
+        useNativeDriver: true
       }),
       Animated.spring(scaleAnim, {
         toValue: 1,
         friction: 4,
         tension: 100,
-        useNativeDriver: true,
-      }),
+        useNativeDriver: true
+      })
     ]).start();
   }, []);
 
-  // Navegación segura
   useEffect(() => {
     if (!navState?.key || loading) return;
 
@@ -51,10 +49,7 @@ export default function Splash() {
     }, 2500);
 
     return () => clearTimeout(timer);
-  }, [navState?.key, loading, user]);
-
-  // PREVENIR NAVEGACIÓN ANTES DE TIEMPO
-  if (!navState?.key) return null;
+  }, [navState, loading, user]);
 
   return (
     <View style={styles.container}>
@@ -65,10 +60,7 @@ export default function Splash() {
       />
       <Animated.Image
         source={require("../assets/images/logo.png")}
-        style={[
-          styles.logo,
-          { opacity: fadeAnim, transform: [{ scale: scaleAnim }] },
-        ]}
+        style={[styles.logo, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}
         resizeMode="contain"
       />
     </View>
@@ -76,16 +68,18 @@ export default function Splash() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: {
+    flex: 1
+  },
   background: {
     width,
     height,
-    position: "absolute",
+    position: "absolute"
   },
   logo: {
     width: "60%",
     height: "30%",
     alignSelf: "center",
-    marginTop: height * 0.35,
-  },
+    marginTop: height * 0.35
+  }
 });

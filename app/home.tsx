@@ -1,6 +1,13 @@
 import { AntDesign, Entypo, Feather, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React, { useState } from "react";
+import {
+  collection,
+  onSnapshot,
+  orderBy,
+  query,
+  Timestamp,
+} from "firebase/firestore";
+import React, { useEffect, useState } from "react";
 import {
   Dimensions,
   FlatList,
@@ -11,64 +18,73 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { firestore } from "../config/firebase-config";
 
 const { width } = Dimensions.get("window");
 
 const tabs = ["Juegos", "Para ti", "Memes"];
 
-const posts = [
-  {
-    id: "1",
-    user: "IsiPateo",
-    community: "Valorant",
-    time: "hace 3 minutos",
-    image: require("../assets/images/foto_publi_valo_guia2.jpg"),
-    text: "Si quieres saber más, pregúntame...",
-    likes: 21,
-    comments: 4,
-    avatar: require("../assets/images/foto_perfil_isi.jpg"),
-  },
-  {
-    id: "2",
-    user: "SuperRobertxdd",
-    community: "R.E.P.O.",
-    time: "hace 2 horas",
-    text: "Han corregido un bug que permitía curarse gratis al recoger un objeto y pulsar 'E' de nuevo.",
-    likes: 15,
-    comments: 2,
-    avatar: require("../assets/images/foto_perfil_robert.jpg"),
-  },
-];
-
 export default function HomeScreen() {
   const [activeTab, setActiveTab] = useState("Para ti");
+  const [posts, setPosts] = useState<any[]>([]);
   const router = useRouter();
+
+  // Escuchar Firestore en tiempo real
+  useEffect(() => {
+    const q = query(
+      collection(firestore, "publicaciones"),
+      orderBy("timestamp", "desc")
+    );
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      const nuevosPosts = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setPosts(nuevosPosts);
+    });
+
+    return () => unsubscribe();
+  }, []);
 
   const renderPost = ({ item }: any) => (
     <View style={styles.postContainer}>
       <View style={styles.postHeader}>
-        <Image source={item.avatar} style={styles.avatar} />
+        <Image
+          source={require("../assets/images/foto_perfil_isi.jpg")}
+          style={styles.avatar}
+        />
         <View style={{ flex: 1 }}>
-          <Text style={styles.postUser}>{item.user} en {item.community}</Text>
-          <Text style={styles.postTime}>{item.time}</Text>
+          <Text style={styles.postUser}>
+            {item.userId} en {item.comunidadId}
+          </Text>
+          <Text style={styles.postTime}>
+            {formatearFecha(item.timestamp)}
+          </Text>
         </View>
         <Entypo name="dots-three-horizontal" size={18} color="#555" />
       </View>
 
-      {item.image && (
-        <Image source={item.image} style={styles.postImage} resizeMode="cover" />
+      {item.mediaUrl && (
+        <Image
+          source={{ uri: item.mediaUrl }}
+          style={styles.postImage}
+          resizeMode="cover"
+        />
       )}
 
-      {item.text && <Text style={styles.postText}>{item.text}</Text>}
+      {item.contenido && <Text style={styles.postText}>{item.contenido}</Text>}
 
       <View style={styles.reactions}>
         <TouchableOpacity style={styles.reactionBtn}>
           <AntDesign name="hearto" size={16} color="#555" />
-          <Text style={styles.reactionText}>{item.likes} me gusta</Text>
+          <Text style={styles.reactionText}>
+            {item.likes?.length || 0} me gusta
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.reactionBtn}>
           <Feather name="message-circle" size={16} color="#555" />
-          <Text style={styles.reactionText}>{item.comments} comentarios</Text>
+          <Text style={styles.reactionText}>0 comentarios</Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -76,7 +92,6 @@ export default function HomeScreen() {
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* Tabs */}
       <View style={styles.tabsContainer}>
         {tabs.map((tab) => (
           <TouchableOpacity key={tab} onPress={() => setActiveTab(tab)}>
@@ -90,7 +105,6 @@ export default function HomeScreen() {
         ))}
       </View>
 
-      {/* Feed */}
       <FlatList
         data={posts}
         keyExtractor={(item) => item.id}
@@ -98,18 +112,34 @@ export default function HomeScreen() {
         showsVerticalScrollIndicator={false}
       />
 
-      {/* Bottom Tab Bar */}
       <View style={styles.bottomTabBar}>
         <AntDesign name="home" size={24} color="#000" />
         <AntDesign name="clockcircleo" size={24} color="#000" />
         <TouchableOpacity onPress={() => router.push("/create-post")}>
-          <AntDesign name="pluscircle" size={40} color="#000" style={{ marginTop: -10 }} />
+          <AntDesign
+            name="pluscircle"
+            size={40}
+            color="#000"
+            style={{ marginTop: -10 }}
+          />
         </TouchableOpacity>
         <AntDesign name="bells" size={24} color="#000" />
         <Ionicons name="person-circle-outline" size={26} color="#000" />
       </View>
     </SafeAreaView>
   );
+}
+
+// 🔧 Función auxiliar para mostrar fecha
+function formatearFecha(timestamp: Timestamp | any) {
+  if (!timestamp?.toDate) return "";
+  const fecha = timestamp.toDate();
+  return fecha.toLocaleString("es-ES", {
+    day: "2-digit",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 const styles = StyleSheet.create({
