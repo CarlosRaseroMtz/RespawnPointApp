@@ -1,4 +1,5 @@
 import { AntDesign, Entypo, Feather, Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React, { useState } from "react";
 import {
   Dimensions,
@@ -41,6 +42,7 @@ const posts = [
 
 export default function HomeScreen() {
   const [activeTab, setActiveTab] = useState("Para ti");
+  const router = useRouter();
 
   const renderPost = ({ item }: any) => (
     <View style={styles.postContainer}>
@@ -100,7 +102,9 @@ export default function HomeScreen() {
       <View style={styles.bottomTabBar}>
         <AntDesign name="home" size={24} color="#000" />
         <AntDesign name="clockcircleo" size={24} color="#000" />
-        <AntDesign name="pluscircle" size={40} color="#000" style={{ marginTop: -10 }} />
+        <TouchableOpacity onPress={() => router.push("/create-post")}>
+          <AntDesign name="pluscircle" size={40} color="#000" style={{ marginTop: -10 }} />
+        </TouchableOpacity>
         <AntDesign name="bells" size={24} color="#000" />
         <Ionicons name="person-circle-outline" size={26} color="#000" />
       </View>
