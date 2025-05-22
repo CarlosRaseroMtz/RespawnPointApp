@@ -1,5 +1,8 @@
 import { useRouter } from "expo-router";
+import { sendPasswordResetEmail } from "firebase/auth";
 import { useState } from "react";
+import { auth } from "../config/firebase-config";
+
 import {
   Alert,
   Image,
@@ -14,14 +17,20 @@ export default function ForgotPasswordScreen() {
   const router = useRouter();
   const [email, setEmail] = useState("");
 
-  const handleRecovery = () => {
+  const handleRecovery = async () => {
     if (!email) {
       Alert.alert("Error", "Introduce tu correo.");
       return;
     }
-    // Aquí irá Firebase sendPasswordResetEmail más adelante
-    Alert.alert("Recuperación enviada", "Revisa tu bandeja de entrada.");
-    router.replace("/login");
+
+    try {
+      await sendPasswordResetEmail(auth, email);
+      Alert.alert("Recuperación enviada", "Revisa tu bandeja de entrada.");
+      router.replace("/login");
+    } catch (error: any) {
+      console.error("Error al enviar recuperación:", error);
+      Alert.alert("Error", "No se pudo enviar el correo. ¿Está bien escrito?");
+    }
   };
 
   return (
