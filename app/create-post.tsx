@@ -2,8 +2,19 @@ import * as ImagePicker from "expo-image-picker";
 import { addDoc, collection, Timestamp } from "firebase/firestore";
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import React, { useState } from "react";
-import { Alert, Button, Image, TextInput, View } from "react-native";
+import {
+  Alert,
+  Dimensions,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from "react-native";
 import { auth, firestore, storage } from "../config/firebase-config";
+
+const { width } = Dimensions.get("window");
 
 export default function CreatePostScreen() {
   const [texto, setTexto] = useState("");
@@ -29,7 +40,6 @@ export default function CreatePostScreen() {
 
     try {
       setSubiendo(true);
-      // Subir imagen a Firebase Storage
       const res = await fetch(imagen);
       const blob = await res.blob();
       const nombreArchivo = `${Date.now()}.jpg`;
@@ -37,7 +47,6 @@ export default function CreatePostScreen() {
       await uploadBytes(refStorage, blob);
       const urlImagen = await getDownloadURL(refStorage);
 
-      // Guardar post en Firestore
       await addDoc(collection(firestore, "publicaciones"), {
         userId: auth.currentUser?.uid ?? "anónimo",
         contenido: texto,
@@ -59,22 +68,95 @@ export default function CreatePostScreen() {
   };
 
   return (
-    <View style={{ flex: 1, padding: 20 }}>
-      <TextInput
-        placeholder="¿Qué estás pensando?"
-        value={texto}
-        onChangeText={setTexto}
-        style={{ borderWidth: 1, padding: 10, marginBottom: 10 }}
-      />
-      {imagen && (
-        <Image
-          source={{ uri: imagen }}
-          style={{ width: "100%", height: 200, marginBottom: 10 }}
-          resizeMode="cover"
+    <View style={styles.container}>
+      <View style={styles.uploadBox}>
+        <Pressable style={styles.uploadArea} onPress={pickImage}>
+          {imagen ? (
+            <Image source={{ uri: imagen }} style={styles.preview} />
+          ) : (
+            <Text style={styles.uploadText}>Pulsa para subir tus archivos</Text>
+          )}
+        </Pressable>
+
+        <TextInput
+          placeholder="Escribe algo..."
+          value={texto}
+          onChangeText={setTexto}
+          style={styles.input}
+          placeholderTextColor="#aaa"
         />
-      )}
-      <Button title="Seleccionar imagen" onPress={pickImage} />
-      <Button title={subiendo ? "Subiendo..." : "Publicar"} onPress={subirPost} disabled={subiendo} />
+
+        <Pressable
+          style={[styles.button, subiendo && { opacity: 0.6 }]}
+          onPress={subirPost}
+          disabled={subiendo}
+        >
+          <Text style={styles.buttonText}>
+            {subiendo ? "Subiendo..." : "Publicar"}
+          </Text>
+        </Pressable>
+      </View>
     </View>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: "#fff",
+    paddingHorizontal: 20,
+    justifyContent: "center",
+  },
+  uploadBox: {
+    backgroundColor: "#fff",
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 14,
+    padding: 20,
+    alignItems: "center",
+    justifyContent: "center",
+    elevation: 3,
+  },
+  uploadArea: {
+    width: width * 0.8,
+    height: 180,
+    borderWidth: 1,
+    borderColor: "#ddd",
+    borderStyle: "dashed",
+    borderRadius: 12,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 15,
+    backgroundColor: "#fdfdfd",
+  },
+  uploadText: {
+    color: "#888",
+    fontSize: 14,
+  },
+  preview: {
+    width: "100%",
+    height: "100%",
+    borderRadius: 12,
+    resizeMode: "cover",
+  },
+  input: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 10,
+    padding: 12,
+    width: "100%",
+    marginBottom: 15,
+    color: "#000",
+  },
+  button: {
+    backgroundColor: "#000",
+    paddingVertical: 12,
+    paddingHorizontal: 25,
+    borderRadius: 10,
+  },
+  buttonText: {
+    color: "#fff",
+    fontWeight: "600",
+    fontSize: 15,
+  },
+});
