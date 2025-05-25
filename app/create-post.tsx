@@ -1,6 +1,6 @@
 import * as ImagePicker from "expo-image-picker";
 import { addDoc, collection, Timestamp } from "firebase/firestore";
-import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 import React, { useState } from "react";
 import {
   Alert,
@@ -12,11 +12,13 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { auth, firestore, storage } from "../config/firebase-config";
+import { firestore } from "../config/firebase-config";
+import { useAuth } from "../hooks/useAuth";
 
 const { width } = Dimensions.get("window");
 
 export default function CreatePostScreen() {
+  const { user, loading } = useAuth();
   const [texto, setTexto] = useState("");
   const [imagen, setImagen] = useState<string | null>(null);
   const [subiendo, setSubiendo] = useState(false);
@@ -33,39 +35,56 @@ export default function CreatePostScreen() {
   };
 
   const subirPost = async () => {
-    if (!texto.trim() || !imagen) {
-      Alert.alert("Completa el texto y selecciona una imagen");
-      return;
-    }
+  if (loading) {
+    Alert.alert("Cargando sesión...");
+    return;
+  }
 
-    try {
-      setSubiendo(true);
-      const res = await fetch(imagen);
-      const blob = await res.blob();
-      const nombreArchivo = `${Date.now()}.jpg`;
-      const refStorage = ref(storage, `posts/${nombreArchivo}`);
-      await uploadBytes(refStorage, blob);
-      const urlImagen = await getDownloadURL(refStorage);
+  if (!user) {
+    Alert.alert("Inicia sesión para publicar");
+    return;
+  }
 
-      await addDoc(collection(firestore, "publicaciones"), {
-        userId: auth.currentUser?.uid ?? "anónimo",
-        contenido: texto,
-        mediaUrl: urlImagen,
-        likes: [],
-        timestamp: Timestamp.now(),
-        comunidadId: "GENERAL",
-      });
+  if (!texto.trim() || !imagen) {
+    Alert.alert("Completa el texto y la imagen");
+    return;
+  }
 
-      Alert.alert("¡Publicación creada!");
-      setTexto("");
-      setImagen(null);
-    } catch (e) {
-      console.error("Error al subir post:", e);
-      Alert.alert("Error al publicar.");
-    } finally {
-      setSubiendo(false);
-    }
-  };
+  try {
+    setSubiendo(true);
+
+    // Convertir la imagen a Blob
+    const response = await fetch(imagen);
+    const blob = await response.blob();
+
+    const filename = imagen.split("/").pop() || `imagen_${Date.now()}.jpg`;
+    const storageRef = ref(getStorage(), `posts/${filename}`);
+
+    // Subir el Blob a Firebase Storage
+    await uploadBytes(storageRef, blob);
+
+    // Obtener la URL de descarga
+    const mediaUrl = await getDownloadURL(storageRef);
+
+    await addDoc(collection(firestore, "publicaciones"), {
+      userId: user.uid,
+      contenido: texto,
+      mediaUrl,
+      likes: [],
+      timestamp: Timestamp.now(),
+      comunidadId: "GENERAL",
+    });
+
+    Alert.alert("¡Publicación creada!");
+    setTexto("");
+    setImagen(null);
+  } catch (e: any) {
+    console.error("❌ Error exacto:", e);
+    Alert.alert("Error", e.message || "Fallo al subir.");
+  } finally {
+    setSubiendo(false);
+  }
+};
 
   return (
     <View style={styles.container}>
