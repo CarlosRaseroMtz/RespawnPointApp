@@ -50,6 +50,7 @@ export default function CreatePostScreen() {
       setSubiendo(true);
 
       const uid = user.uid;
+      const userDisplayName = user.displayName || "Anónimo";
       const timestamp = Date.now();
       const nombreOriginal = imagen.split("/").pop() || `imagen_${timestamp}.jpg`;
       const nombreLimpio = normalizarNombreArchivo(nombreOriginal);
@@ -64,7 +65,7 @@ export default function CreatePostScreen() {
       const mediaUrl = await getDownloadURL(storageRef);
 
       await addDoc(collection(firestore, "publicaciones"), {
-        userId: uid,
+        userId: userDisplayName,
         contenido: texto,
         mediaUrl,
         likes: [],
