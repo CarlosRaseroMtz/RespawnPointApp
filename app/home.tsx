@@ -1,11 +1,15 @@
 import { AntDesign, Entypo, Feather, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import {
+  arrayRemove,
+  arrayUnion,
   collection,
+  doc,
   onSnapshot,
   orderBy,
   query,
   Timestamp,
+  updateDoc,
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
@@ -19,6 +23,7 @@ import {
   View,
 } from "react-native";
 import { firestore } from "../config/firebase-config";
+import { useAuth } from "../hooks/useAuth"; // ✅ nuevo import
 
 const { width } = Dimensions.get("window");
 
@@ -28,6 +33,7 @@ export default function HomeScreen() {
   const [activeTab, setActiveTab] = useState("Para ti");
   const [posts, setPosts] = useState<any[]>([]);
   const router = useRouter();
+  const { user } = useAuth(); // ✅ hook para identificar al usuario logueado
 
   // Escuchar Firestore en tiempo real
   useEffect(() => {
@@ -46,6 +52,20 @@ export default function HomeScreen() {
 
     return () => unsubscribe();
   }, []);
+
+  // ✅ Función para manejar likes
+  const handleLike = async (postId: string, likes: string[]) => {
+    if (!user) return;
+    const ref = doc(firestore, "publicaciones", postId);
+    const yaDioLike = likes.includes(user.uid);
+    try {
+      await updateDoc(ref, {
+        likes: yaDioLike ? arrayRemove(user.uid) : arrayUnion(user.uid),
+      });
+    } catch (e) {
+      console.error("Error al actualizar likes:", e);
+    }
+  };
 
   const renderPost = ({ item }: any) => (
     <View style={styles.postContainer}>
@@ -76,8 +96,17 @@ export default function HomeScreen() {
       {item.contenido && <Text style={styles.postText}>{item.contenido}</Text>}
 
       <View style={styles.reactions}>
-        <TouchableOpacity style={styles.reactionBtn}>
-          <AntDesign name="hearto" size={16} color="#555" />
+        <TouchableOpacity
+          style={styles.reactionBtn}
+          onPress={() => handleLike(item.id, item.likes || [])}
+        >
+          <AntDesign
+            name={
+              item.likes?.includes(user?.uid) ? "heart" : "hearto"
+            }
+            size={16}
+            color={item.likes?.includes(user?.uid) ? "red" : "#555"}
+          />
           <Text style={styles.reactionText}>
             {item.likes?.length || 0} me gusta
           </Text>
@@ -130,7 +159,6 @@ export default function HomeScreen() {
   );
 }
 
-// 🔧 Función auxiliar para mostrar fecha
 function formatearFecha(timestamp: Timestamp | any) {
   if (!timestamp?.toDate) return "";
   const fecha = timestamp.toDate();
