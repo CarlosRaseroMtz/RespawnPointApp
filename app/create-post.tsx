@@ -1,6 +1,6 @@
 import * as ImagePicker from "expo-image-picker";
 import { addDoc, collection, Timestamp } from "firebase/firestore";
-import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import React, { useState } from "react";
 import {
   Alert,
@@ -14,6 +14,7 @@ import {
 } from "react-native";
 import { firestore } from "../config/firebase-config";
 import { useAuth } from "../hooks/useAuth";
+import { normalizarNombreArchivo } from "../utils/normalizar-nombre-archivo";
 
 const { width } = Dimensions.get("window");
 
@@ -35,56 +36,52 @@ export default function CreatePostScreen() {
   };
 
   const subirPost = async () => {
-  if (loading) {
-    Alert.alert("Cargando sesión...");
-    return;
-  }
+    if (loading || !user) {
+      Alert.alert("Sesión no lista", "Inicia sesión primero");
+      return;
+    }
 
-  if (!user) {
-    Alert.alert("Inicia sesión para publicar");
-    return;
-  }
+    if (!texto.trim() || !imagen) {
+      Alert.alert("Campos incompletos", "Debes añadir texto e imagen.");
+      return;
+    }
 
-  if (!texto.trim() || !imagen) {
-    Alert.alert("Completa el texto y la imagen");
-    return;
-  }
+    try {
+      setSubiendo(true);
 
-  try {
-    setSubiendo(true);
+      const uid = user.uid;
+      const timestamp = Date.now();
+      const nombreOriginal = imagen.split("/").pop() || `imagen_${timestamp}.jpg`;
+      const nombreLimpio = normalizarNombreArchivo(nombreOriginal);
+      const ruta = `publicaciones/${uid}/${timestamp}-${nombreLimpio}`;
 
-    // Convertir la imagen a Blob
-    const response = await fetch(imagen);
-    const blob = await response.blob();
+      const response = await fetch(imagen);
+      const blob = await response.blob();
 
-    const filename = imagen.split("/").pop() || `imagen_${Date.now()}.jpg`;
-    const storageRef = ref(getStorage(), `posts/${filename}`);
+      const storageRef = ref(getStorage(), ruta);
+      await uploadBytes(storageRef, blob);
 
-    // Subir el Blob a Firebase Storage
-    await uploadBytes(storageRef, blob);
+      const mediaUrl = await getDownloadURL(storageRef);
 
-    // Obtener la URL de descarga
-    const mediaUrl = await getDownloadURL(storageRef);
+      await addDoc(collection(firestore, "publicaciones"), {
+        userId: uid,
+        contenido: texto,
+        mediaUrl,
+        likes: [],
+        timestamp: Timestamp.now(),
+        comunidadId: "GENERAL",
+      });
 
-    await addDoc(collection(firestore, "publicaciones"), {
-      userId: user.uid,
-      contenido: texto,
-      mediaUrl,
-      likes: [],
-      timestamp: Timestamp.now(),
-      comunidadId: "GENERAL",
-    });
-
-    Alert.alert("¡Publicación creada!");
-    setTexto("");
-    setImagen(null);
-  } catch (e: any) {
-    console.error("❌ Error exacto:", e);
-    Alert.alert("Error", e.message || "Fallo al subir.");
-  } finally {
-    setSubiendo(false);
-  }
-};
+      Alert.alert("¡Publicación creada!");
+      setTexto("");
+      setImagen(null);
+    } catch (e: any) {
+      console.error("❌ Error al subir publicación:", e);
+      Alert.alert("Error", e.message || "Fallo al subir.");
+    } finally {
+      setSubiendo(false);
+    }
+  };
 
   return (
     <View style={styles.container}>
