@@ -1,154 +1,112 @@
 import { Ionicons } from "@expo/vector-icons";
-import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import {
-    Dimensions,
-    FlatList,
-    Image,
-    Pressable,
-    StyleSheet,
-    Text,
-    View,
+  Dimensions,
+  FlatList,
+  Image,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View
 } from "react-native";
-import { firestore } from "../config/firebase-config";
-import { useAuth } from "../hooks/useAuth";
+import BottomTabBar from "./comp/bottom-tab-bar";
 
 const { width } = Dimensions.get("window");
 const imageSize = (width - 40) / 3;
 
+const publicaciones = [
+  require("../assets/images/foto_publi_valo_guia2.jpg"),
+  require("../assets/images/foto_publi_valo_guia2.jpg"),
+  require("../assets/images/foto_publi_valo_guia2.jpg"),
+  require("../assets/images/foto_publi_valo_guia2.jpg"),
+  require("../assets/images/foto_publi_valo_guia2.jpg"),
+  require("../assets/images/foto_publi_valo_guia2.jpg"),
+];
+
 export default function ProfileScreen() {
-  const { user } = useAuth();
-  const [perfil, setPerfil] = useState<any>(null);
-  const [publicaciones, setPublicaciones] = useState<any>([]);
-
-  useEffect(() => {
-    const fetchDatos = async () => {
-      if (!user) return;
-
-      try {
-        // 🔍 Obtener perfil del usuario
-        const userRef = doc(firestore, "usuarios", user.uid);
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) {
-          setPerfil(userSnap.data());
-        }
-
-        // 🧾 Obtener publicaciones del usuario
-        const publicacionesRef = query(
-          collection(firestore, "publicaciones"),
-          where("userId", "==", user.uid)
-        );
-
-        const snap = await getDocs(publicacionesRef);
-        const data = snap.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-
-        setPublicaciones(data);
-      } catch (error) {
-        console.error("❌ Error cargando perfil o publicaciones:", error);
-      }
-    };
-
-    fetchDatos();
-  }, [user]);
-
-  if (!perfil) return null;
-
   return (
-    <View style={styles.container}>
-      {/* HEADER */}
+    <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <Image source={{ uri: perfil.fotoPerfil }} style={styles.avatar} />
-        <View style={styles.headerInfo}>
-          <Text style={styles.username}>{perfil.username}</Text>
-          <Text style={styles.plataforma}>{perfil.plataformaFavorita}</Text>
+        <View style={styles.userInfo}>
+          <Image
+            source={require("../assets/images/foto_perfil_isi.jpg")}
+            style={styles.avatar}
+          />
+          <View style={styles.headerText}>
+            <Text style={styles.username}>LordCarlosxdd</Text>
+            <Text style={styles.platform}>🎮 XBOXONE</Text>
+          </View>
         </View>
-        <Pressable onPress={() => console.log("Abrir ajustes")}>
-          <Ionicons name="settings-outline" size={24} color="#000" />
-        </Pressable>
+        <Ionicons name="settings-outline" size={24} color="#000" />
       </View>
 
-      {/* STATS */}
       <View style={styles.stats}>
         <View style={styles.stat}>
-          <Text style={styles.statValue}>{publicaciones.length}</Text>
+          <Text style={styles.statNumber}>35</Text>
           <Text style={styles.statLabel}>Contenido</Text>
         </View>
         <View style={styles.stat}>
-          <Text style={styles.statValue}>
-            {perfil.seguidores?.length || 0}
-          </Text>
+          <Text style={styles.statNumber}>567</Text>
           <Text style={styles.statLabel}>Seguidores</Text>
         </View>
         <View style={styles.stat}>
-          <Text style={styles.statValue}>
-            {perfil.siguiendo?.length || 0}
-          </Text>
+          <Text style={styles.statNumber}>191</Text>
           <Text style={styles.statLabel}>Seguidos</Text>
         </View>
       </View>
 
-      {/* DESCRIPCIÓN */}
-      <View style={styles.descripcion}>
-        <Text style={styles.genero}>
-          {perfil.generoFavorito}, {perfil.plataformaFavorita} y Competitivo
-        </Text>
-        <Text style={styles.bio}>
-          {perfil.bio ||
-            "Jugador de PC y Xbox, pseudoretirado, ya solo juego con colegas, en busca del resurgimiento gamer"}
+      <View style={styles.bio}>
+        <Text style={styles.genre}>FPS, Shooters y Competitivo</Text>
+        <Text style={styles.description}>
+          Jugador de PC y Xbox, pseudoretirado, ya solo juego con colegas, en
+          busca el resurgimiento gamer
         </Text>
       </View>
 
-      {/* GRID DE PUBLICACIONES */}
       <FlatList
         data={publicaciones}
         numColumns={3}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.grid}
-        renderItem={({ item }) => {
-          if (!item?.mediaUrl) return null;
-          return (
-            <Image
-              source={{ uri: item.mediaUrl }}
-              style={styles.postImage}
-            />
-          );
-        }}
+        keyExtractor={(_, index) => index.toString()}
+        contentContainerStyle={styles.gallery}
+        renderItem={({ item }) => (
+          <Image source={item} style={styles.postImage} />
+        )}
       />
-    </View>
+
+      <BottomTabBar />
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", padding: 20 },
-  header: { flexDirection: "row", alignItems: "center", marginBottom: 16 },
-  avatar: {
-    width: 70,
-    height: 70,
-    borderRadius: 35,
-    marginRight: 12,
+  container: { flex: 1, backgroundColor: "#fff", paddingHorizontal: 16 },
+  header: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 16,
   },
-  headerInfo: { flex: 1 },
-  username: { fontSize: 18, fontWeight: "bold" },
-  plataforma: { fontSize: 12, color: "#888" },
+  userInfo: { flexDirection: "row", alignItems: "center" },
+  avatar: { width: 64, height: 64, borderRadius: 32, marginRight: 12 },
+  headerText: {},
+  username: { fontSize: 18, fontWeight: "700" },
+  platform: { fontSize: 14, color: "#888" },
   stats: {
     flexDirection: "row",
     justifyContent: "space-around",
-    marginVertical: 16,
+    marginVertical: 20,
   },
   stat: { alignItems: "center" },
-  statValue: { fontSize: 16, fontWeight: "bold" },
-  statLabel: { fontSize: 12, color: "#666" },
-  descripcion: { marginBottom: 16 },
-  genero: { fontWeight: "bold", marginBottom: 4 },
-  bio: { color: "#333", fontSize: 13 },
-  grid: { gap: 4 },
+  statNumber: { fontWeight: "700", fontSize: 16 },
+  statLabel: { fontSize: 13, color: "#555" },
+  bio: { marginBottom: 16 },
+  genre: { fontWeight: "600", fontSize: 15, marginBottom: 4 },
+  description: { color: "#444" },
+  gallery: { gap: 4 },
   postImage: {
     width: imageSize,
     height: imageSize,
-    margin: 2,
-    borderRadius: 6,
+    margin: 4,
+    borderRadius: 8,
   },
 });
