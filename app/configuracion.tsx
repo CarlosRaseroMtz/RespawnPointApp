@@ -1,14 +1,18 @@
 import React from "react";
 import {
-    Image,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
+import { useRouter } from "expo-router";
+
+
+const router = useRouter();
 export default function ConfiguracionScreen() {
   return (
     <SafeAreaView style={styles.container}>
@@ -25,7 +29,9 @@ export default function ConfiguracionScreen() {
         </View>
 
         <Text style={styles.sectionTitle}>Configuración</Text>
-        <TouchableOpacity><Text style={styles.item}>Personalizar Perfil</Text></TouchableOpacity>
+        <TouchableOpacity onPress={() => router.push("/editar-perfil")}>
+          <Text style={styles.item}>Editar perfil</Text>
+        </TouchableOpacity>
         <TouchableOpacity><Text style={styles.item}>Accesibilidad e idiomas</Text></TouchableOpacity>
         <TouchableOpacity><Text style={styles.item}>Tu actividad</Text></TouchableOpacity>
 
