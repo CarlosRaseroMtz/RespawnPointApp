@@ -27,12 +27,16 @@ const platforms = [
   "Wii",
   "Wii U",
   "Nintendo Switch",
+  "PC",
+  "Nintendo 3DS",
   "Consola retro/antigua",
 ];
 
 const genres = [
   "Acción", "Aventura", "RPG", "Shooter", "Estrategia",
   "Deportes", "Simulación", "Lucha", "Plataformas", "Terror",
+  "Carreras", "Puzzle", "Indie", "Multijugador", "Sandbox", "MOBA",
+  "Mundo abierto", "Narrativo", "Survival",
 ];
 
 export default function RegisterScreen() {
@@ -46,6 +50,16 @@ export default function RegisterScreen() {
   const [platform, setPlatform] = useState(platforms[0]);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
 
+  const [passwordFocused, setPasswordFocused] = useState(false);
+
+  const criterios = {
+    longitud: password.length >= 8,
+    mayuscula: /[A-Z]/.test(password),
+    minuscula: /[a-z]/.test(password),
+    numero: /\d/.test(password),
+  };
+
+
   const toggleGenre = (genre: string) => {
     if (selectedGenres.includes(genre)) {
       setSelectedGenres(selectedGenres.filter(g => g !== genre));
@@ -56,50 +70,73 @@ export default function RegisterScreen() {
     }
   };
 
-const handleRegister = async () => {
-  if (!email || !password || !fullName || !username || selectedGenres.length === 0) {
-    Alert.alert("Campos incompletos", "Por favor completa todos los campos.");
-    return;
-  }
 
-  try {
-    const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
-    const user = userCredential.user;
+  const evaluarFuerza = (pass: string) => {
+    let fuerza = 0;
+    if (pass.length >= 8) fuerza++;
+    if (/[A-Z]/.test(pass)) fuerza++;
+    if (/[a-z]/.test(pass)) fuerza++;
+    if (/\d/.test(pass)) fuerza++;
+    if (/[\W_]/.test(pass)) fuerza++;
 
-    await updateProfile(user, {
-      displayName: fullName,
-    });
+    if (fuerza <= 2) return "Débil";
+    if (fuerza === 3) return "Media";
+    if (fuerza === 4) return "Fuerte";
+    return "Muy fuerte";
+  };
 
-    // ✅ Crear documento en Firestore
-    await setDoc(doc(firestore, "usuarios", user.uid), {
-      username: username,
-      email: user.email,
-      fotoPerfil: "https://i.pravatar.cc/150?img=12", // avatar por defecto
-      plataformaFav: platform,
-      generoFav: selectedGenres.join(", "),
-      descripcion: "Nuevo jugador registrado.",
-      nivel: null,
-      reputacion: 1,
-      rol: "jugador",
-      comunidades: [],
-    });
+  const fuerza = evaluarFuerza(password);
 
-    console.log("✅ Usuario y perfil creados:", user.email);
-    Alert.alert("Registro exitoso", "Ahora puedes iniciar sesión.");
-    router.replace("/login");
-  } catch (error: any) {
-    console.error("❌ Error al registrar:", error);
-    let message = "Ocurrió un error.";
-    if (error.code === "auth/email-already-in-use") {
-      message = "El correo ya está registrado.";
-    } else if (error.code === "auth/invalid-email") {
-      message = "Correo inválido.";
-    } else if (error.code === "auth/weak-password") {
-      message = "La contraseña debe tener al menos 6 caracteres.";
+
+  const handleRegister = async () => {
+    if (!email || !password || !fullName || !username || selectedGenres.length === 0) {
+      Alert.alert("Campos incompletos", "Por favor completa todos los campos.");
+      return;
     }
-    Alert.alert("Error de registro", message);
-  }
-};
+
+    if (password.length < 8 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/\d/.test(password)) {
+      Alert.alert("Contraseña insegura", "Debe tener mínimo 8 caracteres, una mayúscula, una minúscula y un número.");
+      return;
+    }
+
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
+      const user = userCredential.user;
+
+      await updateProfile(user, {
+        displayName: fullName,
+      });
+
+      // ✅ Crear documento en Firestore
+      await setDoc(doc(firestore, "usuarios", user.uid), {
+        username: username,
+        email: user.email,
+        fotoPerfil: "https://i.pravatar.cc/150?img=12", // avatar por defecto
+        plataformaFav: platform,
+        generoFav: selectedGenres.join(", "),
+        descripcion: "Nuevo jugador registrado.",
+        nivel: null,
+        reputacion: 1,
+        rol: "jugador",
+        comunidades: [],
+      });
+
+      console.log("✅ Usuario y perfil creados:", user.email);
+      Alert.alert("Registro exitoso", "Ahora puedes iniciar sesión.");
+      router.replace("/login");
+    } catch (error: any) {
+      console.error("❌ Error al registrar:", error);
+      let message = "Ocurrió un error.";
+      if (error.code === "auth/email-already-in-use") {
+        message = "El correo ya está registrado.";
+      } else if (error.code === "auth/invalid-email") {
+        message = "Correo inválido.";
+      } else if (error.code === "auth/weak-password") {
+        message = "La contraseña debe tener al menos 6 caracteres.";
+      }
+      Alert.alert("Error de registro", message);
+    }
+  };
 
 
   return (
@@ -114,7 +151,6 @@ const handleRegister = async () => {
         value={email}
         onChangeText={setEmail}
       />
-
       <View style={styles.passwordContainer}>
         <TextInput
           style={styles.input}
@@ -123,6 +159,8 @@ const handleRegister = async () => {
           secureTextEntry={!showPass}
           value={password}
           onChangeText={setPassword}
+          onFocus={() => setPasswordFocused(true)}
+          onBlur={() => setPasswordFocused(false)}
         />
         <TouchableOpacity
           style={styles.eyeIcon}
@@ -131,6 +169,28 @@ const handleRegister = async () => {
           <AntDesign name={showPass ? "eye" : "eyeo"} size={20} color="#888" />
         </TouchableOpacity>
       </View>
+
+      {passwordFocused && (
+
+        <View style={{ marginBottom: 10, marginTop: -10 }}>
+          <Text style={{ color: "#888", fontSize: 12, marginBottom: 5 }}>
+            Fuerza de la contraseña: {fuerza}
+          </Text>
+          <Text style={{ color: criterios.longitud ? "#0c0" : "#999" }}>
+            {criterios.longitud ? "✅" : "❌"} Mínimo 8 caracteres
+          </Text>
+          <Text style={{ color: criterios.mayuscula ? "#0c0" : "#999" }}>
+            {criterios.mayuscula ? "✅" : "❌"} Una mayúscula
+          </Text>
+          <Text style={{ color: criterios.minuscula ? "#0c0" : "#999" }}>
+            {criterios.minuscula ? "✅" : "❌"} Una minúscula
+          </Text>
+          <Text style={{ color: criterios.numero ? "#0c0" : "#999" }}>
+            {criterios.numero ? "✅" : "❌"} Un número
+          </Text>
+        </View>
+      )}
+
 
       <TextInput
         style={styles.input}
@@ -191,9 +251,13 @@ const handleRegister = async () => {
         <View style={styles.line} />
       </View>
 
-      <TouchableOpacity style={styles.googleButton}>
-        <AntDesign name="google" size={20} color="black" />
-        <Text style={styles.googleButtonText}>Continuar con Google</Text>
+      <View style={[styles.googleButton, { opacity: 0.5 }]}>
+        <AntDesign name="google" size={20} color="#999" />
+        <Text style={[styles.googleButtonText, { color: "#999" }]}>Próximamente</Text>
+      </View>
+      <TouchableOpacity onPress={() => router.replace("/login")}>
+        <Text style={{ color: "#FF66C4", textAlign: "center" }}>
+          ¿Ya tienes cuenta? Inicia sesión</Text>
       </TouchableOpacity>
     </ScrollView>
   );

@@ -4,12 +4,11 @@ import {
   arrayRemove,
   arrayUnion,
   collection,
-  doc,
-  onSnapshot,
+  doc, getDoc, onSnapshot,
   orderBy,
   query,
   Timestamp,
-  updateDoc,
+  updateDoc
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
@@ -36,22 +35,36 @@ export default function HomeScreen() {
   const router = useRouter();
   const { user } = useAuth(); // ✅ hook para identificar al usuario logueado
 
-  // Escuchar Firestore en tiempo real
   useEffect(() => {
-    const q = query(
-      collection(firestore, "publicaciones"),
-      orderBy("timestamp", "desc")
-    );
+    const cargarConPerfil = async () => {
+      const q = query(
+        collection(firestore, "publicaciones"),
+        orderBy("timestamp", "desc")
+      );
 
-    const unsubscribe = onSnapshot(q, (snapshot) => {
-      const nuevosPosts = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      setPosts(nuevosPosts);
-    });
+      const unsubscribe = onSnapshot(q, async (snapshot) => {
+        const nuevosPosts = await Promise.all(
+          snapshot.docs.map(async (docSnap) => {
+            const data = docSnap.data();
+            const autorSnap = await getDoc(doc(firestore, "usuarios", data.userId));
+            const autor = autorSnap.exists() ? autorSnap.data() : {};
+            return {
+              id: docSnap.id,
+              ...data,
+              autor: {
+                username: autor.username || "Usuario",
+                fotoPerfil: autor.fotoPerfil || null,
+              },
+            };
+          })
+        );
+        setPosts(nuevosPosts);
+      });
 
-    return () => unsubscribe();
+      return () => unsubscribe();
+    };
+
+    cargarConPerfil();
   }, []);
 
   // ✅ Función para manejar likes
@@ -77,7 +90,7 @@ export default function HomeScreen() {
         />
         <View style={{ flex: 1 }}>
           <Text style={styles.postUser}>
-            {item.userId} en {item.comunidadId}
+            {item.username} en {item.comunidadId}
           </Text>
           <Text style={styles.postTime}>
             {formatearFecha(item.timestamp)}
@@ -85,11 +98,11 @@ export default function HomeScreen() {
         </View>
         <Entypo name="dots-three-horizontal" size={18} color="#555" />
       </View>
-
       {item.mediaUrl && (
         <TouchableOpacity
           onPress={() =>
-            router.push(`/imagen?url=${encodeURIComponent(item.mediaUrl)}`)
+
+            router.push(`/imagen?url=${(item.mediaUrl)}`)
           }
         >
           <Image

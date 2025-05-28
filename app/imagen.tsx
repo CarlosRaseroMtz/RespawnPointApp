@@ -4,11 +4,11 @@ import * as MediaLibrary from "expo-media-library";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useRef } from "react";
 import {
-    Alert,
-    Animated,
-    Dimensions,
-    StyleSheet,
-    TouchableOpacity,
+  Alert,
+  Animated,
+  Dimensions,
+  StyleSheet,
+  TouchableOpacity,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
@@ -18,10 +18,14 @@ export default function ImagenScreen() {
   const { url } = useLocalSearchParams();
   const router = useRouter();
 
+  const imageUrl = Array.isArray(url) ? url[0] : url;
+
   const opacity = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(0.95)).current;
 
   useEffect(() => {
+    console.log("🧪 ImagenViewer - URL recibida:", imageUrl);
+
     Animated.parallel([
       Animated.timing(opacity, {
         toValue: 1,
@@ -46,7 +50,7 @@ export default function ImagenScreen() {
 
       const fileUri = FileSystem.documentDirectory + "imagen.jpg";
       const downloadResumable = FileSystem.createDownloadResumable(
-        url as string,
+        imageUrl as string,
         fileUri
       );
 
@@ -73,17 +77,21 @@ export default function ImagenScreen() {
         <Ionicons name="download-outline" size={28} color="#fff" />
       </TouchableOpacity>
 
-      <Animated.Image
-        source={{ uri: url as string }}
-        style={[
-          styles.image,
-          {
-            opacity,
-            transform: [{ scale }],
-          },
-        ]}
-        resizeMode="contain"
-      />
+      {imageUrl ? (
+        <Animated.Image
+          source={{ uri: imageUrl as string }}
+          style={[
+            styles.image,
+            {
+              opacity,
+              transform: [{ scale }],
+            },
+          ]}
+          resizeMode="contain"
+        />
+      ) : (
+        <></>
+      )}
     </SafeAreaView>
   );
 }
