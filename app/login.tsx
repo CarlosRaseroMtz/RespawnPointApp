@@ -205,6 +205,7 @@ const styles = StyleSheet.create({
   },
   linkText: {
     fontSize: 13,
+    textAlign: "center",
     color: "#000",
     marginBottom: 20,
   },

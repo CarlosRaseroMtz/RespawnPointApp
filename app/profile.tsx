@@ -1,4 +1,5 @@
 import { Ionicons } from "@expo/vector-icons";
+import { useRouter } from "expo-router";
 import React from "react";
 import {
   Dimensions,
@@ -7,12 +8,14 @@ import {
   SafeAreaView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View
 } from "react-native";
 import BottomTabBar from "./comp/bottom-tab-bar";
 
 const { width } = Dimensions.get("window");
 const imageSize = (width - 40) / 3;
+const router = useRouter();
 
 const publicaciones = [
   require("../assets/images/foto_publi_valo_guia2.jpg"),
@@ -37,7 +40,9 @@ export default function ProfileScreen() {
             <Text style={styles.platform}>🎮 XBOXONE</Text>
           </View>
         </View>
-        <Ionicons name="settings-outline" size={24} color="#000" />
+        <TouchableOpacity onPress={() => router.push("/configuracion")}>
+          <Ionicons name="settings-outline" size={24} color="#000" />
+        </TouchableOpacity>
       </View>
 
       <View style={styles.stats}>
