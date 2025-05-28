@@ -68,7 +68,7 @@ export default function ProfileScreen() {
           <Image source={{ uri: perfil.fotoPerfil }} style={styles.avatar} />
           <View style={styles.headerText}>
             <Text style={styles.username}>{perfil.username}</Text>
-            <Text style={styles.platform}>{perfil.PlataformaFav || "Sin plataforma"}</Text>
+            <Text style={styles.platform}>{perfil.plataformaFav || "Sin plataforma"}</Text>
           </View>
         </View>
         <TouchableOpacity onPress={() => router.push("/configuracion")}>
@@ -92,7 +92,7 @@ export default function ProfileScreen() {
       </View>
 
       <View style={styles.bio}>
-        <Text style={styles.genre}>{perfil.GeneroFav || "Sin género favorito"}</Text>
+        <Text style={styles.genre}>{perfil.generoFav || "Sin género favorito"}</Text>
         <Text style={styles.description}>
           {perfil.descripcion || "Jugador/a apasionado/a por los videojuegos 🎮"}
         </Text>
