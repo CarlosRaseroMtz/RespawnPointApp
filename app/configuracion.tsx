@@ -1,7 +1,9 @@
 import { useRouter } from "expo-router";
-import { doc, getDoc } from "firebase/firestore";
+import { deleteUser, signOut } from "firebase/auth";
+import { deleteDoc, doc, getDoc } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
+  Alert,
   Image,
   SafeAreaView,
   ScrollView,
@@ -10,8 +12,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { firestore } from "../config/firebase-config";
+import { auth, firestore } from "../config/firebase-config";
 import { useAuth } from "../hooks/useAuth";
+
 
 export default function ConfiguracionScreen() {
   const router = useRouter();
@@ -27,6 +30,50 @@ export default function ConfiguracionScreen() {
     };
     fetchPerfil();
   }, [user]);
+
+  const cerrarSesion = async () => {
+    try {
+      await signOut(auth);
+      router.replace("/login");
+    } catch (error) {
+      console.error("Error al cerrar sesión:", error);
+    }
+  };
+
+  const eliminarCuenta = async () => {
+    Alert.alert(
+      "¿Eliminar cuenta?",
+      "Esta acción es irreversible. ¿Seguro que quieres continuar?",
+      [
+        { text: "Cancelar", style: "cancel" },
+        {
+          text: "Eliminar",
+          style: "destructive",
+          onPress: async () => {
+            try {
+              const uid = user?.uid;
+              if (!uid) return;
+
+              await deleteDoc(doc(firestore, "usuarios", uid));
+              if (auth.currentUser) {
+                await deleteUser(auth.currentUser);
+              } else {
+                throw new Error("No hay usuario autenticado para eliminar.");
+              }
+
+              Alert.alert("Cuenta eliminada", "Tu cuenta ha sido eliminada.");
+              router.replace("/login");
+            } catch (error) {
+              console.error("❌ Error al eliminar cuenta:", error);
+              Alert.alert("Error", "No se pudo eliminar la cuenta.");
+            }
+          },
+        },
+      ]
+    );
+  };
+
+
 
   return (
     <SafeAreaView style={styles.container}>
@@ -66,9 +113,18 @@ export default function ConfiguracionScreen() {
         <View style={styles.divider} />
 
         <Text style={styles.sectionTitle}>Inicio de sesión</Text>
-        <TouchableOpacity><Text style={[styles.item, { color: "#42BAFF" }]}>Añadir cuenta</Text></TouchableOpacity>
-        <TouchableOpacity><Text style={[styles.item, { color: "red" }]}>Cerrar sesión</Text></TouchableOpacity>
-        <TouchableOpacity><Text style={[styles.item, { color: "#FF66C4" }]}>Eliminar cuenta para siempre</Text></TouchableOpacity>
+        <TouchableOpacity disabled>
+          <Text style={[styles.item, { color: "#ccc" }]}>Añadir cuenta (próximamente)</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={cerrarSesion}>
+          <Text style={[styles.item, { color: "red" }]}>Cerrar sesión</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={eliminarCuenta}>
+          <Text style={[styles.item, { color: "#FF66C4" }]}>
+            Eliminar cuenta para siempre
+          </Text>
+        </TouchableOpacity>
+
       </ScrollView>
     </SafeAreaView>
   );
