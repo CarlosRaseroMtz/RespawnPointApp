@@ -1,8 +1,18 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { addDoc, collection, doc, getDoc, onSnapshot, Timestamp } from "firebase/firestore";
+import {
+    addDoc,
+    collection,
+    deleteDoc,
+    doc,
+    getDoc,
+    onSnapshot,
+    Timestamp,
+    updateDoc,
+} from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
+    Alert,
     FlatList,
     Image,
     KeyboardAvoidingView,
@@ -25,6 +35,8 @@ export default function PublicacionScreen() {
   const [post, setPost] = useState<any>(null);
   const [comentarios, setComentarios] = useState<any[]>([]);
   const [nuevoComentario, setNuevoComentario] = useState("");
+  const [editandoId, setEditandoId] = useState<string | null>(null);
+  const [textoEditado, setTextoEditado] = useState("");
 
   useEffect(() => {
     if (!id) return;
@@ -38,7 +50,6 @@ export default function PublicacionScreen() {
 
   useEffect(() => {
     if (!id) return;
-
     const ref = collection(firestore, "publicaciones", id as string, "comentarios");
     const unsubscribe = onSnapshot(ref, async (snap) => {
       const rawComentarios = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
@@ -61,7 +72,8 @@ export default function PublicacionScreen() {
         })
       );
 
-      setComentarios(enriched);
+      // Ordenar por fecha descendente
+      setComentarios(enriched.sort((a, b) => b.timestamp?.seconds - a.timestamp?.seconds));
     });
 
     return () => unsubscribe();
@@ -78,6 +90,26 @@ export default function PublicacionScreen() {
       setNuevoComentario("");
     } catch (error) {
       console.error("❌ Error al comentar:", error);
+    }
+  };
+
+  const eliminarComentario = async (comentarioId: string) => {
+    try {
+      const ref = doc(firestore, "publicaciones", id as string, "comentarios", comentarioId);
+      await deleteDoc(ref);
+    } catch (error) {
+      console.error("❌ Error al eliminar comentario:", error);
+    }
+  };
+
+  const editarComentario = async (comentarioId: string) => {
+    try {
+      const ref = doc(firestore, "publicaciones", id as string, "comentarios", comentarioId);
+      await updateDoc(ref, { contenido: textoEditado });
+      setEditandoId(null);
+      setTextoEditado("");
+    } catch (error) {
+      console.error("❌ Error al editar comentario:", error);
     }
   };
 
@@ -102,16 +134,58 @@ export default function PublicacionScreen() {
           keyExtractor={(item) => item.id}
           contentContainerStyle={{ paddingBottom: 100 }}
           renderItem={({ item }) => (
-            <View style={styles.comentario}>
-              <Image source={{ uri: item.autor?.fotoPerfil }} style={styles.avatar} />
-              <View>
-                <Text style={styles.username}>{item.autor?.username}</Text>
-                <Text style={styles.comentarioTexto}>{item.contenido}</Text>
-                <Text style={styles.comentarioHora}>
-                  {item.timestamp?.toDate().toLocaleString("es-ES")}
-                </Text>
+            <TouchableOpacity
+              onLongPress={() => {
+                if (item.userId === user?.uid) {
+                  Alert.alert("Comentario", "¿Qué deseas hacer?", [
+                    { text: "Cancelar", style: "cancel" },
+                    {
+                      text: "Editar",
+                      onPress: () => {
+                        setEditandoId(item.id);
+                        setTextoEditado(item.contenido);
+                      },
+                    },
+                    {
+                      text: "Eliminar",
+                      style: "destructive",
+                      onPress: () => eliminarComentario(item.id),
+                    },
+                  ]);
+                }
+              }}
+              delayLongPress={500}
+            >
+              <View style={styles.comentario}>
+                <Image source={{ uri: item.autor?.fotoPerfil }} style={styles.avatar} />
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.username}>{item.autor?.username}</Text>
+
+                  {editandoId === item.id ? (
+                    <>
+                      <TextInput
+                        style={[styles.input, { marginBottom: 4 }]}
+                        value={textoEditado}
+                        onChangeText={setTextoEditado}
+                      />
+                      <TouchableOpacity
+                        onPress={() => editarComentario(item.id)}
+                        style={[styles.sendBtn, { alignSelf: "flex-end" }]}
+                      >
+                        <Ionicons name="checkmark" size={18} color="#fff" />
+                      </TouchableOpacity>
+                    </>
+                  ) : (
+                    <>
+                      <Text style={styles.comentarioTexto}>{item.contenido}</Text>
+                      <Text style={styles.comentarioHora}>
+                        {item.timestamp?.toDate().toLocaleString("es-ES")}
+                      </Text>
+                    </>
+                  )}
+                </View>
               </View>
-            </View>
+            </TouchableOpacity>
           )}
         />
       </View>
