@@ -3,15 +3,17 @@ import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { usePathname, useRouter } from "expo-router";
 import React from "react";
 import { StyleSheet, TouchableOpacity, View } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function BottomTabBar() {
   const router = useRouter();
   const pathname = usePathname();
+    const insets = useSafeAreaInsets(); // <- esto añade soporte para padding dinámico
 
   const isActive = (route: string) => pathname === route;
 
   return (
-    <View style={styles.bottomTabBar}>
+    <View style={[styles.bottomTabBar, { paddingBottom: insets.bottom || 10 }]}>
       <TouchableOpacity onPress={() => router.push("../home")}>
         <AntDesign name="home" size={24} color={isActive("/home") ? "#000" : "#999"} />
       </TouchableOpacity>
