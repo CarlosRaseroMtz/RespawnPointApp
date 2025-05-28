@@ -87,12 +87,19 @@ export default function HomeScreen() {
       </View>
 
       {item.mediaUrl && (
-        <Image
-          source={{ uri: item.mediaUrl }}
-          style={styles.postImage}
-          resizeMode="cover"
-        />
+        <TouchableOpacity
+          onPress={() =>
+            router.push(`/imagen?url=${encodeURIComponent(item.mediaUrl)}`)
+          }
+        >
+          <Image
+            source={{ uri: item.mediaUrl }}
+            style={styles.postImage}
+            resizeMode="cover"
+          />
+        </TouchableOpacity>
       )}
+
 
       {item.contenido && <Text style={styles.postText}>{item.contenido}</Text>}
 
