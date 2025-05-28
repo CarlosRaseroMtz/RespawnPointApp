@@ -112,10 +112,14 @@ export default function HomeScreen() {
             {item.likes?.length || 0} me gusta
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.reactionBtn}>
+        <TouchableOpacity
+          style={styles.reactionBtn}
+          onPress={() => router.push(`../publicacion/${item.id}`)}
+        >
           <Feather name="message-circle" size={16} color="#555" />
-          <Text style={styles.reactionText}>0 comentarios</Text>
+          <Text style={styles.reactionText}>Ver comentarios</Text>
         </TouchableOpacity>
+
       </View>
     </View>
   );
@@ -141,7 +145,7 @@ export default function HomeScreen() {
         renderItem={renderPost}
         showsVerticalScrollIndicator={false}
       />
-      <BottomTabBar/>
+      <BottomTabBar />
     </SafeAreaView>
   );
 }
