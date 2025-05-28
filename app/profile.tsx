@@ -1,6 +1,7 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import React from "react";
+import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
+import React, { useEffect, useState } from "react";
 import {
   Dimensions,
   FlatList,
@@ -9,35 +10,65 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
 } from "react-native";
+import { firestore } from "../config/firebase-config";
+import { useAuth } from "../hooks/useAuth";
 import BottomTabBar from "./comp/bottom-tab-bar";
 
 const { width } = Dimensions.get("window");
-const imageSize = (width - 40) / 3;
-const router = useRouter();
-
-const publicaciones = [
-  require("../assets/images/foto_publi_valo_guia2.jpg"),
-  require("../assets/images/foto_publi_valo_guia2.jpg"),
-  require("../assets/images/foto_publi_valo_guia2.jpg"),
-  require("../assets/images/foto_publi_valo_guia2.jpg"),
-  require("../assets/images/foto_publi_valo_guia2.jpg"),
-  require("../assets/images/foto_publi_valo_guia2.jpg"),
-];
+const imageSize = (width - 36) / 2;
 
 export default function ProfileScreen() {
+  const router = useRouter();
+  const { user } = useAuth();
+
+  const [perfil, setPerfil] = useState<any>(null);
+  const [publicaciones, setPublicaciones] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchDatos = async () => {
+      try {
+        const userRef = doc(firestore, "usuarios", user.uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) setPerfil(userSnap.data());
+
+        const publiQuery = query(
+          collection(firestore, "publicaciones"),
+          where("userId", "==", user.uid)
+        );
+        const publiSnap = await getDocs(publiQuery);
+        const data = publiSnap.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        }));
+        setPublicaciones(data);
+      } catch (error) {
+        console.error("Error al cargar perfil o publicaciones:", error);
+      }
+    };
+
+    fetchDatos();
+  }, [user]);
+
+  if (!perfil) {
+    return (
+      <SafeAreaView style={styles.container}>
+        <Text>Cargando perfil...</Text>
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <View style={styles.userInfo}>
-          <Image
-            source={require("../assets/images/foto_perfil_isi.jpg")}
-            style={styles.avatar}
-          />
+          <Image source={{ uri: perfil.fotoPerfil }} style={styles.avatar} />
           <View style={styles.headerText}>
-            <Text style={styles.username}>LordCarlosxdd</Text>
-            <Text style={styles.platform}>🎮 XBOXONE</Text>
+            <Text style={styles.username}>{perfil.username}</Text>
+            <Text style={styles.platform}>{perfil.PlataformaFav || "Sin plataforma"}</Text>
           </View>
         </View>
         <TouchableOpacity onPress={() => router.push("/configuracion")}>
@@ -47,7 +78,7 @@ export default function ProfileScreen() {
 
       <View style={styles.stats}>
         <View style={styles.stat}>
-          <Text style={styles.statNumber}>35</Text>
+          <Text style={styles.statNumber}>{publicaciones.length}</Text>
           <Text style={styles.statLabel}>Contenido</Text>
         </View>
         <View style={styles.stat}>
@@ -61,20 +92,19 @@ export default function ProfileScreen() {
       </View>
 
       <View style={styles.bio}>
-        <Text style={styles.genre}>FPS, Shooters y Competitivo</Text>
+        <Text style={styles.genre}>{perfil.GeneroFav || "Sin género favorito"}</Text>
         <Text style={styles.description}>
-          Jugador de PC y Xbox, pseudoretirado, ya solo juego con colegas, en
-          busca el resurgimiento gamer
+          {perfil.descripcion || "Jugador/a apasionado/a por los videojuegos 🎮"}
         </Text>
       </View>
 
       <FlatList
         data={publicaciones}
-        numColumns={3}
-        keyExtractor={(_, index) => index.toString()}
+        numColumns={2}
+        keyExtractor={(item) => item.id}
         contentContainerStyle={styles.gallery}
         renderItem={({ item }) => (
-          <Image source={item} style={styles.postImage} />
+          <Image source={{ uri: item.mediaUrl }} style={styles.postImage} />
         )}
       />
 
@@ -110,8 +140,8 @@ const styles = StyleSheet.create({
   gallery: { gap: 4 },
   postImage: {
     width: imageSize,
-    height: imageSize,
+    height: imageSize * 1.2,
     margin: 4,
-    borderRadius: 8,
+    borderRadius: 10,
   },
 });
