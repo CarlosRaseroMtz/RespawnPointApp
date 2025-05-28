@@ -1,4 +1,4 @@
-import { AntDesign, Entypo, Feather, Ionicons } from "@expo/vector-icons";
+import { AntDesign, Entypo, Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import {
   arrayRemove,
@@ -24,6 +24,7 @@ import {
 } from "react-native";
 import { firestore } from "../config/firebase-config";
 import { useAuth } from "../hooks/useAuth"; // ✅ nuevo import
+import BottomTabBar from "./comp/bottom-tab-bar"; // ✅ nuevo import
 
 const { width } = Dimensions.get("window");
 
@@ -140,21 +141,7 @@ export default function HomeScreen() {
         renderItem={renderPost}
         showsVerticalScrollIndicator={false}
       />
-
-      <View style={styles.bottomTabBar}>
-        <AntDesign name="home" size={24} color="#000" />
-        <AntDesign name="clockcircleo" size={24} color="#000" />
-        <TouchableOpacity onPress={() => router.push("/create-post")}>
-          <AntDesign
-            name="pluscircle"
-            size={40}
-            color="#000"
-            style={{ marginTop: -10 }}
-          />
-        </TouchableOpacity>
-        <AntDesign name="bells" size={24} color="#000" />
-        <Ionicons name="person-circle-outline" size={26} color="#000" />
-      </View>
+      <BottomTabBar/>
     </SafeAreaView>
   );
 }
