@@ -16,6 +16,11 @@ import { firestore } from "../config/firebase-config";
 import { useAuth } from "../hooks/useAuth";
 import BottomTabBar from "./comp/bottom-tab-bar";
 
+const truncarTexto = (texto: string, max: number) => {
+  return texto.length > max ? texto.slice(0, max - 1) + "…" : texto;
+};
+
+
 const { width } = Dimensions.get("window");
 const imageSize = (width - 36) / 2;
 
@@ -67,7 +72,9 @@ export default function ProfileScreen() {
         <View style={styles.userInfo}>
           <Image source={{ uri: perfil.fotoPerfil }} style={styles.avatar} />
           <View style={styles.headerText}>
-            <Text style={styles.username}>{perfil.username}</Text>
+            <Text style={styles.username}>
+              {truncarTexto(perfil.username, 18)}
+            </Text>
             <Text style={styles.platform}>{perfil.plataformaFav || "Sin plataforma"}</Text>
           </View>
         </View>
@@ -123,7 +130,10 @@ const styles = StyleSheet.create({
   },
   userInfo: { flexDirection: "row", alignItems: "center" },
   avatar: { width: 64, height: 64, borderRadius: 32, marginRight: 12 },
-  headerText: {},
+  headerText: {
+    maxWidth: width * 0.5, // ajusta si quieres más o menos
+    overflow: "hidden",
+  },
   username: { fontSize: 18, fontWeight: "700" },
   platform: { fontSize: 14, color: "#888" },
   stats: {

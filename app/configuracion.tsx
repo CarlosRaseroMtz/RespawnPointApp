@@ -1,4 +1,6 @@
-import React from "react";
+import { useRouter } from "expo-router";
+import { doc, getDoc } from "firebase/firestore";
+import React, { useEffect, useState } from "react";
 import {
   Image,
   SafeAreaView,
@@ -8,23 +10,39 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { firestore } from "../config/firebase-config";
+import { useAuth } from "../hooks/useAuth";
 
-import { useRouter } from "expo-router";
-
-
-const router = useRouter();
 export default function ConfiguracionScreen() {
+  const router = useRouter();
+  const { user } = useAuth();
+  const [perfil, setPerfil] = useState<any>(null);
+
+  useEffect(() => {
+    const fetchPerfil = async () => {
+      if (!user) return;
+      const ref = doc(firestore, "usuarios", user.uid);
+      const snap = await getDoc(ref);
+      if (snap.exists()) setPerfil(snap.data());
+    };
+    fetchPerfil();
+  }, [user]);
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <View style={styles.header}>
           <Image
-            source={require("../assets/images/foto_perfil_isi.jpg")}
+            source={{ uri: perfil?.fotoPerfil || "https://i.pravatar.cc/150?img=12" }}
             style={styles.avatar}
           />
           <View>
-            <Text style={styles.username}>LordCarlosxdd</Text>
-            <Text style={styles.platform}>🎮 XBOXONE</Text>
+            <Text style={styles.username}>
+              {perfil?.username || "Cargando..."}
+            </Text>
+            <Text style={styles.platform}>
+              🎮 {perfil?.plataformaFav || "Sin plataforma"}
+            </Text>
           </View>
         </View>
 
