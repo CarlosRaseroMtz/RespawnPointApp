@@ -2,8 +2,9 @@ import { AntDesign } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { useRouter } from "expo-router";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
 import { useState } from "react";
-import { auth } from "../config/firebase-config";
+import { auth, firestore } from "../config/firebase-config";
 
 import {
   Alert,
@@ -65,13 +66,25 @@ const handleRegister = async () => {
     const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
     const user = userCredential.user;
 
-    // Guarda el nombre completo como displayName (opcional)
     await updateProfile(user, {
       displayName: fullName,
     });
 
-    console.log("✅ Usuario creado:", user.email);
+    // ✅ Crear documento en Firestore
+    await setDoc(doc(firestore, "usuarios", user.uid), {
+      username: username,
+      email: user.email,
+      fotoPerfil: "https://i.pravatar.cc/150?img=12", // avatar por defecto
+      plataformaFav: platform,
+      generoFav: selectedGenres.join(", "),
+      descripcion: "Nuevo jugador registrado.",
+      nivel: null,
+      reputacion: 1,
+      rol: "jugador",
+      comunidades: [],
+    });
 
+    console.log("✅ Usuario y perfil creados:", user.email);
     Alert.alert("Registro exitoso", "Ahora puedes iniciar sesión.");
     router.replace("/login");
   } catch (error: any) {
@@ -87,6 +100,7 @@ const handleRegister = async () => {
     Alert.alert("Error de registro", message);
   }
 };
+
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -298,3 +312,4 @@ const styles = StyleSheet.create({
     color: "#888",
   },
 });
+
