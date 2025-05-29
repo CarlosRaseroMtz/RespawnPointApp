@@ -1,54 +1,141 @@
-import React, { useState } from "react";
+import { router } from "expo-router";
 import {
-    Image,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  onSnapshot,
+  orderBy,
+  query,
+  setDoc,
+  where,
+} from "firebase/firestore";
+import React, { useEffect, useState } from "react";
+import {
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
+import { firestore } from "../config/firebase-config";
+import { useAuth } from "../hooks/useAuth";
 import BottomTabBar from "./comp/bottom-tab-bar";
 
 const tabs = ["Usuarios", "Comunidades", "Torneos"];
 
-const userChats = [
-  {
-    id: "1",
-    name: "Jamato00",
-    avatar: require("../assets/images/foto_perfil_isi.jpg"),
-    lastMessage: "Illo ruben un smite?",
-    time: "9:20",
-    unread: true,
-  },
-  {
-    id: "2",
-    name: "LDarkPain",
-    avatar: require("../assets/images/foto_perfil_robert.jpg"),
-    lastMessage: "Te paso el link del Discord",
-    time: "18:11",
-    unread: false,
-  },
-];
-
-const groupChats = [
-  {
-    id: "g1",
-    name: "Hunters Team",
-    avatar: require("../assets/images/foto_publi_valo_guia2.jpg"),
-    lastMessage: "Listos para la raid esta noche?",
-    time: "10:55",
-    unread: true,
-  },
-];
-
 export default function ChatsScreen() {
   const [activeTab, setActiveTab] = useState("Usuarios");
+  const { user } = useAuth();
+  const [chats, setChats] = useState<any[]>([]);
+  const [busqueda, setBusqueda] = useState("");
+  const [resultados, setResultados] = useState<any[]>([]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const q = query(
+      collection(firestore, "chats"),
+      where("participantes", "array-contains", user.uid),
+      orderBy("timestamp", "desc")
+    );
+
+    const unsubscribe = onSnapshot(q, async (snap) => {
+      const resultados = await Promise.all(
+        snap.docs.map(async (docSnap) => {
+          const data = docSnap.data();
+          const otroUid = data.participantes.find((uid: string) => uid !== user.uid);
+          const userSnap = await getDoc(doc(firestore, "usuarios", otroUid));
+          const userInfo = userSnap.exists() ? userSnap.data() : {};
+
+          return {
+            id: docSnap.id,
+            tipo: data.tipo || "usuario",
+            nombre: userInfo.username || "Usuario",
+            avatar: userInfo.fotoPerfil || "https://i.pravatar.cc/150?img=2",
+            lastMessage: data.lastMessage || "",
+            timestamp: data.timestamp?.toDate().toLocaleTimeString("es-ES", {
+              hour: "2-digit",
+              minute: "2-digit",
+            }) || "",
+          };
+        })
+      );
+      setChats(resultados);
+    });
+
+    return () => unsubscribe();
+  }, [user]);
+
+  const buscarUsuarios = async () => {
+    const ref = collection(firestore, "usuarios");
+    const snap = await getDocs(ref);
+    type Usuario = {
+      id: string;
+      username: string;
+      fotoPerfil?: string;
+    };
+
+    const encontrados: Usuario[] = snap.docs.map((doc) => ({
+      id: doc.id,
+      ...doc.data(),
+    })) as Usuario[];
+
+    const filtrados = encontrados.filter(
+      (u) =>
+        u.username?.toLowerCase().includes(busqueda.toLowerCase()) &&
+        u.id !== user?.uid
+    );
+
+    setResultados(filtrados);
+
+    if (filtrados.length === 0) {
+      setResultados([{ id: "no-results", username: "No se encontraron usuarios" }]);
+    }
+  };
+
+  const iniciarChatCon = async (usuario: any) => {
+    if (!user) return;
+
+    const q = query(
+      collection(firestore, "chats"),
+      where("participantes", "array-contains", user.uid)
+    );
+    const snap = await getDocs(q);
+
+    const existente = snap.docs.find((doc) => {
+      const p = doc.data().participantes;
+      return p.includes(usuario.id) && p.length === 2;
+    });
+
+    if (existente) {
+      router.push(`./chat/${existente.id}`);
+      return;
+    }
+
+    const chatId = `${user.uid}_${usuario.id}`;
+    await setDoc(doc(firestore, "chats", chatId), {
+      participantes: [user.uid, usuario.id],
+      tipo: "usuario",
+      timestamp: new Date(),
+      lastMessage: "",
+    });
+
+    router.push(`./chat/${chatId}`);
+  };
+
+  const userChats = chats.filter((c) => c.tipo === "usuario");
+  const groupChats = chats.filter((c) => c.tipo === "grupo");
 
   const chatsToShow =
-    activeTab === "Usuarios" ? userChats :
-    activeTab === "Comunidades" ? groupChats :
-    [];
+    activeTab === "Usuarios"
+      ? userChats
+      : activeTab === "Comunidades"
+        ? groupChats
+        : [];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -79,15 +166,51 @@ export default function ChatsScreen() {
         ))}
       </View>
 
+      <TextInput
+        placeholder="Buscar usuarios..."
+        style={{
+          borderWidth: 1,
+          borderColor: "#ccc",
+          borderRadius: 12,
+          paddingHorizontal: 12,
+          paddingVertical: 8,
+          marginBottom: 12,
+        }}
+        value={busqueda}
+        onChangeText={(text) => {
+          setBusqueda(text);
+          if (text.length >= 2) buscarUsuarios();
+          else setResultados([]);
+        }}
+      />
+
+      {resultados.map((u) => (
+        <TouchableOpacity
+          key={u.id}
+          style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}
+          onPress={() => iniciarChatCon(u)}
+        >
+          <Image
+            source={{ uri: u.fotoPerfil }}
+            style={{ width: 40, height: 40, borderRadius: 20, marginRight: 10 }}
+          />
+          <Text style={{ fontSize: 16 }}>{u.username}</Text>
+        </TouchableOpacity>
+      ))}
+
       <ScrollView>
         {chatsToShow.map((chat) => (
-          <TouchableOpacity key={chat.id} style={styles.chatItem}>
+          <TouchableOpacity
+            key={chat.id}
+            style={styles.chatItem}
+            onPress={() => router.push(`./chat/${chat.id}`)}
+          >
             <View style={styles.chatRow}>
-              {chat.unread && <View style={styles.dot} />}
-              <Image source={chat.avatar} style={styles.avatar} />
+              <Image source={{ uri: chat.avatar }} style={styles.avatar} />
               <View style={styles.chatInfo}>
                 <Text style={styles.name}>
-                  {chat.name} <Text style={styles.time}>{chat.time}</Text>
+                  {chat.nombre} {" "}
+                  <Text style={styles.time}>{chat.timestamp}</Text>
                 </Text>
                 <Text style={styles.message}>{chat.lastMessage}</Text>
               </View>
@@ -146,13 +269,6 @@ const styles = StyleSheet.create({
   chatRow: {
     flexDirection: "row",
     alignItems: "center",
-  },
-  dot: {
-    width: 10,
-    height: 10,
-    backgroundColor: "#42BAFF",
-    borderRadius: 5,
-    marginRight: 8,
   },
   avatar: {
     width: 52,
