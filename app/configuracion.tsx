@@ -15,41 +15,41 @@ import {
 import { auth, firestore } from "../config/firebase-config";
 import { useAuth } from "../hooks/useAuth";
 
-
 export default function ConfiguracionScreen() {
   const router = useRouter();
   const { user } = useAuth();
   const [perfil, setPerfil] = useState<any>(null);
 
   useEffect(() => {
-    let activo = true;
+    if (!user?.uid) return;
 
-    const fetchPerfil = async () => {
-      if (!user?.uid) return;
+    let activo = true;
+    const ref = doc(firestore, "usuarios", user.uid);
+
+    const cargarPerfil = async () => {
       try {
-        const ref = doc(firestore, "usuarios", user.uid);
         const snap = await getDoc(ref);
-        if (snap.exists() && activo) setPerfil(snap.data());
-      } catch (error) {
-        console.error("❌ Error al obtener perfil:", error);
+        if (snap.exists() && activo) {
+          setPerfil(snap.data());
+        }
+      } catch (err) {
+        console.error("❌ Error al obtener perfil:", err);
       }
     };
 
-    fetchPerfil();
+    cargarPerfil();
 
     return () => {
       activo = false;
     };
   }, [user?.uid]);
 
-
-
   const cerrarSesion = async () => {
     try {
       await signOut(auth);
       router.replace("/login");
     } catch (error) {
-      console.error("Error al cerrar sesión:", error);
+      console.error("❌ Error al cerrar sesión:", error);
     }
   };
 
@@ -74,7 +74,7 @@ export default function ConfiguracionScreen() {
                 throw new Error("No hay usuario autenticado para eliminar.");
               }
 
-              Alert.alert("Cuenta eliminada", "Tu cuenta ha sido eliminada.");
+              Alert.alert("✅ Cuenta eliminada", "Tu cuenta ha sido eliminada.");
               router.replace("/login");
             } catch (error) {
               console.error("❌ Error al eliminar cuenta:", error);
@@ -86,8 +86,6 @@ export default function ConfiguracionScreen() {
     );
   };
 
-
-
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
@@ -97,12 +95,8 @@ export default function ConfiguracionScreen() {
             style={styles.avatar}
           />
           <View>
-            <Text style={styles.username}>
-              {perfil?.username || "Cargando..."}
-            </Text>
-            <Text style={styles.platform}>
-              🎮 {perfil?.plataformaFav || "Sin plataforma"}
-            </Text>
+            <Text style={styles.username}>{perfil?.username || "Cargando..."}</Text>
+            <Text style={styles.platform}>🎮 {perfil?.plataformaFav || "Sin plataforma"}</Text>
           </View>
         </View>
 
@@ -110,18 +104,34 @@ export default function ConfiguracionScreen() {
         <TouchableOpacity onPress={() => router.push("/editar-perfil")}>
           <Text style={styles.item}>Editar perfil</Text>
         </TouchableOpacity>
-        <TouchableOpacity><Text style={styles.item}>Accesibilidad e idiomas</Text></TouchableOpacity>
-        <TouchableOpacity><Text style={styles.item}>Tu actividad</Text></TouchableOpacity>
+        <TouchableOpacity>
+          <Text style={styles.item}>Accesibilidad e idiomas</Text>
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <Text style={styles.item}>Tu actividad</Text>
+        </TouchableOpacity>
 
         <View style={styles.divider} />
 
         <Text style={styles.sectionTitle}>Privacidad</Text>
-        <TouchableOpacity><Text style={styles.item}>Suscripciones</Text></TouchableOpacity>
-        <TouchableOpacity><Text style={styles.item}>Usuarios bloqueados</Text></TouchableOpacity>
-        <TouchableOpacity><Text style={styles.item}>Notificaciones</Text></TouchableOpacity>
-        <TouchableOpacity><Text style={styles.item}>Ayuda</Text></TouchableOpacity>
-        <TouchableOpacity><Text style={styles.item}>Centro de privacidad</Text></TouchableOpacity>
-        <TouchableOpacity><Text style={styles.item}>Estado de la cuenta</Text></TouchableOpacity>
+        <TouchableOpacity>
+          <Text style={styles.item}>Suscripciones</Text>
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <Text style={styles.item}>Usuarios bloqueados</Text>
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <Text style={styles.item}>Notificaciones</Text>
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <Text style={styles.item}>Ayuda</Text>
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <Text style={styles.item}>Centro de privacidad</Text>
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <Text style={styles.item}>Estado de la cuenta</Text>
+        </TouchableOpacity>
 
         <View style={styles.divider} />
 
@@ -137,7 +147,6 @@ export default function ConfiguracionScreen() {
             Eliminar cuenta para siempre
           </Text>
         </TouchableOpacity>
-
       </ScrollView>
     </SafeAreaView>
   );
