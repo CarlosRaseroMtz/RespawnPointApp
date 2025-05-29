@@ -23,6 +23,7 @@ import {
 } from "react-native";
 import { firestore } from "../config/firebase-config";
 import { useAuth } from "../hooks/useAuth"; // ✅ nuevo import
+import { crearNotificacion } from "../utils/crear-notificacion";
 import BottomTabBar from "./comp/bottom-tab-bar"; // ✅ nuevo import
 
 const { width } = Dimensions.get("window");
@@ -67,19 +68,35 @@ export default function HomeScreen() {
     cargarConPerfil();
   }, []);
 
-  // ✅ Función para manejar likes
-  const handleLike = async (postId: string, likes: string[]) => {
-    if (!user) return;
-    const ref = doc(firestore, "publicaciones", postId);
-    const yaDioLike = likes.includes(user.uid);
-    try {
-      await updateDoc(ref, {
-        likes: yaDioLike ? arrayRemove(user.uid) : arrayUnion(user.uid),
-      });
-    } catch (e) {
-      console.error("Error al actualizar likes:", e);
+const handleLike = async (postId: string, likes: string[]) => {
+  if (!user) return;
+  const ref = doc(firestore, "publicaciones", postId);
+  const yaDioLike = likes.includes(user.uid);
+
+  await updateDoc(ref, {
+    likes: yaDioLike ? arrayRemove(user.uid) : arrayUnion(user.uid),
+  });
+
+  // 🔔 Solo si es un nuevo like
+  if (!yaDioLike) {
+    const snap = await getDoc(ref);
+    if (snap.exists()) {
+      const post = snap.data();
+      const postOwnerId = post.userId;
+
+      if (postOwnerId !== user.uid) {
+        await crearNotificacion({
+          paraUid: postOwnerId,
+          deUid: user.uid,
+          deNombre: user.displayName || "Anónimo",
+          avatar: user.photoURL || "https://i.pravatar.cc/150?img=12",
+          contenido: "le ha dado me gusta a tu publicación",
+          tipo: "like",
+        });
+      }
     }
-  };
+  }
+};
 
   const renderPost = ({ item }: any) => (
     <View style={styles.postContainer}>

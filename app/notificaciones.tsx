@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Image,
   SafeAreaView,
@@ -12,30 +12,36 @@ import BottomTabBar from "./comp/bottom-tab-bar";
 
 const tabs = ["Usuarios", "Comunidades", "Torneos"];
 
-const notifications = [
-  {
-    id: 1,
-    user: "ArruinaNochess",
-    message: "Ha empezado a seguirte",
-    time: "1d",
-    avatar: require("../assets/images/foto_perfil_isi.jpg"),
-    action: "seguir",
-  },
-  {
-    id: 2,
-    user: "GABICHUELAS00",
-    message: "Se ha unido a la comunidad",
-    time: "1d",
-    avatar: require("../assets/images/foto_perfil_robert.jpg"),
-  },
-  {
-    id: 3,
-    user: "LDarkPain",
-    message: "Abro streaming chavaleeee!!!!\ntwitch.tv/ldarkpain",
-    time: "2d",
-    avatar: require("../assets/images/foto_publi_valo_guia2.jpg"),
-  },
-];
+import {
+  collection,
+  onSnapshot,
+  orderBy,
+  query,
+} from "firebase/firestore";
+import { firestore } from "../config/firebase-config";
+import { useAuth } from "../hooks/useAuth"; // ya lo tienes seguramente
+
+// ...
+
+const [notifications, setNotifications] = useState<any[]>([]);
+const { user } = useAuth();
+
+useEffect(() => {
+  if (!user) return;
+
+  const q = query(
+    collection(firestore, "notificaciones", user.uid, "items"),
+    orderBy("timestamp", "desc")
+  );
+
+  const unsub = onSnapshot(q, (snap) => {
+    const docs = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    setNotifications(docs);
+  });
+
+  return () => unsub();
+}, [user]);
+
 
 export default function NotificacionesScreen() {
   const [activeTab, setActiveTab] = useState("Usuarios");
@@ -78,28 +84,35 @@ export default function NotificacionesScreen() {
         <ScrollView style={{ flex: 1 }}>
           {notifications.map((item) => (
             <View key={item.id} style={styles.notification}>
-              <Image source={item.avatar} style={styles.avatar} />
+              <Image
+                source={{ uri: item.avatar || "https://i.pravatar.cc/150?img=3" }}
+                style={styles.avatar}
+              />
               <View style={{ flex: 1 }}>
                 <Text style={styles.user}>
-                  {item.user} <Text style={styles.time}>{item.time}</Text>
-                </Text>
-                <Text style={styles.message}>{item.message}</Text>
-              </View>
-              {item.action === "seguir" && (
-                <TouchableOpacity
-                  style={[
-                    styles.followBtn,
-                    seguidos[item.id] && { backgroundColor: "#FF66C4" },
-                  ]}
-                  onPress={() => toggleSeguir(item.id)}
-                >
-                  <Text style={styles.followText}>
-                    {seguidos[item.id] ? "Seguido" : "Seguir"}
+                  {item.deNombre || "Usuario"}{" "}
+                  <Text style={styles.time}>
+                    {item.timestamp?.toDate()?.toLocaleDateString("es-ES", {
+                      day: "2-digit",
+                      month: "short",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
                   </Text>
+                </Text>
+                <Text style={styles.message}>{item.contenido}</Text>
+              </View>
+
+              {item.tipo === "seguimiento" && (
+                <TouchableOpacity
+                  style={[styles.followBtn, { backgroundColor: "#FF66C4" }]}
+                >
+                  <Text style={styles.followText}>Seguir</Text>
                 </TouchableOpacity>
               )}
             </View>
           ))}
+
         </ScrollView>
       </View>
       <BottomTabBar />
