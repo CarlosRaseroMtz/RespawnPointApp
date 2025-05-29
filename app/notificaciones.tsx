@@ -1,17 +1,14 @@
 import React, { useState } from "react";
 import {
-    Image,
-    SafeAreaView,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import BottomTabBar from "./comp/bottom-tab-bar";
-
-// ... resto del código
-
 
 const tabs = ["Usuarios", "Comunidades", "Torneos"];
 
@@ -34,7 +31,7 @@ const notifications = [
   {
     id: 3,
     user: "LDarkPain",
-    message: "Abro streaming chavaleeee!!!!\\ntwitch.tv/ldarkpain",
+    message: "Abro streaming chavaleeee!!!!\ntwitch.tv/ldarkpain",
     time: "2d",
     avatar: require("../assets/images/foto_publi_valo_guia2.jpg"),
   },
@@ -42,6 +39,14 @@ const notifications = [
 
 export default function NotificacionesScreen() {
   const [activeTab, setActiveTab] = useState("Usuarios");
+  const [seguidos, setSeguidos] = useState<{ [key: number]: boolean }>({});
+
+  const toggleSeguir = (id: number) => {
+    setSeguidos((prev) => ({
+      ...prev,
+      [id]: !prev[id],
+    }));
+  };
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
@@ -81,8 +86,16 @@ export default function NotificacionesScreen() {
                 <Text style={styles.message}>{item.message}</Text>
               </View>
               {item.action === "seguir" && (
-                <TouchableOpacity style={styles.followBtn}>
-                  <Text style={styles.followText}>Seguir</Text>
+                <TouchableOpacity
+                  style={[
+                    styles.followBtn,
+                    seguidos[item.id] && { backgroundColor: "#FF66C4" },
+                  ]}
+                  onPress={() => toggleSeguir(item.id)}
+                >
+                  <Text style={styles.followText}>
+                    {seguidos[item.id] ? "Seguido" : "Seguir"}
+                  </Text>
                 </TouchableOpacity>
               )}
             </View>

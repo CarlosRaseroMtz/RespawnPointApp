@@ -72,6 +72,7 @@ export default function ChatScreen() {
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: "#fff" }}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
     >
       <SafeAreaView style={{ flex: 1 }}>
         <FlatList
@@ -97,18 +98,17 @@ export default function ChatScreen() {
           )}
         />
 
-<SafeAreaView edges={["bottom"]} style={styles.inputArea}>
-  <TextInput
-    style={styles.input}
-    placeholder="Escribe un mensaje..."
-    value={texto}
-    onChangeText={setTexto}
-  />
-  <TouchableOpacity style={styles.btn} onPress={enviar}>
-    <Text style={{ color: "#fff" }}>Enviar</Text>
-  </TouchableOpacity>
-</SafeAreaView>
-
+        <SafeAreaView edges={["bottom"]} style={styles.inputArea}>
+          <TextInput
+            style={styles.input}
+            placeholder="Escribe un mensaje..."
+            value={texto}
+            onChangeText={setTexto}
+          />
+          <TouchableOpacity style={styles.btn} onPress={enviar}>
+            <Text style={{ color: "#fff" }}>Enviar</Text>
+          </TouchableOpacity>
+        </SafeAreaView>
       </SafeAreaView>
     </KeyboardAvoidingView>
   );

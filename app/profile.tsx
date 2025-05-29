@@ -30,6 +30,8 @@ export default function ProfileScreen() {
 
   const [perfil, setPerfil] = useState<any>(null);
   const [publicaciones, setPublicaciones] = useState<any[]>([]);
+  const [seguidores, setSeguidores] = useState<any[]>([]);
+   const [siguiendo, setSiguiendo] = useState<any[]>([]);
 
   useEffect(() => {
     if (!user) return;
@@ -89,11 +91,11 @@ export default function ProfileScreen() {
           <Text style={styles.statLabel}>Contenido</Text>
         </View>
         <View style={styles.stat}>
-          <Text style={styles.statNumber}>567</Text>
+          <Text style={styles.statNumber}>{seguidores.length}</Text>
           <Text style={styles.statLabel}>Seguidores</Text>
         </View>
         <View style={styles.stat}>
-          <Text style={styles.statNumber}>191</Text>
+          <Text style={styles.statNumber}>{siguiendo.length}</Text>
           <Text style={styles.statLabel}>Seguidos</Text>
         </View>
       </View>
