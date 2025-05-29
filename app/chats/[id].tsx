@@ -14,13 +14,13 @@ import {
     FlatList,
     KeyboardAvoidingView,
     Platform,
-    SafeAreaView,
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
     View,
 } from "react-native";
+import { SafeAreaView } from "react-native-safe-area-context";
 import { firestore } from "../../config/firebase-config";
 import { useAuth } from "../../hooks/useAuth";
 
@@ -97,17 +97,18 @@ export default function ChatScreen() {
           )}
         />
 
-        <View style={styles.inputArea}>
-          <TextInput
-            style={styles.input}
-            placeholder="Escribe un mensaje..."
-            value={texto}
-            onChangeText={setTexto}
-          />
-          <TouchableOpacity style={styles.btn} onPress={enviar}>
-            <Text style={{ color: "#fff" }}>Enviar</Text>
-          </TouchableOpacity>
-        </View>
+<SafeAreaView edges={["bottom"]} style={styles.inputArea}>
+  <TextInput
+    style={styles.input}
+    placeholder="Escribe un mensaje..."
+    value={texto}
+    onChangeText={setTexto}
+  />
+  <TouchableOpacity style={styles.btn} onPress={enviar}>
+    <Text style={{ color: "#fff" }}>Enviar</Text>
+  </TouchableOpacity>
+</SafeAreaView>
+
       </SafeAreaView>
     </KeyboardAvoidingView>
   );

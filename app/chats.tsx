@@ -124,7 +124,7 @@ export default function ChatsScreen() {
       lastMessage: "",
     });
 
-    router.push(`./chat/${chatId}`);
+    router.push(`./chats/${chatId}`);
   };
 
   const userChats = chats.filter((c) => c.tipo === "usuario");
@@ -203,7 +203,7 @@ export default function ChatsScreen() {
           <TouchableOpacity
             key={chat.id}
             style={styles.chatItem}
-            onPress={() => router.push(`./chat/${chat.id}`)}
+            onPress={() => router.push(`./chats/${chat.id}`)}
           >
             <View style={styles.chatRow}>
               <Image source={{ uri: chat.avatar }} style={styles.avatar} />
@@ -218,7 +218,26 @@ export default function ChatsScreen() {
           </TouchableOpacity>
         ))}
       </ScrollView>
-
+      {busqueda.length > 0 && resultados.length > 0 && (
+        <>
+          <Text style={{ fontWeight: "600", marginBottom: 8 }}>Usuarios encontrados:</Text>
+          {resultados.map((usuario) => (
+            <TouchableOpacity
+              key={usuario.id}
+              style={styles.chatItem}
+              onPress={() => iniciarChatCon(usuario)}
+            >
+              <View style={styles.chatRow}>
+                <Image source={{ uri: usuario.fotoPerfil }} style={styles.avatar} />
+                <View style={styles.chatInfo}>
+                  <Text style={styles.name}>{usuario.username}</Text>
+                  <Text style={styles.message}>Pulsar para chatear</Text>
+                </View>
+              </View>
+            </TouchableOpacity>
+          ))}
+        </>
+      )}
       <BottomTabBar />
     </SafeAreaView>
   );
