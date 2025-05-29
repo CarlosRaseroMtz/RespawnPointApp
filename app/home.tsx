@@ -90,8 +90,9 @@ export default function HomeScreen() {
         />
         <View style={{ flex: 1 }}>
           <Text style={styles.postUser}>
-            {item.username} en {item.comunidadId}
+            {item.autor?.username} en {item.comunidadId}
           </Text>
+
           <Text style={styles.postTime}>
             {formatearFecha(item.timestamp)}
           </Text>

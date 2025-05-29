@@ -24,8 +24,6 @@ export default function ImagenScreen() {
   const scale = useRef(new Animated.Value(0.95)).current;
 
   useEffect(() => {
-    console.log("🧪 ImagenViewer - URL recibida:", imageUrl);
-
     Animated.parallel([
       Animated.timing(opacity, {
         toValue: 1,

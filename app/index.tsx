@@ -1,4 +1,4 @@
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import { onAuthStateChanged, User } from "firebase/auth";
 import { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
@@ -7,6 +7,7 @@ import { auth } from "../config/firebase-config"; // Asegúrate que esto apunta 
 export default function Index() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
@@ -18,8 +19,7 @@ export default function Index() {
   }, []);
 
   useEffect(() => {
-    if (loading) return;
-
+    if (loading) return; // Redirige a la pantalla de splash
     if (user) {
       router.replace("/home");
     } else {
