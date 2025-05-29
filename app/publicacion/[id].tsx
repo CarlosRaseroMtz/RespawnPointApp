@@ -1,31 +1,33 @@
 import { Ionicons } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-    addDoc,
-    collection,
-    deleteDoc,
-    doc,
-    getDoc,
-    onSnapshot,
-    Timestamp,
-    updateDoc,
+  addDoc,
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  onSnapshot,
+  Timestamp,
+  updateDoc,
 } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
-    Alert,
-    FlatList,
-    Image,
-    KeyboardAvoidingView,
-    Platform,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  FlatList,
+  Image,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { firestore } from "../../config/firebase-config";
 import { useAuth } from "../../hooks/useAuth";
+import { crearNotificacion } from "../../utils/crear-notificacion";
+
 
 export default function PublicacionScreen() {
   const { id } = useLocalSearchParams();
@@ -80,18 +82,37 @@ export default function PublicacionScreen() {
   }, [id]);
 
   const enviarComentario = async () => {
-    if (!nuevoComentario.trim()) return;
+    if (!nuevoComentario.trim() || !user) return;
+
+    const comentario = {
+      contenido: nuevoComentario.trim(),
+      userId: user.uid,
+      timestamp: Timestamp.now(),
+    };
+
     try {
-      await addDoc(collection(firestore, "publicaciones", id as string, "comentarios"), {
-        contenido: nuevoComentario.trim(),
-        userId: user?.uid,
-        timestamp: Timestamp.now(),
-      });
+      await addDoc(
+        collection(firestore, "publicaciones", id as string, "comentarios"),
+        comentario
+      );
       setNuevoComentario("");
+
+      // 🔔 Crear notificación al autor si el comentario NO es suyo
+      if (post?.userId && post.userId !== user.uid) {
+        await crearNotificacion({
+          paraUid: post.userId,
+          deUid: user.uid,
+          deNombre: user.displayName || "Anónimo",
+          avatar: user.photoURL || "https://i.pravatar.cc/150?img=8",
+          contenido: "ha comentado tu publicación",
+          tipo: "comentario",
+        });
+      }
     } catch (error) {
       console.error("❌ Error al comentar:", error);
     }
   };
+
 
   const eliminarComentario = async (comentarioId: string) => {
     try {

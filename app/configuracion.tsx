@@ -22,14 +22,27 @@ export default function ConfiguracionScreen() {
   const [perfil, setPerfil] = useState<any>(null);
 
   useEffect(() => {
+    let activo = true;
+
     const fetchPerfil = async () => {
-      if (!user) return;
-      const ref = doc(firestore, "usuarios", user.uid);
-      const snap = await getDoc(ref);
-      if (snap.exists()) setPerfil(snap.data());
+      if (!user?.uid) return;
+      try {
+        const ref = doc(firestore, "usuarios", user.uid);
+        const snap = await getDoc(ref);
+        if (snap.exists() && activo) setPerfil(snap.data());
+      } catch (error) {
+        console.error("❌ Error al obtener perfil:", error);
+      }
     };
+
     fetchPerfil();
-  }, [user]);
+
+    return () => {
+      activo = false;
+    };
+  }, [user?.uid]);
+
+
 
   const cerrarSesion = async () => {
     try {
