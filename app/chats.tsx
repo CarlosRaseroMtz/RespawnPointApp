@@ -145,25 +145,25 @@ export default function ChatsScreen() {
         {tabs.map((tab) => (
           <TouchableOpacity
             key={tab}
-            onPress={() => tab !== "Torneos" && setActiveTab(tab)}
+            onPress={() => tab === "Torneos" ? null : setActiveTab(tab)}
+            disabled={tab === "Torneos"}
             style={[
               styles.tab,
               activeTab === tab && styles.activeTab,
-              tab === "Torneos" && styles.disabledTab,
+              tab === "Torneos" && { opacity: 0.5 },
             ]}
-            disabled={tab === "Torneos"}
           >
             <Text
               style={[
                 styles.tabText,
                 activeTab === tab && styles.activeTabText,
-                tab === "Torneos" && styles.disabledText,
               ]}
             >
               {tab}
             </Text>
           </TouchableOpacity>
         ))}
+
       </View>
 
       <TextInput

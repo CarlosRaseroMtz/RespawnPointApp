@@ -1,7 +1,16 @@
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { firestore } from "../config/firebase-config";
 
-type TipoNoti = "like" | "comentario" | "seguimiento" | "mensaje";
+export type TipoNoti = "like" | "comentario" | "seguimiento" | "mensaje";
+
+interface CrearNotificacionParams {
+  paraUid: string;
+  deUid: string;
+  deNombre: string;
+  avatar?: string;
+  contenido: string;
+  tipo: TipoNoti;
+}
 
 export const crearNotificacion = async ({
   paraUid,
@@ -10,23 +19,18 @@ export const crearNotificacion = async ({
   avatar,
   contenido,
   tipo,
-}: {
-  paraUid: string;
-  deUid: string;
-  deNombre: string;
-  avatar?: string;
-  contenido: string;
-  tipo: TipoNoti;
-}) => {
-  try {
-    if (!paraUid || !deUid || !deNombre || !contenido || !tipo) {
-      throw new Error("Faltan campos obligatorios para la notificación.");
-    }
+}: CrearNotificacionParams) => {
+  if (!paraUid || !deUid || !deNombre || !contenido || !tipo) {
+    console.warn("❌ No se ha creado notificación: faltan campos.");
+    return;
+  }
 
-    await addDoc(collection(firestore, "notificaciones", paraUid, "items"), {
+  try {
+    const ref = collection(firestore, "notificaciones", paraUid, "items");
+    await addDoc(ref, {
       deUid,
       deNombre,
-      avatar: avatar || "https://i.pravatar.cc/150?img=12", // por defecto
+      avatar: avatar || "https://i.pravatar.cc/150?img=12",
       contenido,
       tipo,
       leido: false,

@@ -1,3 +1,5 @@
+import { getAuth } from "firebase/auth";
+import { collection, getFirestore, onSnapshot } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
   Image,
@@ -8,51 +10,46 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { app } from "../config/firebase-config";
 import BottomTabBar from "./comp/bottom-tab-bar";
 
 const tabs = ["Usuarios", "Comunidades", "Torneos"];
 
-import {
-  collection,
-  onSnapshot,
-  orderBy,
-  query,
-} from "firebase/firestore";
-import { firestore } from "../config/firebase-config";
-import { useAuth } from "../hooks/useAuth"; // ya lo tienes seguramente
-
-// ...
-
-const [notifications, setNotifications] = useState<any[]>([]);
-const { user } = useAuth();
-
-useEffect(() => {
-  if (!user) return;
-
-  const q = query(
-    collection(firestore, "notificaciones", user.uid, "items"),
-    orderBy("timestamp", "desc")
-  );
-
-  const unsub = onSnapshot(q, (snap) => {
-    const docs = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    setNotifications(docs);
-  });
-
-  return () => unsub();
-}, [user]);
-
-
 export default function NotificacionesScreen() {
   const [activeTab, setActiveTab] = useState("Usuarios");
-  const [seguidos, setSeguidos] = useState<{ [key: number]: boolean }>({});
+  const [seguidos, setSeguidos] = useState<{ [key: string]: boolean }>({});
+  const [notifications, setNotifications] = useState<any[]>([]);
 
-  const toggleSeguir = (id: number) => {
+  const db = getFirestore(app);
+  const auth = getAuth(app);
+
+  useEffect(() => {
+    const user = auth.currentUser;
+    if (!user) return;
+
+    const itemsRef = collection(db, "notificaciones", user.uid, "items");
+
+    const unsubscribe = onSnapshot(itemsRef, (snapshot) => {
+      const notifList = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setNotifications(notifList);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const toggleSeguir = (id: string) => {
     setSeguidos((prev) => ({
       ...prev,
       [id]: !prev[id],
     }));
   };
+
+  const filteredNotifications = notifications.filter(
+    (item) => item.categoria === activeTab
+  );
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
@@ -63,10 +60,12 @@ export default function NotificacionesScreen() {
           {tabs.map((tab) => (
             <TouchableOpacity
               key={tab}
-              onPress={() => setActiveTab(tab)}
+              onPress={() => tab !== "Torneos" && setActiveTab(tab)}
+              disabled={tab === "Torneos"}
               style={[
                 styles.tab,
                 activeTab === tab && styles.activeTab,
+                tab === "Torneos" && { opacity: 0.5 }, // efecto visual de desactivado
               ]}
             >
               <Text
@@ -79,40 +78,43 @@ export default function NotificacionesScreen() {
               </Text>
             </TouchableOpacity>
           ))}
+
         </View>
 
         <ScrollView style={{ flex: 1 }}>
-          {notifications.map((item) => (
-            <View key={item.id} style={styles.notification}>
-              <Image
-                source={{ uri: item.avatar || "https://i.pravatar.cc/150?img=3" }}
-                style={styles.avatar}
-              />
-              <View style={{ flex: 1 }}>
-                <Text style={styles.user}>
-                  {item.deNombre || "Usuario"}{" "}
-                  <Text style={styles.time}>
-                    {item.timestamp?.toDate()?.toLocaleDateString("es-ES", {
-                      day: "2-digit",
-                      month: "short",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}
+          {filteredNotifications.length === 0 ? (
+            <Text style={{ color: "#888", textAlign: "center", marginTop: 20 }}>
+              No hay notificaciones en esta categoría.
+            </Text>
+          ) : (
+            filteredNotifications.map((item) => (
+              <View key={item.id} style={styles.notification}>
+                <Image
+                  source={{ uri: item.avatar }}
+                  style={styles.avatar}
+                />
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.user}>
+                    {item.user} <Text style={styles.time}>{item.time}</Text>
                   </Text>
-                </Text>
-                <Text style={styles.message}>{item.contenido}</Text>
+                  <Text style={styles.message}>{item.message}</Text>
+                </View>
+                {item.action === "seguir" && (
+                  <TouchableOpacity
+                    style={[
+                      styles.followBtn,
+                      seguidos[item.id] && { backgroundColor: "#FF66C4" },
+                    ]}
+                    onPress={() => toggleSeguir(item.id)}
+                  >
+                    <Text style={styles.followText}>
+                      {seguidos[item.id] ? "Seguido" : "Seguir"}
+                    </Text>
+                  </TouchableOpacity>
+                )}
               </View>
-
-              {item.tipo === "seguimiento" && (
-                <TouchableOpacity
-                  style={[styles.followBtn, { backgroundColor: "#FF66C4" }]}
-                >
-                  <Text style={styles.followText}>Seguir</Text>
-                </TouchableOpacity>
-              )}
-            </View>
-          ))}
-
+            ))
+          )}
         </ScrollView>
       </View>
       <BottomTabBar />
