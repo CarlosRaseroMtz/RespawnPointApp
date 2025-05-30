@@ -100,9 +100,14 @@ export default function HomeScreen() {
     <View style={styles.postContainer}>
       <View style={styles.postHeader}>
         <Image
-          source={require("../assets/images/foto_perfil_isi.jpg")}
+          source={
+            item.autor?.fotoPerfil
+              ? { uri: item.autor.fotoPerfil }
+              : require("../assets/images/foto_perfil_isi.jpg") // tu avatar por defecto
+          }
           style={styles.avatar}
         />
+
         <View style={{ flex: 1 }}>
           <Text style={styles.postUser}>
             {item.autor?.username} en {item.comunidadId}
