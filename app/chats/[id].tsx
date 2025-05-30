@@ -9,7 +9,7 @@ import {
   Timestamp,
   updateDoc,
 } from "firebase/firestore";
-import React, { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   FlatList,
   KeyboardAvoidingView,
@@ -21,73 +21,80 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
+
+/* ⬇️  ruta intacta: dos niveles arriba desde app/chats */
 import { firestore } from "../../config/firebase-config";
 import { useAuth } from "../../hooks/useAuth";
 
 export default function ChatScreen() {
-  const { id } = useLocalSearchParams(); // chatId
+  /* tipamos el parámetro */
+  const { id } = useLocalSearchParams<{ id: string }>();
+
   const { user } = useAuth();
   const [mensajes, setMensajes] = useState<any[]>([]);
   const [texto, setTexto] = useState("");
   const flatListRef = useRef<FlatList>(null);
 
+  /* ----------- listener de mensajes ----------- */
   useEffect(() => {
     if (!id || !user?.uid) return;
 
     const q = query(
-      collection(firestore, "chats", id as string, "mensajes"),
+      collection(firestore, "chats", id, "mensajes"),
       orderBy("timestamp", "asc")
     );
 
     const unsub = onSnapshot(q, (snap) => {
-      const data = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+      const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
       setMensajes(data);
+
+      /* marcar como leído */
       data.forEach(async (msg: any) => {
         if (msg.userId !== user.uid && !msg.leidoPor?.includes(user.uid)) {
           try {
             await updateDoc(
-              doc(firestore, "chats", id as string, "mensajes", msg.id),
-              {
-                leidoPor: [...(msg.leidoPor || []), user.uid],
-              }
+              doc(firestore, "chats", id, "mensajes", msg.id),
+              { leidoPor: [...(msg.leidoPor || []), user.uid] }
             );
-          } catch (err) {
-            console.error("❌ Error al marcar como leído:", err);
+          } catch (e) {
+            console.error("❌ update leído:", e);
           }
         }
       });
 
+      /* scroll al final */
       setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
     });
 
-    return () => unsub();
+    return unsub;
   }, [id, user?.uid]);
 
+  /* ----------- enviar mensaje ----------- */
   const enviar = async () => {
     if (!texto.trim() || !user || !id) return;
 
-    const ref = doc(firestore, "chats", id as string);
+    const chatRef = doc(firestore, "chats", id);
 
-    await addDoc(collection(ref, "mensajes"), {
+    await addDoc(collection(chatRef, "mensajes"), {
       userId: user.uid,
       texto: texto.trim(),
       timestamp: Timestamp.now(),
       leidoPor: [],
     });
 
-    await updateDoc(ref, {
-      ultimoMensaje: texto.trim(),
+    await updateDoc(chatRef, {
+      lastMessage: texto.trim(),
       timestamp: Timestamp.now(),
     });
 
     setTexto("");
   };
 
+  /* ----------- UI ----------- */
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: "#fff" }}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 0}
     >
       <SafeAreaView style={{ flex: 1 }}>
         <FlatList
@@ -129,6 +136,7 @@ export default function ChatScreen() {
   );
 }
 
+/* ----------- estilos ----------- */
 const styles = StyleSheet.create({
   burbuja: {
     maxWidth: "75%",
@@ -144,14 +152,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#eee",
     alignSelf: "flex-start",
   },
-  texto: {
-    color: "#000",
-  },
-  hora: {
-    fontSize: 10,
-    color: "#666",
-    marginTop: 4,
-  },
+  texto: { color: "#000" },
+  hora: { fontSize: 10, color: "#666", marginTop: 4 },
   inputArea: {
     flexDirection: "row",
     padding: 12,

@@ -98,7 +98,7 @@ export default function BottomTabBar() {
       </TouchableOpacity>
 
 
-      <TouchableOpacity onPress={() => router.push("../create-post")}>
+      <TouchableOpacity onPress={() => router.push("../publicacion/create-post")}>
         <AntDesign
           name="pluscircle"
           size={40}

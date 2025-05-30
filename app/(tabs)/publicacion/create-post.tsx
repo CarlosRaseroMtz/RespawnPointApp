@@ -1,7 +1,17 @@
 import * as ImagePicker from "expo-image-picker";
-import { addDoc, collection, Timestamp } from "firebase/firestore";
-import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
-import React, { useState } from "react";
+import { router } from "expo-router";
+import {
+  addDoc,
+  collection,
+  Timestamp,
+} from "firebase/firestore";
+import {
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytes,
+} from "firebase/storage";
+import { useState } from "react";
 import {
   Alert,
   Dimensions,
@@ -17,64 +27,65 @@ import { useAuth } from "../../../hooks/useAuth";
 import { normalizarNombreArchivo } from "../../../utils/normalizar-nombre-archivo";
 
 const { width } = Dimensions.get("window");
+const CATEGORIAS = ["Videojuego", "Meme"]; // puedes ampliar
 
 export default function CreatePostScreen() {
   const { user, loading } = useAuth();
+
   const [texto, setTexto] = useState("");
   const [imagen, setImagen] = useState<string | null>(null);
+  const [categoria, setCategoria] = useState(CATEGORIAS[0]);
   const [subiendo, setSubiendo] = useState(false);
 
+  /* ---------- elegir imagen ---------- */
   const pickImage = async () => {
-    const result = await ImagePicker.launchImageLibraryAsync({
+    const res = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       quality: 0.8,
     });
-
-    if (!result.canceled && result.assets.length > 0) {
-      setImagen(result.assets[0].uri);
+    if (!res.canceled && res.assets.length) {
+      setImagen(res.assets[0].uri);
     }
   };
 
+  /* ---------- publicar ---------- */
   const subirPost = async () => {
     if (loading || !user) {
       Alert.alert("Sesión no lista", "Inicia sesión primero");
       return;
     }
-
     if (!texto.trim() || !imagen) {
-      Alert.alert("Campos incompletos", "Debes añadir texto e imagen.");
+      Alert.alert("Campos incompletos", "Añade mensaje e imagen.");
       return;
     }
 
     try {
       setSubiendo(true);
 
-      const uid = user.uid;
-      const timestamp = Date.now();
-      const nombreOriginal = imagen.split("/").pop() || `imagen_${timestamp}.jpg`;
-      const nombreLimpio = normalizarNombreArchivo(nombreOriginal);
-      const ruta = `publicaciones/${uid}/${timestamp}-${nombreLimpio}`;
+      /* 1. Subir imagen a Storage */
+      const ts = Date.now();
+      const nombreBase = imagen.split("/").pop() || `img_${ts}.jpg`;
+      const nombreLimpio = normalizarNombreArchivo(nombreBase);
+      const rutaStorage = `publicaciones/${user.uid}/${ts}-${nombreLimpio}`;
 
-      const response = await fetch(imagen);
-      const blob = await response.blob();
-
-      const storageRef = ref(getStorage(), ruta);
+      const blob = await (await fetch(imagen)).blob();
+      const storageRef = ref(getStorage(), rutaStorage);
       await uploadBytes(storageRef, blob);
-
       const mediaUrl = await getDownloadURL(storageRef);
 
+      /* 2. Crear documento en Firestore */
       await addDoc(collection(firestore, "publicaciones"), {
-        userId: uid,
-        contenido: texto,
+        userId: user.uid,
+        contenido: texto.trim(),
         mediaUrl,
+        categoria,
         likes: [],
         timestamp: Timestamp.now(),
         comunidadId: "GENERAL",
       });
 
-      Alert.alert("¡Publicación creada!");
-      setTexto("");
-      setImagen(null);
+      Alert.alert("✅ ¡Publicación creada!");
+      router.back(); // ← vuelve a la pantalla anterior
     } catch (e: any) {
       console.error("❌ Error al subir publicación:", e);
       Alert.alert("Error", e.message || "Fallo al subir.");
@@ -83,25 +94,53 @@ export default function CreatePostScreen() {
     }
   };
 
+  /* ---------- UI ---------- */
   return (
     <View style={styles.container}>
-      <View style={styles.uploadBox}>
+      <View style={styles.box}>
+        {/* selector de imagen */}
         <Pressable style={styles.uploadArea} onPress={pickImage}>
           {imagen ? (
             <Image source={{ uri: imagen }} style={styles.preview} />
           ) : (
-            <Text style={styles.uploadText}>Pulsa para subir tus archivos</Text>
+            <Text style={styles.uploadText}>Pulsa para elegir imagen</Text>
           )}
         </Pressable>
 
+        {/* mensaje */}
         <TextInput
+          style={styles.input}
           placeholder="Escribe algo..."
+          placeholderTextColor="#888"
+          multiline
           value={texto}
           onChangeText={setTexto}
-          style={styles.input}
-          placeholderTextColor="#aaa"
         />
 
+        {/* chips de categoría */}
+        <View style={styles.catRow}>
+          {CATEGORIAS.map((cat) => (
+            <Pressable
+              key={cat}
+              onPress={() => setCategoria(cat)}
+              style={[
+                styles.chip,
+                categoria === cat && styles.chipActive,
+              ]}
+            >
+              <Text
+                style={[
+                  styles.chipText,
+                  categoria === cat && styles.chipTextActive,
+                ]}
+              >
+                {cat}
+              </Text>
+            </Pressable>
+          ))}
+        </View>
+
+        {/* botón publicar */}
         <Pressable
           style={[styles.button, subiendo && { opacity: 0.6 }]}
           onPress={subirPost}
@@ -116,6 +155,7 @@ export default function CreatePostScreen() {
   );
 }
 
+/* ---------- estilos ---------- */
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -123,15 +163,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     justifyContent: "center",
   },
-  uploadBox: {
-    backgroundColor: "#fff",
+  box: {
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 14,
     padding: 20,
     alignItems: "center",
-    justifyContent: "center",
     elevation: 3,
+    backgroundColor: "#fff",
   },
   uploadArea: {
     width: width * 0.8,
@@ -143,36 +182,36 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 15,
-    backgroundColor: "#fdfdfd",
+    backgroundColor: "#fafafa",
   },
-  uploadText: {
-    color: "#888",
-    fontSize: 14,
-  },
-  preview: {
-    width: "100%",
-    height: "100%",
-    borderRadius: 12,
-    resizeMode: "cover",
-  },
+  uploadText: { color: "#888" },
+  preview: { width: "100%", height: "100%", borderRadius: 12 },
   input: {
     borderWidth: 1,
     borderColor: "#ccc",
     borderRadius: 10,
     padding: 12,
     width: "100%",
+    minHeight: 80,
+    textAlignVertical: "top",
     marginBottom: 15,
     color: "#000",
   },
+  catRow: { flexDirection: "row", gap: 8, marginBottom: 15, flexWrap: "wrap" },
+  chip: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
+    backgroundColor: "#eee",
+  },
+  chipActive: { backgroundColor: "#FF66C4" },
+  chipText: { color: "#666" },
+  chipTextActive: { color: "#fff" },
   button: {
     backgroundColor: "#000",
     paddingVertical: 12,
     paddingHorizontal: 25,
     borderRadius: 10,
   },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "600",
-    fontSize: 15,
-  },
+  buttonText: { color: "#fff", fontWeight: "600", fontSize: 15 },
 });

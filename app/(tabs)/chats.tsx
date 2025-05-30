@@ -1,4 +1,4 @@
-import { router } from "expo-router";
+import { useRouter } from "expo-router";
 import {
   collection,
   doc,
@@ -10,7 +10,7 @@ import {
   setDoc,
   where,
 } from "firebase/firestore";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Image,
   SafeAreaView,
@@ -21,19 +21,28 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+
+/* 👈 sigue siendo dos niveles arriba desde (tabs) */
 import { firestore } from "../../config/firebase-config";
 import { useAuth } from "../../hooks/useAuth";
-import BottomTabBar from "../comp/bottom-tab-bar";
+
+/* ❌ BottomTabBar ya no hace falta porque usamos <Tabs>.
+   Si todavía lo quieres como extra UI, importa con:
+   import BottomTabBar from "../../comp/bottom-tab-bar";
+*/
 
 const tabs = ["Usuarios", "Comunidades", "Torneos"];
 
 export default function ChatsScreen() {
-  const [activeTab, setActiveTab] = useState("Usuarios");
+  const router = useRouter();
   const { user } = useAuth();
+
+  const [activeTab, setActiveTab] = useState("Usuarios");
   const [chats, setChats] = useState<any[]>([]);
   const [busqueda, setBusqueda] = useState("");
   const [resultados, setResultados] = useState<any[]>([]);
 
+  /* ---------- listener de todos mis chats ---------- */
   useEffect(() => {
     if (!user) return;
 
@@ -43,46 +52,42 @@ export default function ChatsScreen() {
       orderBy("timestamp", "desc")
     );
 
-    const unsubscribe = onSnapshot(q, async (snap) => {
-      const resultados = await Promise.all(
-        snap.docs.map(async (docSnap) => {
-          const data = docSnap.data();
+    const unsub = onSnapshot(q, async (snap) => {
+      const res = await Promise.all(
+        snap.docs.map(async (d) => {
+          const data = d.data();
           const otroUid = data.participantes.find((uid: string) => uid !== user.uid);
-          const userSnap = await getDoc(doc(firestore, "usuarios", otroUid));
-          const userInfo = userSnap.exists() ? userSnap.data() : {};
+          const otroSnap = await getDoc(doc(firestore, "usuarios", otroUid));
+          const userInfo = otroSnap.exists() ? otroSnap.data() : {};
 
           return {
-            id: docSnap.id,
-            tipo: data.tipo || "usuario",
-            nombre: userInfo.username || "Usuario",
-            avatar: userInfo.fotoPerfil || "https://i.pravatar.cc/150?img=2",
-            lastMessage: data.lastMessage || "",
-            timestamp: data.timestamp?.toDate().toLocaleTimeString("es-ES", {
-              hour: "2-digit",
-              minute: "2-digit",
-            }) || "",
+            id: d.id,
+            tipo: data.tipo ?? "usuario",
+            nombre: userInfo.username ?? "Usuario",
+            avatar: userInfo.fotoPerfil ?? "https://i.pravatar.cc/150?img=2",
+            lastMessage: data.lastMessage ?? "",
+            timestamp:
+              data.timestamp?.toDate().toLocaleTimeString("es-ES", {
+                hour: "2-digit",
+                minute: "2-digit",
+              }) ?? "",
           };
         })
       );
-      setChats(resultados);
+      setChats(res);
     });
 
-    return () => unsubscribe();
+    return unsub;
   }, [user]);
 
+  /* ---------- búsqueda de usuarios ---------- */
   const buscarUsuarios = async () => {
-    const ref = collection(firestore, "usuarios");
-    const snap = await getDocs(ref);
-    type Usuario = {
-      id: string;
-      username: string;
-      fotoPerfil?: string;
-    };
+    const snap = await getDocs(collection(firestore, "usuarios"));
 
-    const encontrados: Usuario[] = snap.docs.map((doc) => ({
-      id: doc.id,
-      ...doc.data(),
-    })) as Usuario[];
+    const encontrados = snap.docs.map((d) => ({
+      id: d.id,
+      ...d.data(),
+    })) as { id: string; username: string; fotoPerfil?: string }[];
 
     const filtrados = encontrados.filter(
       (u) =>
@@ -90,32 +95,32 @@ export default function ChatsScreen() {
         u.id !== user?.uid
     );
 
-    setResultados(filtrados);
-
-    if (filtrados.length === 0) {
-      setResultados([{ id: "no-results", username: "No se encontraron usuarios" }]);
-    }
+    setResultados(
+      filtrados.length ? filtrados : [{ id: "no-results", username: "No se encontraron usuarios" }]
+    );
   };
 
+  /* ---------- iniciar chat ---------- */
   const iniciarChatCon = async (usuario: any) => {
     if (!user) return;
 
+    // ¿Existe ya un chat 1-a-1?
     const q = query(
       collection(firestore, "chats"),
       where("participantes", "array-contains", user.uid)
     );
     const snap = await getDocs(q);
-
-    const existente = snap.docs.find((doc) => {
-      const p = doc.data().participantes;
+    const existente = snap.docs.find((d) => {
+      const p = d.data().participantes;
       return p.includes(usuario.id) && p.length === 2;
     });
 
     if (existente) {
-      router.push(`./chat/${existente.id}`);
+      router.push(`./chats/${existente.id}`);         // ✅ ruta absoluta
       return;
     }
 
+    // Nuevo chat
     const chatId = `${user.uid}_${usuario.id}`;
     await setDoc(doc(firestore, "chats", chatId), {
       participantes: [user.uid, usuario.id],
@@ -124,23 +129,26 @@ export default function ChatsScreen() {
       lastMessage: "",
     });
 
-    router.push(`./chats/${chatId}`);
+    router.push(`./chats/${chatId}`);                // ✅
   };
 
-  const userChats = chats.filter((c) => c.tipo === "usuario");
+  /* ---------- filtros de pestaña ---------- */
+  const userChats  = chats.filter((c) => c.tipo === "usuario");
   const groupChats = chats.filter((c) => c.tipo === "grupo");
 
   const chatsToShow =
     activeTab === "Usuarios"
       ? userChats
       : activeTab === "Comunidades"
-        ? groupChats
-        : [];
+      ? groupChats
+      : [];
 
+  /* ---------- UI ---------- */
   return (
     <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Chats de</Text>
+      <Text style={styles.title}>Chats</Text>
 
+      {/* pestañas */}
       <View style={styles.tabs}>
         {tabs.map((tab) => (
           <TouchableOpacity
@@ -163,19 +171,12 @@ export default function ChatsScreen() {
             </Text>
           </TouchableOpacity>
         ))}
-
       </View>
 
+      {/* búsqueda */}
       <TextInput
         placeholder="Buscar usuarios..."
-        style={{
-          borderWidth: 1,
-          borderColor: "#ccc",
-          borderRadius: 12,
-          paddingHorizontal: 12,
-          paddingVertical: 8,
-          marginBottom: 12,
-        }}
+        style={styles.search}
         value={busqueda}
         onChangeText={(text) => {
           setBusqueda(text);
@@ -184,32 +185,35 @@ export default function ChatsScreen() {
         }}
       />
 
+      {/* resultados de búsqueda */}
       {resultados.map((u) => (
         <TouchableOpacity
           key={u.id}
-          style={{ flexDirection: "row", alignItems: "center", marginBottom: 10 }}
+          style={styles.searchItem}
           onPress={() => iniciarChatCon(u)}
+          disabled={u.id === "no-results"}
         >
           <Image
-            source={{ uri: u.fotoPerfil }}
-            style={{ width: 40, height: 40, borderRadius: 20, marginRight: 10 }}
+            source={{ uri: u.fotoPerfil ?? "https://i.pravatar.cc/150?img=1" }}
+            style={styles.avatar}
           />
-          <Text style={{ fontSize: 16 }}>{u.username}</Text>
+          <Text style={styles.name}>{u.username}</Text>
         </TouchableOpacity>
       ))}
 
+      {/* lista de chats */}
       <ScrollView>
         {chatsToShow.map((chat) => (
           <TouchableOpacity
             key={chat.id}
             style={styles.chatItem}
-            onPress={() => router.push(`/chats/${chat.id}`)}
+            onPress={() => router.push(`./chats/${chat.id}`)}
           >
             <View style={styles.chatRow}>
               <Image source={{ uri: chat.avatar }} style={styles.avatar} />
               <View style={styles.chatInfo}>
                 <Text style={styles.name}>
-                  {chat.nombre} {" "}
+                  {chat.nombre}{" "}
                   <Text style={styles.time}>{chat.timestamp}</Text>
                 </Text>
                 <Text style={styles.message}>{chat.lastMessage}</Text>
@@ -218,47 +222,15 @@ export default function ChatsScreen() {
           </TouchableOpacity>
         ))}
       </ScrollView>
-      {busqueda.length > 0 && resultados.length > 0 && (
-        <>
-          <Text style={{ fontWeight: "600", marginBottom: 8 }}>Usuarios encontrados:</Text>
-          {resultados.map((usuario) => (
-            <TouchableOpacity
-              key={usuario.id}
-              style={styles.chatItem}
-              onPress={() => iniciarChatCon(usuario)}
-            >
-              <View style={styles.chatRow}>
-                <Image source={{ uri: usuario.fotoPerfil }} style={styles.avatar} />
-                <View style={styles.chatInfo}>
-                  <Text style={styles.name}>{usuario.username}</Text>
-                  <Text style={styles.message}>Pulsar para chatear</Text>
-                </View>
-              </View>
-            </TouchableOpacity>
-          ))}
-        </>
-      )}
-      <BottomTabBar />
     </SafeAreaView>
   );
 }
 
+/* ---------- estilos ---------- */
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    paddingHorizontal: 16,
-    paddingTop: 16,
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: "600",
-    marginBottom: 12,
-  },
-  tabs: {
-    flexDirection: "row",
-    marginBottom: 16,
-  },
+  container: { flex: 1, backgroundColor: "#fff", paddingHorizontal: 16, paddingTop: 16 },
+  title: { fontSize: 20, fontWeight: "600", marginBottom: 12 },
+  tabs: { flexDirection: "row", marginBottom: 16 },
   tab: {
     backgroundColor: "#eee",
     paddingHorizontal: 12,
@@ -266,50 +238,21 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     marginRight: 8,
   },
-  activeTab: {
-    backgroundColor: "#FF66C4",
+  activeTab: { backgroundColor: "#FF66C4" },
+  tabText: { color: "#666", fontWeight: "500" },
+  activeTabText: { color: "#fff" },
+  search: {
+    borderWidth: 1, borderColor: "#ccc", borderRadius: 12,
+    paddingHorizontal: 12, paddingVertical: 8, marginBottom: 12,
   },
-  disabledTab: {
-    backgroundColor: "#ddd",
+  searchItem: {
+    flexDirection: "row", alignItems: "center", marginBottom: 10,
   },
-  tabText: {
-    color: "#666",
-    fontWeight: "500",
-  },
-  activeTabText: {
-    color: "#fff",
-  },
-  disabledText: {
-    color: "#aaa",
-  },
-  chatItem: {
-    marginBottom: 20,
-  },
-  chatRow: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  avatar: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
-    marginRight: 12,
-  },
-  chatInfo: {
-    flex: 1,
-  },
-  name: {
-    fontWeight: "600",
-    color: "#000",
-    fontSize: 16,
-  },
-  message: {
-    color: "#555",
-    marginTop: 2,
-  },
-  time: {
-    fontWeight: "400",
-    color: "#888",
-    fontSize: 12,
-  },
+  chatItem: { marginBottom: 20 },
+  chatRow: { flexDirection: "row", alignItems: "center" },
+  avatar: { width: 52, height: 52, borderRadius: 26, marginRight: 12 },
+  chatInfo: { flex: 1 },
+  name: { fontWeight: "600", color: "#000", fontSize: 16 },
+  message: { color: "#555", marginTop: 2 },
+  time: { fontWeight: "400", color: "#888", fontSize: 12 },
 });

@@ -1,11 +1,12 @@
 import { AntDesign } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { useRouter } from "expo-router";
-import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import {
+  createUserWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useState } from "react";
-import { auth, firestore } from "../../config/firebase-config";
-
 import {
   Alert,
   Image,
@@ -17,8 +18,10 @@ import {
   View,
 } from "react-native";
 
-const platforms = [
-  "Xbox 360",
+/* ⬇️  ruta correcta: 2 niveles arriba desde (auth) */
+import { auth, firestore } from "../../config/firebase-config";
+
+const platforms = ["Xbox 360",
   "Xbox One",
   "Xbox Series X/S",
   "PlayStation 3",
@@ -30,14 +33,16 @@ const platforms = [
   "PC",
   "Nintendo 3DS",
   "Consola retro/antigua",
-];
+  "Móviles",
+  "VRs",
+  "Otro",
+  "No tengo una plataforma favorita"];
 
-const genres = [
-  "Acción", "Aventura", "RPG", "Shooter", "Estrategia",
+const genres = ["Acción", "Aventura", "RPG", "Shooter", "Estrategia",
   "Deportes", "Simulación", "Lucha", "Plataformas", "Terror",
   "Carreras", "Puzzle", "Indie", "Multijugador", "Sandbox", "MOBA",
-  "Mundo abierto", "Narrativo", "Survival",
-];
+  "Mundo abierto", "Narrativo", "Survival", "Battle Royale",
+  "Sigilo", "Construcción", "Educativo", "Otro"];
 
 export default function RegisterScreen() {
   const router = useRouter();
@@ -49,69 +54,62 @@ export default function RegisterScreen() {
   const [username, setUsername] = useState("");
   const [platform, setPlatform] = useState(platforms[0]);
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
-
   const [passwordFocused, setPasswordFocused] = useState(false);
 
+  /* —— validaciones auxiliares —— */
   const criterios = {
     longitud: password.length >= 8,
     mayuscula: /[A-Z]/.test(password),
     minuscula: /[a-z]/.test(password),
     numero: /\d/.test(password),
   };
-
-
-  const toggleGenre = (genre: string) => {
-    if (selectedGenres.includes(genre)) {
-      setSelectedGenres(selectedGenres.filter(g => g !== genre));
-    } else if (selectedGenres.length < 2) {
-      setSelectedGenres([...selectedGenres, genre]);
-    } else {
-      Alert.alert("Límite", "Solo puedes elegir 2 géneros");
-    }
-  };
-
-
   const evaluarFuerza = (pass: string) => {
-    let fuerza = 0;
-    if (pass.length >= 8) fuerza++;
-    if (/[A-Z]/.test(pass)) fuerza++;
-    if (/[a-z]/.test(pass)) fuerza++;
-    if (/\d/.test(pass)) fuerza++;
-    if (/[\W_]/.test(pass)) fuerza++;
-
-    if (fuerza <= 2) return "Débil";
-    if (fuerza === 3) return "Media";
-    if (fuerza === 4) return "Fuerte";
-    return "Muy fuerte";
+    let f = 0;
+    if (pass.length >= 8) f++;
+    if (/[A-Z]/.test(pass)) f++;
+    if (/[a-z]/.test(pass)) f++;
+    if (/\d/.test(pass)) f++;
+    if (/[\W_]/.test(pass)) f++;
+    return ["Débil", "Débil", "Media", "Fuerte", "Muy fuerte"][f - 1] ?? "Débil";
   };
-
   const fuerza = evaluarFuerza(password);
 
+  const toggleGenre = (genre: string) => {
+    if (selectedGenres.includes(genre))
+      setSelectedGenres(selectedGenres.filter((g) => g !== genre));
+    else if (selectedGenres.length < 2)
+      setSelectedGenres([...selectedGenres, genre]);
+    else Alert.alert("Límite", "Solo puedes elegir 2 géneros");
+  };
 
+  /* —— registro —— */
   const handleRegister = async () => {
-    if (!email || !password || !fullName || !username || selectedGenres.length === 0) {
-      Alert.alert("Campos incompletos", "Por favor completa todos los campos.");
+    if (
+      !email || !password || !fullName || !username ||
+      selectedGenres.length === 0
+    ) {
+      Alert.alert("Campos incompletos", "Completa todos los datos.");
       return;
     }
-
-    if (password.length < 8 || !/[A-Z]/.test(password) || !/[a-z]/.test(password) || !/\d/.test(password)) {
-      Alert.alert("Contraseña insegura", "Debe tener mínimo 8 caracteres, una mayúscula, una minúscula y un número.");
+    if (!criterios.longitud || !criterios.mayuscula ||
+      !criterios.minuscula || !criterios.numero) {
+      Alert.alert(
+        "Contraseña insegura",
+        "Mínimo 8 caracteres, una mayúscula, una minúscula y un número."
+      );
       return;
     }
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email.trim(), password);
-      const user = userCredential.user;
+      const { user } = await createUserWithEmailAndPassword(
+        auth, email.trim(), password
+      );
+      await updateProfile(user, { displayName: fullName });
 
-      await updateProfile(user, {
-        displayName: fullName,
-      });
-
-      // ✅ Crear documento en Firestore
       await setDoc(doc(firestore, "usuarios", user.uid), {
-        username: username,
+        username,
         email: user.email,
-        fotoPerfil: "https://i.pravatar.cc/150?img=12", // avatar por defecto
+        fotoPerfil: "https://i.pravatar.cc/150?img=12",
         plataformaFav: platform,
         generoFav: selectedGenres.join(", "),
         descripcion: "Nuevo jugador registrado.",
@@ -121,36 +119,42 @@ export default function RegisterScreen() {
         comunidades: [],
       });
 
-      console.log("✅ Usuario y perfil creados:", user.email);
-      Alert.alert("Registro exitoso", "Ahora puedes iniciar sesión.");
-      router.replace("/login");
-    } catch (error: any) {
-      console.error("❌ Error al registrar:", error);
-      let message = "Ocurrió un error.";
-      if (error.code === "auth/email-already-in-use") {
-        message = "El correo ya está registrado.";
-      } else if (error.code === "auth/invalid-email") {
-        message = "Correo inválido.";
-      } else if (error.code === "auth/weak-password") {
-        message = "La contraseña debe tener al menos 6 caracteres.";
-      }
-      Alert.alert("Error de registro", message);
+      Alert.alert("Registro exitoso", "¡Bienvenido!");
+      router.replace("/login");          // ✔️  usa ruta absoluta
+    } catch (e: any) {
+      console.error("❌ Registro:", e);
+      const msg =
+        e.code === "auth/email-already-in-use"
+          ? "El correo ya está registrado."
+          : e.code === "auth/invalid-email"
+            ? "Correo inválido."
+            : e.code === "auth/weak-password"
+              ? "Contraseña muy débil."
+              : "Ocurrió un error.";
+      Alert.alert("Error de registro", msg);
     }
   };
 
-
+  /* —— UI —— */
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Image source={require("../../assets/images/logo.png")} style={styles.logo} />
+      <Image
+        source={require("../../../assets/images/logo.png")}
+        style={styles.logo}
+      />
       <Text style={styles.title}>Regístrate</Text>
 
+      {/*  correo / contraseña */}
       <TextInput
         style={styles.input}
         placeholder="Correo electrónico"
         placeholderTextColor="#888"
+        autoCapitalize="none"
+        keyboardType="email-address"
         value={email}
         onChangeText={setEmail}
       />
+
       <View style={styles.passwordContainer}>
         <TextInput
           style={styles.input}
@@ -171,13 +175,12 @@ export default function RegisterScreen() {
       </View>
 
       {passwordFocused && (
-
         <View style={{ marginBottom: 10, marginTop: -10 }}>
           <Text style={{ color: "#888", fontSize: 12, marginBottom: 5 }}>
-            Fuerza de la contraseña: {fuerza}
+            Fuerza: {fuerza}
           </Text>
           <Text style={{ color: criterios.longitud ? "#0c0" : "#999" }}>
-            {criterios.longitud ? "✅" : "❌"} Mínimo 8 caracteres
+            {criterios.longitud ? "✅" : "❌"} 8+ caracteres
           </Text>
           <Text style={{ color: criterios.mayuscula ? "#0c0" : "#999" }}>
             {criterios.mayuscula ? "✅" : "❌"} Una mayúscula
@@ -191,7 +194,7 @@ export default function RegisterScreen() {
         </View>
       )}
 
-
+      {/*  nombre / user */}
       <TextInput
         style={styles.input}
         placeholder="Nombre completo"
@@ -203,10 +206,12 @@ export default function RegisterScreen() {
         style={styles.input}
         placeholder="Nombre de usuario"
         placeholderTextColor="#888"
+        autoCapitalize="none"
         value={username}
         onChangeText={setUsername}
       />
 
+      {/*  plataforma */}
       <Text style={styles.label}>Plataforma favorita</Text>
       <View style={styles.pickerContainer}>
         <Picker
@@ -214,15 +219,16 @@ export default function RegisterScreen() {
           onValueChange={setPlatform}
           style={styles.picker}
         >
-          {platforms.map(p => (
+          {platforms.map((p) => (
             <Picker.Item key={p} label={p} value={p} />
           ))}
         </Picker>
       </View>
 
+      {/*  géneros */}
       <Text style={styles.label}>Géneros favoritos (máx. 2)</Text>
       <View style={styles.genreContainer}>
-        {genres.map(g => (
+        {genres.map((g) => (
           <TouchableOpacity
             key={g}
             style={[
@@ -231,10 +237,12 @@ export default function RegisterScreen() {
             ]}
             onPress={() => toggleGenre(g)}
           >
-            <Text style={[
-              styles.genreText,
-              selectedGenres.includes(g) && styles.genreTextSelected
-            ]}>
+            <Text
+              style={[
+                styles.genreText,
+                selectedGenres.includes(g) && styles.genreTextSelected,
+              ]}
+            >
               {g}
             </Text>
           </TouchableOpacity>
@@ -242,9 +250,10 @@ export default function RegisterScreen() {
       </View>
 
       <TouchableOpacity style={styles.primaryButton} onPress={handleRegister}>
-        <Text style={styles.primaryButtonText}>Siguiente</Text>
+        <Text style={styles.primaryButtonText}>Registrarme</Text>
       </TouchableOpacity>
 
+      {/* separador / login */}
       <View style={styles.separator}>
         <View style={styles.line} />
         <Text style={styles.separatorText}>o</Text>
@@ -253,17 +262,23 @@ export default function RegisterScreen() {
 
       <View style={[styles.googleButton, { opacity: 0.5 }]}>
         <AntDesign name="google" size={20} color="#999" />
-        <Text style={[styles.googleButtonText, { color: "#999" }]}>Próximamente</Text>
+        <Text style={[styles.googleButtonText, { color: "#999" }]}>
+          Próximamente
+        </Text>
       </View>
+
       <TouchableOpacity onPress={() => router.replace("/login")}>
         <Text style={{ color: "#FF66C4", textAlign: "center" }}>
-          ¿Ya tienes cuenta? Inicia sesión</Text>
+          ¿Ya tienes cuenta? Inicia sesión
+        </Text>
       </TouchableOpacity>
     </ScrollView>
   );
 }
 
-const styles = StyleSheet.create({
+/* —— estilos idénticos … —— */
+const styles = StyleSheet.create({ /* ↓ mantenidos como los tuyos */
+
   container: { padding: 20, paddingBottom: 40, backgroundColor: "#fff" },
   logo: {
     width: 180,
@@ -376,4 +391,3 @@ const styles = StyleSheet.create({
     color: "#888",
   },
 });
-

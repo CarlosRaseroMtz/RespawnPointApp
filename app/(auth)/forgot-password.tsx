@@ -1,8 +1,6 @@
 import { useRouter } from "expo-router";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { useState } from "react";
-import { auth } from "../../config/firebase-config";
-
 import {
   Alert,
   Image,
@@ -13,6 +11,9 @@ import {
   View,
 } from "react-native";
 
+/* ⬇️  ruta correcta (dos niveles arriba desde (auth)) */
+import { auth } from "../../config/firebase-config";
+
 export default function ForgotPasswordScreen() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -22,13 +23,12 @@ export default function ForgotPasswordScreen() {
       Alert.alert("Error", "Introduce tu correo.");
       return;
     }
-
     try {
-      await sendPasswordResetEmail(auth, email);
+      await sendPasswordResetEmail(auth, email.trim());
       Alert.alert("Recuperación enviada", "Revisa tu bandeja de entrada.");
-      router.replace("/login");
-    } catch (error: any) {
-      console.error("Error al enviar recuperación:", error);
+      router.replace("/login");        
+    } catch (e) {
+      console.error("❌ Recuperación:", e);
       Alert.alert("Error", "No se pudo enviar el correo. ¿Está bien escrito?");
     }
   };
@@ -46,6 +46,8 @@ export default function ForgotPasswordScreen() {
         style={styles.input}
         placeholder="Correo electrónico"
         placeholderTextColor="#888"
+        autoCapitalize="none"
+        keyboardType="email-address"
         value={email}
         onChangeText={setEmail}
       />
@@ -54,6 +56,7 @@ export default function ForgotPasswordScreen() {
         <Text style={styles.primaryButtonText}>Enviar recuperación</Text>
       </TouchableOpacity>
 
+      {/* separador */}
       <View style={styles.separator}>
         <View style={styles.line} />
         <Text style={styles.separatorText}>o</Text>
@@ -61,14 +64,17 @@ export default function ForgotPasswordScreen() {
       </View>
 
       <Text style={styles.linkText}>
-        Si aún no tienes cuenta,{" "}
-        <Text style={styles.pink} onPress={() => router.push("/register")}>
-          pulsa aquí para registrarte
+        ¿Aún no tienes cuenta?{" "}
+        <Text
+          style={styles.pink}
+          onPress={() => router.push("/register")} 
+        >
+          Regístrate aquí
         </Text>
       </Text>
 
       <Text style={styles.terms}>
-        Al hacer click en continuar, aceptas nuestros{" "}
+        Al continuar aceptas nuestros{" "}
         <Text style={styles.linkBlue}>Términos de servicio</Text> y{" "}
         <Text style={styles.linkBlue}>Política de privacidad</Text>.
       </Text>
@@ -76,13 +82,9 @@ export default function ForgotPasswordScreen() {
   );
 }
 
+/* —— estilos sin cambios —— */
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    backgroundColor: "#fff",
-    flex: 1,
-    justifyContent: "center",
-  },
+  container: { flex: 1, padding: 20, backgroundColor: "#fff", justifyContent: "center" },
   logo: {
     width: 180,
     height: 180,
@@ -90,12 +92,7 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
     marginBottom: 10,
   },
-  title: {
-    fontSize: 22,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 25,
-  },
+  title: { fontSize: 22, fontWeight: "bold", textAlign: "center", marginBottom: 25 },
   input: {
     backgroundColor: "#fff",
     borderColor: "#ccc",
@@ -111,39 +108,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 15,
   },
-  primaryButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  separator: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 10,
-  },
-  line: {
-    flex: 1,
-    height: 1,
-    backgroundColor: "#ccc",
-  },
-  separatorText: {
-    marginHorizontal: 10,
-    color: "#888",
-  },
-  linkText: {
-    fontSize: 13,
-    color: "#000",
-    marginBottom: 15,
-  },
-  pink: {
-    color: "#FF66C4",
-  },
-  terms: {
-    fontSize: 12,
-    textAlign: "center",
-    marginTop: 10,
-    color: "#888",
-  },
-  linkBlue: {
-    color: "#42BAFF",
-  },
+  primaryButtonText: { color: "#fff", fontWeight: "bold" },
+  separator: { flexDirection: "row", alignItems: "center", marginVertical: 10 },
+  line: { flex: 1, height: 1, backgroundColor: "#ccc" },
+  separatorText: { marginHorizontal: 10, color: "#888" },
+  linkText: { fontSize: 13, color: "#000", marginBottom: 15 },
+  pink: { color: "#FF66C4" },
+  terms: { fontSize: 12, textAlign: "center", color: "#888" },
+  linkBlue: { color: "#42BAFF" },
 });
