@@ -1,6 +1,6 @@
 import { useRouter } from "expo-router";
 import { deleteUser, signOut } from "firebase/auth";
-import { deleteDoc, doc, getDoc } from "firebase/firestore";
+import { deleteDoc, doc, onSnapshot } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
   Alert,
@@ -23,24 +23,32 @@ export default function ConfiguracionScreen() {
   useEffect(() => {
     if (!user?.uid) return;
 
-    let activo = true;
-    const ref = doc(firestore, "usuarios", user.uid);
+    let unsub: () => void;
 
-    const cargarPerfil = async () => {
-      try {
-        const snap = await getDoc(ref);
-        if (snap.exists() && activo) {
-          setPerfil(snap.data());
+    try {
+      const ref = doc(firestore, "usuarios", user.uid);
+
+      unsub = onSnapshot(
+        ref,
+        (snap) => {
+          if (snap.exists()) {
+            setPerfil(snap.data());
+          }
+        },
+        (error) => {
+          if (error.code === "permission-denied") {
+            console.warn("⛔ Listener bloqueado: permiso denegado (posible logout)");
+          } else {
+            console.error("❌ Error inesperado en listener:", error);
+          }
         }
-      } catch (err) {
-        console.error("❌ Error al obtener perfil:", err);
-      }
-    };
-
-    cargarPerfil();
+      );
+    } catch (err) {
+      console.error("❌ Error fuera del snapshot:", err);
+    }
 
     return () => {
-      activo = false;
+      if (unsub) unsub();
     };
   }, [user?.uid]);
 
