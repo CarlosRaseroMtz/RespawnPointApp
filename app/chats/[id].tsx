@@ -32,7 +32,7 @@ export default function ChatScreen() {
   const flatListRef = useRef<FlatList>(null);
 
   useEffect(() => {
-    if (!id) return;
+    if (!id || !user?.uid) return;
 
     const q = query(
       collection(firestore, "chats", id as string, "mensajes"),
@@ -42,11 +42,20 @@ export default function ChatScreen() {
     const unsub = onSnapshot(q, (snap) => {
       const data = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       setMensajes(data);
+      data.forEach(async (msg: any) => {
+        const yaLeido = (msg.leidoPor || []).includes(user.uid);
+        if (!yaLeido && msg.userId !== user.uid) {
+          await updateDoc(doc(firestore, "chats", id as string, "mensajes", msg.id), {
+            leidoPor: [...(msg.leidoPor || []), user.uid],
+          });
+        }
+      });
+
       setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
     });
 
     return () => unsub();
-  }, [id]);
+  }, [id, user?.uid]);
 
   const enviar = async () => {
     if (!texto.trim() || !user || !id) return;
@@ -57,7 +66,7 @@ export default function ChatScreen() {
       userId: user.uid,
       texto: texto.trim(),
       timestamp: Timestamp.now(),
-      leido: false,
+      leidoPor: [],
     });
 
     await updateDoc(ref, {
