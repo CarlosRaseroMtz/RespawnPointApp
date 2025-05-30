@@ -1,7 +1,7 @@
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import { getAuth } from "firebase/auth";
-import { collection, getFirestore, onSnapshot } from "firebase/firestore";
+import { collection, getFirestore, onSnapshot, updateDoc } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
   Image,
@@ -32,12 +32,26 @@ export default function NotificacionesScreen() {
     const itemsRef = collection(db, "notificaciones", user.uid, "items");
 
     const unsubscribe = onSnapshot(itemsRef, (snapshot) => {
-      const notifList = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      console.log("🔔 Notificaciones cargadas:", notifList);
+      const notifList = snapshot.docs
+        .map((doc) => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            ...data,
+            seconds: data.time?.seconds || 0, // extra para ordenación
+          };
+        })
+        .sort((a, b) => b.seconds - a.seconds); // más recientes primero
+
       setNotifications(notifList);
+
+      // 🔵 Marcar como leídas
+      snapshot.docs.forEach((doc) => {
+        const data = doc.data();
+        if (!data.leida) {
+          updateDoc(doc.ref, { leida: true });
+        }
+      });
     });
 
     return () => unsubscribe();
@@ -93,7 +107,11 @@ export default function NotificacionesScreen() {
             </Text>
           ) : (
             filteredNotifications.map((item) => (
-              <View key={item.id} style={styles.notification}>
+              <View key={item.id} style={[styles.notification, { position: "relative" }]}>
+                {!item.leida && (
+                  <View style={styles.unreadDot} />
+                )}
+
                 <Image
                   source={{ uri: item.avatar }}
                   style={styles.avatar}
@@ -198,5 +216,14 @@ const styles = StyleSheet.create({
   followText: {
     color: "#fff",
     fontWeight: "600",
+  },
+  unreadDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#42BAFF", // tu color azul eléctrico
+    position: "absolute",
+    top: 0,
+    right: 0,
   },
 });
