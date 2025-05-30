@@ -24,9 +24,9 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { firestore } from "../../config/firebase-config";
-import { useAuth } from "../../hooks/useAuth";
-import { crearNotificacion } from "../../utils/crear-notificacion";
+import { firestore } from "../../../config/firebase-config";
+import { useAuth } from "../../../hooks/useAuth";
+import { crearNotificacion } from "../../../utils/crear-notificacion";
 
 
 export default function PublicacionScreen() {

@@ -12,9 +12,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { firestore } from "../config/firebase-config";
-import { useAuth } from "../hooks/useAuth";
-import BottomTabBar from "./comp/bottom-tab-bar";
+import { firestore } from "../../config/firebase-config";
+import { useAuth } from "../../hooks/useAuth";
+import BottomTabBar from "../comp/bottom-tab-bar";
 
 const truncarTexto = (texto: string, max: number) => {
   return texto.length > max ? texto.slice(0, max - 1) + "…" : texto;

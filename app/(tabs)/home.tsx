@@ -21,10 +21,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { firestore } from "../config/firebase-config";
-import { useAuth } from "../hooks/useAuth"; // ✅ nuevo import
-import { crearNotificacion } from "../utils/crear-notificacion";
-import BottomTabBar from "./comp/bottom-tab-bar"; // ✅ nuevo import
+import { firestore } from "../../config/firebase-config";
+import { useAuth } from "../../hooks/useAuth"; // ✅ nuevo import
+import { crearNotificacion } from "../../utils/crear-notificacion";
+import BottomTabBar from "../comp/bottom-tab-bar"; // ✅ nuevo import
 
 const { width } = Dimensions.get("window");
 
@@ -96,46 +96,46 @@ export default function HomeScreen() {
       }
     }
   };
-  const renderPost = ({ item }: any) => (
-    <View style={styles.postContainer}>
-      <View style={styles.postHeader}>
+const renderPost = ({ item }: any) => (
+  <View style={styles.postContainer}>
+    <View style={styles.postHeader}>
+      <TouchableOpacity
+        onPress={() => router.push(`/perfil/${item.autor.uid}`)}
+        style={{ flexDirection: "row", alignItems: "center" }}
+      >
         <Image
           source={
             item.autor?.fotoPerfil
               ? { uri: item.autor.fotoPerfil }
-              : require("../assets/images/foto_perfil_isi.jpg") // tu avatar por defecto
+              : require("../../assets/images/foto_perfil_isi.jpg") // avatar por defecto
           }
           style={styles.avatar}
         />
-
-        <View style={{ flex: 1 }}>
+        <View>
           <Text style={styles.postUser}>
-            {item.autor?.username} en {item.comunidadId}
+            {item.autor?.username}
           </Text>
-
           <Text style={styles.postTime}>
             {formatearFecha(item.timestamp)}
           </Text>
         </View>
-        <Entypo name="dots-three-horizontal" size={18} color="#555" />
-      </View>
-      {item.mediaUrl && (
-        <TouchableOpacity
-          onPress={() =>
+      </TouchableOpacity>
+      <Entypo name="dots-three-horizontal" size={18} color="#555" />
+    </View>
 
-            router.push(`/imagen?url=${(item.mediaUrl)}`)
-          }
-        >
-          <Image
-            source={{ uri: item.mediaUrl }}
-            style={styles.postImage}
-            resizeMode="cover"
-          />
-        </TouchableOpacity>
-      )}
+    {item.mediaUrl && (
+      <TouchableOpacity
+        onPress={() => router.push(`./imagen?url=${item.mediaUrl}`)}
+      >
+        <Image
+          source={{ uri: item.mediaUrl }}
+          style={styles.postImage}
+          resizeMode="cover"
+        />
+      </TouchableOpacity>
+    )}
 
-
-      {item.contenido && <Text style={styles.postText}>{item.contenido}</Text>}
+    {item.contenido && <Text style={styles.postText}>{item.contenido}</Text>}
 
       <View style={styles.reactions}>
         <TouchableOpacity

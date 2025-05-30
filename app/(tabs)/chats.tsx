@@ -21,9 +21,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { firestore } from "../config/firebase-config";
-import { useAuth } from "../hooks/useAuth";
-import BottomTabBar from "./comp/bottom-tab-bar";
+import { firestore } from "../../config/firebase-config";
+import { useAuth } from "../../hooks/useAuth";
+import BottomTabBar from "../comp/bottom-tab-bar";
 
 const tabs = ["Usuarios", "Comunidades", "Torneos"];
 
@@ -203,7 +203,7 @@ export default function ChatsScreen() {
           <TouchableOpacity
             key={chat.id}
             style={styles.chatItem}
-            onPress={() => router.push(`./chats/${chat.id}`)}
+            onPress={() => router.push(`/chats/${chat.id}`)}
           >
             <View style={styles.chatRow}>
               <Image source={{ uri: chat.avatar }} style={styles.avatar} />

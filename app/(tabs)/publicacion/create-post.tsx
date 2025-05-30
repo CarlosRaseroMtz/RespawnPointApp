@@ -12,9 +12,9 @@ import {
   TextInput,
   View,
 } from "react-native";
-import { firestore } from "../config/firebase-config";
-import { useAuth } from "../hooks/useAuth";
-import { normalizarNombreArchivo } from "../utils/normalizar-nombre-archivo";
+import { firestore } from "../../../config/firebase-config";
+import { useAuth } from "../../../hooks/useAuth";
+import { normalizarNombreArchivo } from "../../../utils/normalizar-nombre-archivo";
 
 const { width } = Dimensions.get("window");
 

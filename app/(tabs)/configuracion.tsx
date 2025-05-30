@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
 import { deleteUser, signOut } from "firebase/auth";
 import { deleteDoc, doc, onSnapshot } from "firebase/firestore";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Alert,
   Image,
@@ -12,59 +12,47 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { auth, firestore } from "../config/firebase-config";
-import { useAuth } from "../hooks/useAuth";
+
+/* 👈 nueva ruta (dos niveles arriba desde app/(tabs)/) */
+import { auth, firestore } from "../../config/firebase-config";
+import { useAuth } from "../../hooks/useAuth";
 
 export default function ConfiguracionScreen() {
   const router = useRouter();
   const { user } = useAuth();
   const [perfil, setPerfil] = useState<any>(null);
 
+  /* ----------- listener de perfil ----------- */
   useEffect(() => {
     if (!user?.uid) return;
 
-    let unsub: () => void;
+    const ref = doc(firestore, "usuarios", user.uid);
+    const unsub = onSnapshot(
+      ref,
+      (snap) => snap.exists() && setPerfil(snap.data()),
+      (e) =>
+        e.code === "permission-denied"
+          ? console.warn("⛔ Permiso denegado")
+          : console.error("❌ Listener:", e)
+    );
 
-    try {
-      const ref = doc(firestore, "usuarios", user.uid);
-
-      unsub = onSnapshot(
-        ref,
-        (snap) => {
-          if (snap.exists()) {
-            setPerfil(snap.data());
-          }
-        },
-        (error) => {
-          if (error.code === "permission-denied") {
-            console.warn("⛔ Listener bloqueado: permiso denegado (posible logout)");
-          } else {
-            console.error("❌ Error inesperado en listener:", error);
-          }
-        }
-      );
-    } catch (err) {
-      console.error("❌ Error fuera del snapshot:", err);
-    }
-
-    return () => {
-      if (unsub) unsub();
-    };
+    return unsub;
   }, [user?.uid]);
 
+  /* ----------- acciones ----------- */
   const cerrarSesion = async () => {
     try {
       await signOut(auth);
       router.replace("/login");
-    } catch (error) {
-      console.error("❌ Error al cerrar sesión:", error);
+    } catch (e) {
+      console.error("❌ Sign-out:", e);
     }
   };
 
   const eliminarCuenta = async () => {
     Alert.alert(
       "¿Eliminar cuenta?",
-      "Esta acción es irreversible. ¿Seguro que quieres continuar?",
+      "Esta acción es irreversible.",
       [
         { text: "Cancelar", style: "cancel" },
         {
@@ -76,16 +64,12 @@ export default function ConfiguracionScreen() {
               if (!uid) return;
 
               await deleteDoc(doc(firestore, "usuarios", uid));
-              if (auth.currentUser) {
-                await deleteUser(auth.currentUser);
-              } else {
-                throw new Error("No hay usuario autenticado para eliminar.");
-              }
+              if (auth.currentUser) await deleteUser(auth.currentUser);
 
-              Alert.alert("✅ Cuenta eliminada", "Tu cuenta ha sido eliminada.");
+              Alert.alert("✅ Cuenta eliminada");
               router.replace("/login");
-            } catch (error) {
-              console.error("❌ Error al eliminar cuenta:", error);
+            } catch (e) {
+              console.error("❌ Delete account:", e);
               Alert.alert("Error", "No se pudo eliminar la cuenta.");
             }
           },
@@ -94,22 +78,34 @@ export default function ConfiguracionScreen() {
     );
   };
 
+  /* ----------- UI ----------- */
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
+        {/* perfil */}
         <View style={styles.header}>
           <Image
-            source={{ uri: perfil?.fotoPerfil || "https://i.pravatar.cc/150?img=12" }}
+            source={{
+              uri: perfil?.fotoPerfil || "https://i.pravatar.cc/150?img=12",
+            }}
             style={styles.avatar}
           />
           <View>
-            <Text style={styles.username}>{perfil?.username || "Cargando..."}</Text>
-            <Text style={styles.platform}>🎮 {perfil?.plataformaFav || "Sin plataforma"}</Text>
+            <Text style={styles.username}>
+              {perfil?.username || "Cargando..."}
+            </Text>
+            <Text style={styles.platform}>
+              🎮 {perfil?.plataformaFav || "Sin plataforma"}
+            </Text>
           </View>
         </View>
 
+        {/* ajustes */}
         <Text style={styles.sectionTitle}>Configuración</Text>
-        <TouchableOpacity onPress={() => router.push("/editar-perfil")}>
+        <TouchableOpacity
+          /* 👈 ruta absoluta al nuevo lugar del archivo */
+          onPress={() => router.push("/publicacion/editar-perfil")}
+        >
           <Text style={styles.item}>Editar perfil</Text>
         </TouchableOpacity>
         <TouchableOpacity>
@@ -121,6 +117,7 @@ export default function ConfiguracionScreen() {
 
         <View style={styles.divider} />
 
+        {/* privacidad */}
         <Text style={styles.sectionTitle}>Privacidad</Text>
         <TouchableOpacity>
           <Text style={styles.item}>Suscripciones</Text>
@@ -143,9 +140,12 @@ export default function ConfiguracionScreen() {
 
         <View style={styles.divider} />
 
+        {/* sesión */}
         <Text style={styles.sectionTitle}>Inicio de sesión</Text>
         <TouchableOpacity disabled>
-          <Text style={[styles.item, { color: "#ccc" }]}>Añadir cuenta (próximamente)</Text>
+          <Text style={[styles.item, { color: "#ccc" }]}>
+            Añadir cuenta (próximamente)
+          </Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={cerrarSesion}>
           <Text style={[styles.item, { color: "red" }]}>Cerrar sesión</Text>
@@ -160,6 +160,7 @@ export default function ConfiguracionScreen() {
   );
 }
 
+/* ----------- estilos ----------- */
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff", paddingHorizontal: 16 },
   header: {
@@ -169,33 +170,15 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     gap: 12,
   },
-  avatar: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-  },
-  username: {
-    fontSize: 18,
-    fontWeight: "700",
-  },
-  platform: {
-    fontSize: 14,
-    color: "#888",
-  },
+  avatar: { width: 64, height: 64, borderRadius: 32 },
+  username: { fontSize: 18, fontWeight: "700" },
+  platform: { fontSize: 14, color: "#888" },
   sectionTitle: {
     fontWeight: "600",
     fontSize: 15,
     marginBottom: 8,
     marginTop: 20,
   },
-  item: {
-    fontSize: 15,
-    paddingVertical: 6,
-    color: "#000",
-  },
-  divider: {
-    height: 1,
-    backgroundColor: "#eee",
-    marginVertical: 16,
-  },
+  item: { fontSize: 15, paddingVertical: 6, color: "#000" },
+  divider: { height: 1, backgroundColor: "#eee", marginVertical: 16 },
 });

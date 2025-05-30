@@ -4,7 +4,7 @@ import { useRouter } from "expo-router";
 import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useState } from "react";
-import { auth, firestore } from "../config/firebase-config";
+import { auth, firestore } from "../../config/firebase-config";
 
 import {
   Alert,
@@ -141,7 +141,7 @@ export default function RegisterScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Image source={require("../assets/images/logo.png")} style={styles.logo} />
+      <Image source={require("../../assets/images/logo.png")} style={styles.logo} />
       <Text style={styles.title}>Regístrate</Text>
 
       <TextInput

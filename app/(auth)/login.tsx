@@ -12,14 +12,15 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { auth } from "../config/firebase-config";
 
+/* 👈 Ruta actualizada (estás un nivel más profundo) */
+import { auth } from "../../config/firebase-config";
 
 const { width } = Dimensions.get("window");
 
 export default function LoginScreen() {
-
   const router = useRouter();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -32,11 +33,10 @@ export default function LoginScreen() {
 
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      alert("Has iniciado sesión correctamente.");
-      router.replace("/home"); // ✅ Cambia esto si tu ruta inicial es otra
-    } catch (error: any) {
+      router.replace("/home");            // 👈 ruta nueva
+    } catch (err: any) {
       let message = "Error al iniciar sesión.";
-      switch (error.code) {
+      switch (err.code) {
         case "auth/user-not-found":
           message = "Este usuario no existe.";
           break;
@@ -56,18 +56,22 @@ export default function LoginScreen() {
       <View style={styles.background} />
 
       <View style={styles.inner}>
+        {/* 👈 Ruta del logo ajustada */}
         <Image
-          source={require("../assets/images/logo.png")}
+          source={require("../../assets/images/logo.png")}
           style={styles.logo}
         />
 
         <Text style={styles.title}>Inicio de sesión</Text>
 
+        {/* ——— inputs ——— */}
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
             placeholder="Correo electrónico"
             placeholderTextColor="#888"
+            autoCapitalize="none"
+            keyboardType="email-address"
             value={email}
             onChangeText={setEmail}
           />
@@ -94,26 +98,25 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </View>
 
+        {/* ——— enlaces ——— */}
         <Text style={styles.linkText}>
-          Si has olvidado la contraseña,{" "}
+          ¿Olvidaste la contraseña?{" "}
           <Text
             style={styles.pink}
             onPress={() => router.push("/forgot-password")}
           >
-            pulsa aquí
+            Pulsa aquí
           </Text>
         </Text>
 
+        {/* ——— botones ——— */}
         <TouchableOpacity style={styles.primaryButton} onPress={handleLogin}>
           <Text style={styles.primaryButtonText}>Continuar</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
-          style={[
-            styles.googleButton,
-            { opacity: 0.5 }, // apariencia deshabilitada
-          ]}
-          disabled={true} // evita interacción
+          style={[styles.googleButton, { opacity: 0.5 }]}
+          disabled
         >
           <AntDesign name="google" size={20} color="#999" />
           <Text style={[styles.googleButtonText, { color: "#999" }]}>
@@ -121,7 +124,7 @@ export default function LoginScreen() {
           </Text>
         </TouchableOpacity>
 
-
+        {/* ——— separador ——— */}
         <View style={styles.separator}>
           <View style={styles.line} />
           <Text style={styles.separatorText}>o</Text>
@@ -129,14 +132,17 @@ export default function LoginScreen() {
         </View>
 
         <Text style={styles.linkText}>
-          Si aún no tienes cuenta,{" "}
-          <Text style={styles.pink} onPress={() => router.push("/register")}>
-            pulsa aquí para registrarte
+          ¿Aún no tienes cuenta?{" "}
+          <Text
+            style={styles.pink}
+            onPress={() => router.push("/register")}
+          >
+            Regístrate aquí
           </Text>
         </Text>
 
         <Text style={styles.terms}>
-          Al hacer click en continuar, aceptas nuestros{" "}
+          Al continuar aceptas nuestros{" "}
           <Text
             style={styles.linkBlue}
             onPress={() => Linking.openURL("https://www.ejemplo.com/terminos")}
@@ -159,6 +165,7 @@ export default function LoginScreen() {
   );
 }
 
+/* ——— estilos idénticos ——— */
 const styles = StyleSheet.create({
   container: { flex: 1, position: "relative", backgroundColor: "#fff" },
   background: {
@@ -168,11 +175,7 @@ const styles = StyleSheet.create({
     width: width,
     backgroundColor: "#fff",
   },
-  inner: {
-    flex: 1,
-    padding: 20,
-    justifyContent: "center",
-  },
+  inner: { flex: 1, padding: 20, justifyContent: "center" },
   logo: {
     width: 180,
     height: 180,
@@ -180,16 +183,8 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
     marginBottom: 10,
   },
-  title: {
-    fontSize: 22,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 25,
-  },
-  inputContainer: {
-    marginBottom: 15,
-    position: "relative",
-  },
+  title: { fontSize: 22, fontWeight: "bold", textAlign: "center", marginBottom: 25 },
+  inputContainer: { marginBottom: 15, position: "relative" },
   input: {
     backgroundColor: "#fff",
     borderColor: "#ccc",
@@ -198,20 +193,9 @@ const styles = StyleSheet.create({
     padding: 12,
     paddingRight: 40,
   },
-  eyeIcon: {
-    position: "absolute",
-    right: 12,
-    top: 14,
-  },
-  linkText: {
-    fontSize: 13,
-    textAlign: "center",
-    color: "#000",
-    marginBottom: 20,
-  },
-  pink: {
-    color: "#FF66C4",
-  },
+  eyeIcon: { position: "absolute", right: 12, top: 14 },
+  linkText: { fontSize: 13, textAlign: "center", color: "#000", marginBottom: 20 },
+  pink: { color: "#FF66C4" },
   primaryButton: {
     backgroundColor: "#000",
     padding: 15,
@@ -219,10 +203,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 15,
   },
-  primaryButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
+  primaryButtonText: { color: "#fff", fontWeight: "bold" },
   googleButton: {
     backgroundColor: "#eee",
     flexDirection: "row",
@@ -233,31 +214,10 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     gap: 10,
   },
-  googleButtonText: {
-    fontWeight: "500",
-    color: "#000",
-  },
-  separator: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: 10,
-  },
-  line: {
-    flex: 1,
-    height: 1,
-    backgroundColor: "#ccc",
-  },
-  separatorText: {
-    marginHorizontal: 10,
-    color: "#888",
-  },
-  terms: {
-    fontSize: 12,
-    textAlign: "center",
-    marginTop: 10,
-    color: "#888",
-  },
-  linkBlue: {
-    color: "#42BAFF",
-  },
+  googleButtonText: { fontWeight: "500", color: "#000" },
+  separator: { flexDirection: "row", alignItems: "center", marginVertical: 10 },
+  line: { flex: 1, height: 1, backgroundColor: "#ccc" },
+  separatorText: { marginHorizontal: 10, color: "#888" },
+  terms: { fontSize: 12, textAlign: "center", marginTop: 10, color: "#888" },
+  linkBlue: { color: "#42BAFF" },
 });

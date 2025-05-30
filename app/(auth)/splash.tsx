@@ -8,7 +8,7 @@ import {
   StyleSheet,
   View
 } from "react-native";
-import { useAuth } from "../hooks/useAuth"; // ← importar tu hook
+import { useAuth } from "../../hooks/useAuth"; // ← importar tu hook
 
 const { width, height } = Dimensions.get("window");
 
@@ -54,12 +54,12 @@ export default function Splash() {
   return (
     <View style={styles.container}>
       <Image
-        source={require("../assets/images/fondoSplashScreen.png")}
+        source={require("../../assets/images/fondoSplashScreen.png")}
         style={styles.background}
         resizeMode="cover"
       />
       <Animated.Image
-        source={require("../assets/images/logo.png")}
+        source={require("../../assets/images/logo.png")}
         style={[styles.logo, { opacity: fadeAnim, transform: [{ scale: scaleAnim }] }]}
         resizeMode="contain"
       />

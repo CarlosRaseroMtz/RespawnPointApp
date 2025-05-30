@@ -12,8 +12,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { app } from "../config/firebase-config";
-import BottomTabBar from "./comp/bottom-tab-bar";
+import { app } from "../../config/firebase-config";
+import BottomTabBar from "../comp/bottom-tab-bar";
 
 const tabs = ["Usuarios", "Comunidades", "Torneos"];
 

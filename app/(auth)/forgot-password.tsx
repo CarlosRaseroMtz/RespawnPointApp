@@ -1,7 +1,7 @@
 import { useRouter } from "expo-router";
 import { sendPasswordResetEmail } from "firebase/auth";
 import { useState } from "react";
-import { auth } from "../config/firebase-config";
+import { auth } from "../../config/firebase-config";
 
 import {
   Alert,
@@ -36,7 +36,7 @@ export default function ForgotPasswordScreen() {
   return (
     <View style={styles.container}>
       <Image
-        source={require("../assets/images/logo.png")}
+        source={require("../../assets/images/logo.png")}
         style={styles.logo}
       />
 
