@@ -68,35 +68,34 @@ export default function HomeScreen() {
     cargarConPerfil();
   }, []);
 
-const handleLike = async (postId: string, likes: string[]) => {
-  if (!user) return;
-  const ref = doc(firestore, "publicaciones", postId);
-  const yaDioLike = likes.includes(user.uid);
+  const handleLike = async (postId: string, likes: string[]) => {
+    if (!user) return;
+    const ref = doc(firestore, "publicaciones", postId);
+    const yaDioLike = likes.includes(user.uid);
 
-  await updateDoc(ref, {
-    likes: yaDioLike ? arrayRemove(user.uid) : arrayUnion(user.uid),
-  });
+    await updateDoc(ref, {
+      likes: yaDioLike ? arrayRemove(user.uid) : arrayUnion(user.uid),
+    });
 
-  // 🔔 Solo si es un nuevo like
-  if (!yaDioLike) {
-    const snap = await getDoc(ref);
-    if (snap.exists()) {
-      const post = snap.data();
-      const postOwnerId = post.userId;
+    // 🔔 Solo si es un nuevo like
+    if (!yaDioLike) {
+      const snap = await getDoc(ref);
+      if (snap.exists()) {
+        const post = snap.data();
+        const postOwnerId = post.userId;
 
-      if (postOwnerId !== user.uid) {
-        await crearNotificacion({
-          paraUid: postOwnerId,
-          deUid: user.uid,
-          deNombre: user.displayName || "Anónimo",
-          avatar: user.photoURL || "https://i.pravatar.cc/150?img=12",
-          contenido: "le ha dado me gusta a tu publicación",
-          tipo: "like",
-        });
+        if (postOwnerId !== user.uid) {
+          await crearNotificacion({
+            paraUid: postOwnerId,
+            deUid: user.uid,
+            contenido: "le ha dado me gusta a tu publicación",
+            tipo: "like",
+          });
+
+        }
       }
     }
-  }
-};
+  };
   const renderPost = ({ item }: any) => (
     <View style={styles.postContainer}>
       <View style={styles.postHeader}>

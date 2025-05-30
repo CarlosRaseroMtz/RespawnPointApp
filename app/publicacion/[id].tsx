@@ -97,17 +97,15 @@ export default function PublicacionScreen() {
       );
       setNuevoComentario("");
 
-      // 🔔 Crear notificación al autor si el comentario NO es suyo
-      if (post?.userId && post.userId !== user.uid) {
+      if (post?.userId && user?.uid !== post.userId) {
         await crearNotificacion({
           paraUid: post.userId,
           deUid: user.uid,
-          deNombre: user.displayName || "Anónimo",
-          avatar: user.photoURL || "https://i.pravatar.cc/150?img=8",
           contenido: "ha comentado tu publicación",
           tipo: "comentario",
         });
       }
+
     } catch (error) {
       console.error("❌ Error al comentar:", error);
     }
