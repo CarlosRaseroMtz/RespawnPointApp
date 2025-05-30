@@ -43,11 +43,17 @@ export default function ChatScreen() {
       const data = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
       setMensajes(data);
       data.forEach(async (msg: any) => {
-        const yaLeido = (msg.leidoPor || []).includes(user.uid);
-        if (!yaLeido && msg.userId !== user.uid) {
-          await updateDoc(doc(firestore, "chats", id as string, "mensajes", msg.id), {
-            leidoPor: [...(msg.leidoPor || []), user.uid],
-          });
+        if (msg.userId !== user.uid && !msg.leidoPor?.includes(user.uid)) {
+          try {
+            await updateDoc(
+              doc(firestore, "chats", id as string, "mensajes", msg.id),
+              {
+                leidoPor: [...(msg.leidoPor || []), user.uid],
+              }
+            );
+          } catch (err) {
+            console.error("❌ Error al marcar como leído:", err);
+          }
         }
       });
 
