@@ -1,3 +1,5 @@
+import { formatDistanceToNow } from "date-fns";
+import { es } from "date-fns/locale";
 import { getAuth } from "firebase/auth";
 import { collection, getFirestore, onSnapshot } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
@@ -34,6 +36,7 @@ export default function NotificacionesScreen() {
         id: doc.id,
         ...doc.data(),
       }));
+      console.log("🔔 Notificaciones cargadas:", notifList);
       setNotifications(notifList);
     });
 
@@ -48,8 +51,10 @@ export default function NotificacionesScreen() {
   };
 
   const filteredNotifications = notifications.filter(
-    (item) => item.categoria === activeTab
+    (n) => n.user && n.message && n.time
   );
+
+
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
@@ -95,8 +100,14 @@ export default function NotificacionesScreen() {
                 />
                 <View style={{ flex: 1 }}>
                   <Text style={styles.user}>
-                    {item.user} <Text style={styles.time}>{item.time}</Text>
+                    {item.user}{" "}
+                    <Text style={styles.time}>
+                      {item.time?.toDate
+                        ? formatDistanceToNow(item.time.toDate(), { locale: es, addSuffix: true })
+                        : "sin fecha"}
+                    </Text>
                   </Text>
+
                   <Text style={styles.message}>{item.message}</Text>
                 </View>
                 {item.action === "seguir" && (

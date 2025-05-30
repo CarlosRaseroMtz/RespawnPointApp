@@ -97,7 +97,6 @@ const handleLike = async (postId: string, likes: string[]) => {
     }
   }
 };
-
   const renderPost = ({ item }: any) => (
     <View style={styles.postContainer}>
       <View style={styles.postHeader}>

@@ -25,16 +25,22 @@ export const crearNotificacion = async ({
     return;
   }
 
+  const categoria = tipo === "mensaje" || tipo === "seguimiento"
+    ? "Usuarios"
+    : tipo === "comentario" || tipo === "like"
+    ? "Usuarios"
+    : "Comunidades"; // Puedes ajustar esto según tus pestañas
+
   try {
     const ref = collection(firestore, "notificaciones", paraUid, "items");
     await addDoc(ref, {
-      deUid,
-      deNombre,
+      user: deNombre,
       avatar: avatar || "https://i.pravatar.cc/150?img=12",
-      contenido,
-      tipo,
-      leido: false,
-      timestamp: serverTimestamp(),
+      message: contenido,
+      categoria,
+      action: tipo === "seguimiento" ? "seguir" : null,
+      leida: false,
+      time: serverTimestamp(),
     });
   } catch (error) {
     console.error("❌ Error al crear notificación:", error);
