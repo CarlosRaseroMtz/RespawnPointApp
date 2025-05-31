@@ -20,19 +20,20 @@ type Autor = {
   username: string;
   fotoPerfil?: string;
 };
+
 interface Props {
   post: Post;
   autor: Autor | null;
-  /* Mostrar texto completo cuando true (detalle) */
   inDetail?: boolean;
 
-  /* —— acciones ——— */
+  /* acciones */
   likes?: string[];
+  commentsCount?: number;        // 👈 NUEVO
   isLiked?: boolean;
   onLike?: () => void;
   onComment?: () => void;
-  /* Pulsar la imagen / tarjeta */
   onPress?: () => void;
+  onAuthorPress?: () => void;    // 👈 NUEVO
 }
 
 export default function PostCard({
@@ -40,15 +41,21 @@ export default function PostCard({
   autor,
   inDetail = false,
   likes = [],
+  commentsCount = 0,
   isLiked = false,
   onLike,
   onComment,
   onPress,
+  onAuthorPress,
 }: Props) {
   return (
     <View style={styles.card}>
       {/* —— header —— */}
-      <View style={styles.header}>
+      <TouchableOpacity
+        style={styles.header}
+        activeOpacity={0.8}
+        onPress={onAuthorPress}
+      >
         <Image
           source={{
             uri:
@@ -58,33 +65,32 @@ export default function PostCard({
           style={styles.avatar}
         />
         <Text style={styles.username}>{autor?.username ?? "Player"}</Text>
-      </View>
+      </TouchableOpacity>
 
       {/* —— media —— */}
       <TouchableOpacity activeOpacity={0.9} onPress={onPress}>
         <Image source={{ uri: post.mediaUrl }} style={styles.media} />
       </TouchableOpacity>
 
-      {/* —— meta fila (chip + mini like) —— */}
-      <View style={styles.metaRow}>
-        {post.categoria && (
+      {/* —— meta (chip) —— */}
+      {post.categoria && (
+        <View style={styles.metaRow}>
           <View style={styles.chip}>
             <Text style={styles.chipText}>{post.categoria}</Text>
           </View>
-        )}
-      </View>
+        </View>
+      )}
 
       {/* —— caption —— */}
       {post.contenido ? (
-        <Text
-          numberOfLines={inDetail ? undefined : 3}
-          style={styles.caption}
-        >
+        <Text numberOfLines={inDetail ? undefined : 3} style={styles.caption}>
           {post.contenido}
         </Text>
       ) : null}
+
       {/* —— acciones —— */}
       <View style={styles.actionRow}>
+        {/* Like */}
         <TouchableOpacity style={styles.action} onPress={onLike}>
           <AntDesign
             name={isLiked ? "heart" : "hearto"}
@@ -94,9 +100,21 @@ export default function PostCard({
           <Text style={styles.actionText}>{likes.length} me gusta</Text>
         </TouchableOpacity>
 
+        {/* Comentarios */}
         <TouchableOpacity style={styles.action} onPress={onComment}>
-          <Feather name="message-circle" size={18} color="#555" />
-          <Text style={styles.actionText}>Comentarios</Text>
+          <Feather
+            name="message-circle"
+            size={18}
+            color={commentsCount ? "#42BAFF" : "#555"}
+          />
+          <Text
+            style={[
+              styles.actionText,
+              commentsCount ? { color: "#42BAFF", fontWeight: "600" } : null,
+            ]}
+          >
+            {commentsCount ? commentsCount : ""} Comentarios
+          </Text>
         </TouchableOpacity>
       </View>
     </View>
@@ -140,12 +158,9 @@ const styles = StyleSheet.create({
   },
   chipText: { color: "#fff", fontSize: 12, fontWeight: "500" },
 
-  likeRow: { flexDirection: "row", alignItems: "center", gap: 4 },
-  likeText: { color: "#000", fontSize: 12 },
-
   caption: { padding: 12, color: "#000" },
 
-  /* —— acciones —— */
+  /* acciones */
   actionRow: {
     flexDirection: "row",
     justifyContent: "space-around",

@@ -1,159 +1,144 @@
+/* -----------------  MI PERFIL  ----------------- */
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { collection, doc, getDoc, getDocs, query, where } from "firebase/firestore";
-import React, { useEffect, useState } from "react";
 import {
-  Dimensions,
-  FlatList,
-  Image,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+  collection, doc, onSnapshot, orderBy, query, where
+} from "firebase/firestore";
+import { useEffect, useState } from "react";
+import {
+  Dimensions, FlatList, Image, SafeAreaView,
+  StyleSheet, Text, TouchableOpacity, View
 } from "react-native";
 import { firestore } from "../../config/firebase-config";
 import { useAuth } from "../../hooks/useAuth";
 import BottomTabBar from "../comp/bottom-tab-bar";
 
-const truncarTexto = (texto: string, max: number) => {
-  return texto.length > max ? texto.slice(0, max - 1) + "…" : texto;
-};
-
-
+/* helpers */
 const { width } = Dimensions.get("window");
-const imageSize = (width - 36) / 2;
+const PHOTO = 80;
+const GAP   = 18;
+const IMG   = (width - 36) / 2;        // grid 2×n
+const truncate = (t: string, n = 26) =>
+  t.length > n ? t.slice(0, n - 1) + "…" : t;
 
-export default function ProfileScreen() {
+/* ——————— componente ——————— */
+export default function MyProfile() {
   const router = useRouter();
   const { user } = useAuth();
 
-  const [perfil, setPerfil] = useState<any>(null);
-  const [publicaciones, setPublicaciones] = useState<any[]>([]);
-  const [seguidores, setSeguidores] = useState<any[]>([]);
-   const [siguiendo, setSiguiendo] = useState<any[]>([]);
+  const [info,  setInfo]  = useState<any>();
+  const [posts, setPosts] = useState<any[]>([]);
 
+  /* user snapshot */
   useEffect(() => {
-    if (!user) return;
-
-    const fetchDatos = async () => {
-      try {
-        const userRef = doc(firestore, "usuarios", user.uid);
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) setPerfil(userSnap.data());
-
-        const publiQuery = query(
-          collection(firestore, "publicaciones"),
-          where("userId", "==", user.uid)
-        );
-        const publiSnap = await getDocs(publiQuery);
-        const data = publiSnap.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setPublicaciones(data);
-      } catch (error) {
-        console.error("Error al cargar perfil o publicaciones:", error);
-      }
-    };
-
-    fetchDatos();
-  }, [user]);
-
-  if (!perfil) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <Text>Cargando perfil...</Text>
-      </SafeAreaView>
+    if (!user?.uid) return;
+    return onSnapshot(doc(firestore,"usuarios",user.uid), (s) =>
+      s.exists() && setInfo(s.data())
     );
-  }
+  }, [user?.uid]);
+
+  /* my posts */
+  useEffect(() => {
+    if (!user?.uid) return;
+    const q = query(
+      collection(firestore,"publicaciones"),
+      where("userId","==", user.uid),
+      orderBy("timestamp","desc")
+    );
+    return onSnapshot(q, (snap) =>
+      setPosts(snap.docs.map((d)=>({id:d.id,...d.data()})))
+    );
+  }, [user?.uid]);
+
+  if (!info)
+    return <SafeAreaView style={styles.center}><Text>Cargando…</Text></SafeAreaView>;
+
+  /* counters */
+  const seg  = info.seguidores?.length ?? 0;
+  const sigo = info.siguiendo?.length  ?? 0;
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.userInfo}>
-          <Image source={{ uri: perfil.fotoPerfil }} style={styles.avatar} />
-          <View style={styles.headerText}>
-            <Text style={styles.username}>
-              {truncarTexto(perfil.username, 18)}
-            </Text>
-            <Text style={styles.platform}>{perfil.plataformaFav || "Sin plataforma"}</Text>
-          </View>
+      {/* ─── NOMBRE + PLATAFORMA ─── */}
+      <View style={styles.nameBox}>
+        <Text style={styles.nameTxt}>{truncate(info.username)}</Text>
+        {info.plataformaFav && (
+          <Text style={styles.platform}>{info.plataformaFav}</Text>
+        )}
+      </View>
+
+      {/* ─── AVATAR + CONTADORES ─── */}
+      <View style={styles.row}>
+        <Image
+          source={{ uri: info.fotoPerfil ?? "https://i.pravatar.cc/150?u="+info.username }}
+          style={styles.avatar}
+        />
+
+        <View style={styles.statsRow}>
+          <Counter n={posts.length} label="Contenido" />
+          <Counter n={seg}          label="Seguidores" />
+          <Counter n={sigo}         label="Seguidos"   />
         </View>
-        <TouchableOpacity onPress={() => router.push("/configuracion")}>
-          <Ionicons name="settings-outline" size={24} color="#000" />
+
+        <TouchableOpacity onPress={()=>router.push("/configuracion")} style={styles.gear}>
+          <Ionicons name="settings-outline" size={24} color="#fff" />
         </TouchableOpacity>
       </View>
 
-      <View style={styles.stats}>
-        <View style={styles.stat}>
-          <Text style={styles.statNumber}>{publicaciones.length}</Text>
-          <Text style={styles.statLabel}>Contenido</Text>
-        </View>
-        <View style={styles.stat}>
-          <Text style={styles.statNumber}>{seguidores.length}</Text>
-          <Text style={styles.statLabel}>Seguidores</Text>
-        </View>
-        <View style={styles.stat}>
-          <Text style={styles.statNumber}>{siguiendo.length}</Text>
-          <Text style={styles.statLabel}>Seguidos</Text>
-        </View>
-      </View>
+      {/* ─── GÉNEROS + BIO ─── */}
+      {info.generoFav && (
+        <Text style={styles.genres}>{info.generoFav}</Text>
+      )}
+      {info.descripcion && (
+        <Text style={styles.bio}>{info.descripcion}</Text>
+      )}
 
-      <View style={styles.bio}>
-        <Text style={styles.genre}>{perfil.generoFav || "Sin género favorito"}</Text>
-        <Text style={styles.description}>
-          {perfil.descripcion || "Jugador/a apasionado/a por los videojuegos 🎮"}
-        </Text>
-      </View>
-
+      {/* ─── GRID 2×n ─── */}
       <FlatList
-        data={publicaciones}
+        data={posts}
         numColumns={2}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.gallery}
-        renderItem={({ item }) => (
-          <Image source={{ uri: item.mediaUrl }} style={styles.postImage} />
+        keyExtractor={(p)=>p.id}
+        columnWrapperStyle={{ gap:4 }}
+        contentContainerStyle={{ gap:4, paddingBottom:90 }}
+        renderItem={({item})=>(
+          <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={()=>router.push({pathname:"/publicacion/[id]",params:{id:item.id}})}
+          >
+            <Image source={{uri:item.mediaUrl}} style={styles.gridImg}/>
+          </TouchableOpacity>
         )}
       />
-
-      <BottomTabBar />
+      <BottomTabBar/>
     </SafeAreaView>
   );
 }
 
+/* ——————— perfil ajeno usa Counter tmb ——————— */
+function Counter({n,label}:{n:number,label:string}){
+  return(
+    <View style={{alignItems:"center"}}>
+      <Text style={{fontWeight:"700"}}>{n}</Text>
+      <Text style={{fontSize:12,color:"#555"}}>{label}</Text>
+    </View>
+  );
+}
+
+/* estilos propios + comunes */
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", paddingHorizontal: 16 },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginTop: 16,
-  },
-  userInfo: { flexDirection: "row", alignItems: "center" },
-  avatar: { width: 64, height: 64, borderRadius: 32, marginRight: 12 },
-  headerText: {
-    maxWidth: width * 0.5, // ajusta si quieres más o menos
-    overflow: "hidden",
-  },
-  username: { fontSize: 18, fontWeight: "700" },
-  platform: { fontSize: 14, color: "#888" },
-  stats: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginVertical: 20,
-  },
-  stat: { alignItems: "center" },
-  statNumber: { fontWeight: "700", fontSize: 16 },
-  statLabel: { fontSize: 13, color: "#555" },
-  bio: { marginBottom: 16 },
-  genre: { fontWeight: "600", fontSize: 15, marginBottom: 4 },
-  description: { color: "#444" },
-  gallery: { gap: 4 },
-  postImage: {
-    width: imageSize,
-    height: imageSize * 1.2,
-    margin: 1,
-    borderRadius: 10,
-  },
+  container:{flex:1,backgroundColor:"#fff",padding:16},
+  center:{flex:1,justifyContent:"center",alignItems:"center"},
+  nameBox:{alignItems:"center",marginBottom:12},
+  nameTxt:{fontSize:22,fontWeight:"700",color:"#000"},
+  platform:{color:"#888",marginTop:2},
+  row:{flexDirection:"row",alignItems:"center",marginBottom:14},
+  avatar:{width:PHOTO,height:PHOTO,borderRadius:PHOTO/2},
+  statsRow:{flex:1,flexDirection:"row",justifyContent:"space-around",marginLeft:GAP},
+  gear:{backgroundColor:"#000",padding:8,borderRadius:24},
+  genres:{fontWeight:"600",fontSize:15,marginBottom:4},
+  bio:{color:"#000",marginBottom:12},
+  gridImg:{width:IMG,height:IMG*1.2,borderRadius:10},
 });
+
+/* – estilos comunes para compartir – */
+export const stylesCommon = { PHOTO, IMG, GAP };

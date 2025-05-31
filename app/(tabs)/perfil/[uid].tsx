@@ -1,229 +1,152 @@
+/* -------------  PERFIL AJENO  ------------- */
+import { Feather } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-  arrayRemove,
-  arrayUnion,
-  collection,
-  doc,
-  getDoc,
-  getDocs,
-  query,
-  updateDoc,
-  where,
+  arrayRemove, arrayUnion,
+  collection, doc,
+  onSnapshot,
+  orderBy, query, updateDoc, where
 } from "firebase/firestore";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
-  Dimensions,
-  FlatList,
-  Image,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
+  Dimensions, FlatList, Image, SafeAreaView,
+  StyleSheet, Text, TouchableOpacity, View
 } from "react-native";
 import { firestore } from "../../../config/firebase-config";
 import { useAuth } from "../../../hooks/useAuth";
-import BottomTabBar from "../../comp/bottom-tab-bar";
+import { stylesCommon as C } from "../profile"; // reutilizamos tamaños
 
 const { width } = Dimensions.get("window");
-const imageSize = (width - 36) / 2;
+const IMG = C.IMG;
 
-const truncarTexto = (texto: string, max: number) => {
-  return texto.length > max ? texto.slice(0, max - 1) + "…" : texto;
-};
-
-export default function OtroProfileScreen() {
-  const router = useRouter();
+export default function OtherProfile() {
+  const { uid } = useLocalSearchParams<{uid:string}>();
   const { user } = useAuth();
-  const { uid } = useLocalSearchParams(); // UID del otro usuario
+  const router   = useRouter();
 
-  const [perfil, setPerfil] = useState<any>(null);
-  const [publicaciones, setPublicaciones] = useState<any[]>([]);
-  const [seguido, setSeguido] = useState(false);
+  const [info,setInfo]   = useState<any>();
+  const [posts,setPosts] = useState<any[]>([]);
+  const [yoSigo,setYoSigo] = useState(false);
 
-  useEffect(() => {
-    if (!uid || typeof uid !== "string") return;
+  /* datos del usuario */
+  useEffect(()=>{ if(!uid) return;
+    const ref=doc(firestore,"usuarios",uid);
+    const unsub=onSnapshot(ref,(s)=>{
+      if(!s.exists()) return;
+      setInfo(s.data());
+      setYoSigo(s.data().seguidores?.includes(user?.uid));
+    });
+    return unsub;
+  },[uid,user?.uid]);
 
-    const fetchDatos = async () => {
-      try {
-        const perfilRef = doc(firestore, "usuarios", uid);
-        const perfilSnap = await getDoc(perfilRef);
-        if (perfilSnap.exists()) setPerfil(perfilSnap.data());
+  /* sus publicaciones */
+  useEffect(()=>{ if(!uid) return;
+    const q=query(
+      collection(firestore,"publicaciones"),
+      where("userId","==",uid),
+      orderBy("timestamp","desc")
+    );
+    return onSnapshot(q,(snap)=>
+      setPosts(snap.docs.map((d)=>({id:d.id,...d.data()})))
+    );
+  },[uid]);
 
-        const pubQuery = query(
-          collection(firestore, "publicaciones"),
-          where("userId", "==", uid)
-        );
-        const pubSnap = await getDocs(pubQuery);
-        const data = pubSnap.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-        setPublicaciones(data);
+  if(!info) return <SafeAreaView style={s.center}><Text>Cargando…</Text></SafeAreaView>;
 
-        if (user) {
-          const miPerfilRef = doc(firestore, "usuarios", user.uid);
-          const miPerfilSnap = await getDoc(miPerfilRef);
-          const miData = miPerfilSnap.exists() ? miPerfilSnap.data() : {};
-          setSeguido(miData.siguiendo?.includes(uid));
-        }
-      } catch (error) {
-        console.error("❌ Error al cargar otro perfil:", error);
-      }
-    };
-
-    fetchDatos();
-  }, [uid]);
-
-  const toggleSeguir = async () => {
-    if (!user || !uid) return;
-
-    const miRef = doc(firestore, "usuarios", user.uid);
-    if (typeof uid !== "string") return;
-    const otroRef = doc(firestore, "usuarios", uid);
-
-    try {
-      if (seguido) {
-        await updateDoc(miRef, {
-          siguiendo: arrayRemove(uid),
-        });
-        await updateDoc(otroRef, {
-          seguidores: arrayRemove(user.uid),
-        });
-      } else {
-        await updateDoc(miRef, {
-          siguiendo: arrayUnion(uid),
-        });
-        await updateDoc(otroRef, {
-          seguidores: arrayUnion(user.uid),
-        });
-      }
-
-      setSeguido(!seguido);
-    } catch (err) {
-      console.error("❌ Error al seguir:", err);
-    }
+  /* seguir/dejar de seguir */
+  const toggleFollow = async ()=>{
+    if(!user) return;
+    const miRef   = doc(firestore,"usuarios",user.uid);
+    const suRef   = doc(firestore,"usuarios",uid!);
+    await updateDoc(miRef,{
+      siguiendo: yoSigo ? arrayRemove(uid) : arrayUnion(uid)
+    });
+    await updateDoc(suRef,{
+      seguidores: yoSigo ? arrayRemove(user.uid) : arrayUnion(user.uid)
+    });
   };
 
-  if (!perfil) {
-    return (
-      <SafeAreaView style={styles.container}>
-        <Text>Cargando perfil...</Text>
-      </SafeAreaView>
-    );
-  }
+  const seguidores = info.seguidores?.length ?? 0;
+  const siguiendo  = info.siguiendo?.length  ?? 0;
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <View style={styles.userInfo}>
-          <Image source={{ uri: perfil.fotoPerfil }} style={styles.avatar} />
-          <View style={styles.headerText}>
-            <Text style={styles.username}>
-              {truncarTexto(perfil.username, 18)}
+    <SafeAreaView style={s.container}>
+      {/* nombre y plataforma centrados */}
+      <View style={s.nameBox}>
+        <Text style={s.nameTxt}>{info.username}</Text>
+        {info.plataformaFav && (
+          <Text style={s.platform}>{info.plataformaFav}</Text>
+        )}
+      </View>
+
+      {/* avatar + stats + btns */}
+      <View style={s.row}>
+        <Image source={{uri:info.fotoPerfil}} style={s.avatar}/>
+        <View style={s.statsRow}>
+          <Counter n={posts.length} label="Contenido"/>
+          <Counter n={seguidores}   label="Seguidores"/>
+          <Counter n={siguiendo}    label="Seguidos"/>
+        </View>
+
+        {/* botones */}
+        <View style={{alignItems:"center",gap:8}}>
+          <TouchableOpacity style={[s.followBtn, yoSigo && {backgroundColor:"#ddd"}]} onPress={toggleFollow}>
+            <Text style={{color:yoSigo?"#000":"#fff",fontWeight:"600"}}>
+              {yoSigo?"Seguido":"Seguir"}
             </Text>
-            <Text style={styles.platform}>
-              {perfil.plataformaFav || "Sin plataforma"}
-            </Text>
-          </View>
+          </TouchableOpacity>
+          <TouchableOpacity style={s.msgBtn}
+            onPress={()=>router.push({pathname:"/chats",params:{uid}})}
+          >
+            <Feather name="message-circle" size={18} color="#000"/>
+          </TouchableOpacity>
         </View>
       </View>
 
-      <View style={styles.buttons}>
-        <TouchableOpacity
-          onPress={toggleSeguir}
-          style={[
-            styles.seguirBtn,
-            seguido && { backgroundColor: "#FF66C4" },
-          ]}
-        >
-          <Text style={styles.seguirText}>
-            {seguido ? "Seguido" : "Seguir"}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          onPress={() => router.push(`/chats/${uid}`)}
-          style={styles.msgBtn}
-        >
-          <Text style={styles.msgText}>Mensaje</Text>
-        </TouchableOpacity>
-      </View>
+      {/* género + bio */}
+      {info.generoFav && <Text style={s.genres}>{info.generoFav}</Text>}
+      {info.descripcion && <Text style={s.bio}>{info.descripcion}</Text>}
 
-      <View style={styles.bio}>
-        <Text style={styles.genre}>
-          {perfil.generoFav || "Sin género favorito"}
-        </Text>
-        <Text style={styles.description}>
-          {perfil.descripcion ||
-            "Jugador/a apasionado/a por los videojuegos 🎮"}
-        </Text>
-      </View>
-
+      {/* grid 2×n */}
       <FlatList
-        data={publicaciones}
+        data={posts}
         numColumns={2}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.gallery}
-        renderItem={({ item }) => (
-          <Image source={{ uri: item.mediaUrl }} style={styles.postImage} />
+        keyExtractor={(p)=>p.id}
+        columnWrapperStyle={{gap:4}}
+        contentContainerStyle={{gap:4,paddingBottom:80}}
+        renderItem={({item})=>(
+          <TouchableOpacity activeOpacity={0.9}
+            onPress={()=>router.push({pathname:"/publicacion/[id]",params:{id:item.id}})}
+          >
+            <Image source={{uri:item.mediaUrl}} style={s.gridImg}/>
+          </TouchableOpacity>
         )}
       />
-
-      <BottomTabBar />
     </SafeAreaView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", paddingHorizontal: 16 },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 16,
-    marginBottom: 10,
-  },
-  userInfo: { flexDirection: "row", alignItems: "center" },
-  avatar: { width: 64, height: 64, borderRadius: 32, marginRight: 12 },
-  headerText: {
-    maxWidth: width * 0.5,
-    overflow: "hidden",
-  },
-  username: { fontSize: 18, fontWeight: "700" },
-  platform: { fontSize: 14, color: "#888" },
-  buttons: {
-    flexDirection: "row",
-    justifyContent: "center",
-    gap: 12,
-    marginBottom: 16,
-  },
-  seguirBtn: {
-    backgroundColor: "#42BAFF",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  seguirText: {
-    color: "#fff",
-    fontWeight: "600",
-  },
-  msgBtn: {
-    backgroundColor: "#000",
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-  },
-  msgText: {
-    color: "#fff",
-    fontWeight: "600",
-  },
-  bio: { marginBottom: 16 },
-  genre: { fontWeight: "600", fontSize: 15, marginBottom: 4 },
-  description: { color: "#444" },
-  gallery: { gap: 4 },
-  postImage: {
-    width: imageSize,
-    height: imageSize * 1.2,
-    margin: 1,
-    borderRadius: 10,
-  },
+function Counter({n,label}:{n:number,label:string}){return(
+  <View style={{alignItems:"center"}}>
+    <Text style={{fontWeight:"700"}}>{n}</Text>
+    <Text style={{fontSize:12,color:"#555"}}>{label}</Text>
+  </View>
+);}
+
+/* estilos */
+const s = StyleSheet.create({
+  ...StyleSheet.create({}),                // placeholder para no perder IntelliSense
+  container:{flex:1,backgroundColor:"#fff",padding:16},
+  center:{flex:1,justifyContent:"center",alignItems:"center"},
+  nameBox:{alignItems:"center",marginBottom:12},
+  nameTxt:{fontSize:22,fontWeight:"700"},
+  platform:{color:"#888",marginTop:2},
+  row:{flexDirection:"row",alignItems:"center",marginBottom:14},
+  avatar:{width:C.PHOTO,height:C.PHOTO,borderRadius:C.PHOTO/2},
+  statsRow:{flex:1,flexDirection:"row",justifyContent:"space-around",marginLeft:C.GAP},
+  followBtn:{backgroundColor:"#42BAFF",paddingVertical:6,paddingHorizontal:16,borderRadius:20},
+  msgBtn:{borderWidth:1,borderColor:"#000",borderRadius:20,padding:6},
+  genres:{fontWeight:"600",fontSize:15,marginBottom:4},
+  bio:{color:"#000",marginBottom:12},
+  gridImg:{width:IMG,height:IMG*1.2,borderRadius:10},
 });

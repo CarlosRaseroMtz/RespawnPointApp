@@ -1,5 +1,5 @@
 import { Image } from "expo-image";
-import { useLocalSearchParams } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   addDoc,
   arrayRemove,
@@ -7,6 +7,7 @@ import {
   collection,
   doc,
   getDoc,
+  increment,
   onSnapshot,
   orderBy,
   query,
@@ -30,6 +31,7 @@ import { firestore } from "../../../config/firebase-config";
 import { useAuth } from "../../../hooks/useAuth";
 import PostCard from "../../comp/post-card";
 
+/* —— tipos —— */
 type Publicacion = {
   id: string;
   userId: string;
@@ -37,6 +39,7 @@ type Publicacion = {
   contenido: string;
   categoria?: string;
   likes: string[];
+  commentsCount?: number;
   timestamp: Timestamp;
 };
 type Comentario = {
@@ -49,6 +52,7 @@ type Comentario = {
 
 export default function PublicacionDetalle() {
   const { id } = useLocalSearchParams<{ id: string }>();
+  const router = useRouter();
   const { user } = useAuth();
 
   const [post, setPost] = useState<Publicacion>();
@@ -59,7 +63,7 @@ export default function PublicacionDetalle() {
 
   const flatRef = useRef<FlatList>(null);
 
-  /* —— snapshot publicación + autor + likes —— */
+  /* —— snapshot publicación + autor —— */
   useEffect(() => {
     if (!id) return;
     const ref = doc(firestore, "publicaciones", id);
@@ -77,7 +81,7 @@ export default function PublicacionDetalle() {
     return unsub;
   }, [id]);
 
-  /* —— comentarios con avatar y fecha —— */
+  /* —— snapshot comentarios con avatar —— */
   useEffect(() => {
     if (!id) return;
     const q = query(
@@ -92,7 +96,10 @@ export default function PublicacionDetalle() {
           const textoReal = c.texto ?? c.mensaje ?? c.contenido ?? "";
           const usnap = await getDoc(doc(firestore, "usuarios", c.userId));
           const autor = usnap.exists()
-            ? { username: usnap.data().username, fotoPerfil: usnap.data().fotoPerfil }
+            ? {
+                username: usnap.data().username,
+                fotoPerfil: usnap.data().fotoPerfil,
+              }
             : { username: "Player" };
 
           return { id: d.id, ...c, texto: textoReal, autor } as Comentario;
@@ -123,6 +130,9 @@ export default function PublicacionDetalle() {
       texto: texto.trim(),
       timestamp: Timestamp.now(),
     });
+    await updateDoc(doc(firestore, "publicaciones", id), {
+      commentsCount: increment(1),
+    });
     setTexto("");
     setTimeout(() => flatRef.current?.scrollToEnd({ animated: true }), 100);
   };
@@ -130,26 +140,36 @@ export default function PublicacionDetalle() {
   if (loading) return <ActivityIndicator style={{ flex: 1 }} />;
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: "#fff" }}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
+    <>
+      {/* —— lista + cabecera —— */}
       <FlatList
         ref={flatRef}
         data={comentarios}
         keyExtractor={(c) => c.id}
         contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
         ListHeaderComponent={
-          <PostCard
-            post={post!}
-            autor={autor}
-            inDetail
-            likes={post!.likes}
-            isLiked={post!.likes.includes(user?.uid ?? "")}
-            onLike={toggleLike}
-            onComment={() => flatRef.current?.scrollToEnd({ animated: true })}
-            onPress={() => { }}
-          />
+          post &&
+          autor && (
+            <PostCard
+              post={post}
+              autor={autor}
+              inDetail
+              likes={post.likes}
+              commentsCount={post.commentsCount ?? 0}
+              isLiked={post.likes.includes(user?.uid ?? "")}
+              onLike={toggleLike}
+              onComment={() =>
+                flatRef.current?.scrollToEnd({ animated: true })
+              }
+              onPress={() => {}}
+              onAuthorPress={() =>
+                router.push({
+                  pathname: "/perfil/[uid]",
+                  params: { uid: post.userId },
+                })
+              }
+            />
+          )
         }
         renderItem={({ item }) => (
           <View style={styles.coment}>
@@ -176,21 +196,27 @@ export default function PublicacionDetalle() {
           </View>
         )}
       />
-      {user && (
-        <SafeAreaView edges={["bottom"]} style={styles.inputRow}>
-          <TextInput
-            style={styles.input}
-            placeholder="Escribe un comentario…"
-            value={texto}
-            onChangeText={setTexto}
-          />
-          <TouchableOpacity onPress={enviarComentario}>
-            <Text style={styles.enviar}>Enviar</Text>
-          </TouchableOpacity>
-        </SafeAreaView>
-      )}
 
-    </KeyboardAvoidingView>
+      {/* —— barra de entrada protegida —— */}
+      {user && (
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 80}
+        >
+          <SafeAreaView edges={["bottom"]} style={styles.inputRow}>
+            <TextInput
+              style={styles.input}
+              placeholder="Escribe un comentario…"
+              value={texto}
+              onChangeText={setTexto}
+            />
+            <TouchableOpacity onPress={enviarComentario}>
+              <Text style={styles.enviar}>Enviar</Text>
+            </TouchableOpacity>
+          </SafeAreaView>
+        </KeyboardAvoidingView>
+      )}
+    </>
   );
 }
 
@@ -206,11 +232,13 @@ const styles = StyleSheet.create({
   comTexto: { color: "#000", marginTop: 2 },
   comAutor: { fontWeight: "600" },
   comFecha: { fontSize: 10, color: "#888", marginTop: 2 },
+
   inputRow: {
     flexDirection: "row",
     borderTopWidth: 1,
     borderColor: "#eee",
     padding: 10,
+    backgroundColor: "#fff",
   },
   input: {
     flex: 1,

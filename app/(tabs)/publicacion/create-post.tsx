@@ -80,6 +80,7 @@ export default function CreatePostScreen() {
         mediaUrl,
         categoria,
         likes: [],
+        commentsCount: 0,
         timestamp: Timestamp.now(),
         comunidadId: "GENERAL",
       });
