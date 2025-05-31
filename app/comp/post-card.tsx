@@ -95,7 +95,7 @@ export default function PostCard({
           <AntDesign
             name={isLiked ? "heart" : "hearto"}
             size={18}
-            color={isLiked ? "red" : "#555"}
+            color={isLiked ? "#FF66C4" : "#555"}
           />
           <Text style={styles.actionText}>{likes.length} me gusta</Text>
         </TouchableOpacity>

@@ -112,6 +112,8 @@ export default function RegisterScreen() {
         fotoPerfil: "https://i.pravatar.cc/150?img=12",
         plataformaFav: platform,
         generoFav: selectedGenres.join(", "),
+        seguidores: [],     // 👈
+        siguiendo: [],
         descripcion: "Nuevo jugador registrado.",
         nivel: null,
         reputacion: 1,

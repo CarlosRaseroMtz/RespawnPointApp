@@ -1,4 +1,4 @@
-/* -----------------  MI PERFIL  ----------------- */
+/* -----------------  MI PERFIL (REDISEÑADO) ----------------- */
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import {
@@ -17,7 +17,7 @@ import BottomTabBar from "../comp/bottom-tab-bar";
 const { width } = Dimensions.get("window");
 const PHOTO = 80;
 const GAP   = 18;
-const IMG   = (width - 36) / 2;        // grid 2×n
+const IMG   = (width - 36) / 2;
 const truncate = (t: string, n = 26) =>
   t.length > n ? t.slice(0, n - 1) + "…" : t;
 
@@ -29,83 +29,72 @@ export default function MyProfile() {
   const [info,  setInfo]  = useState<any>();
   const [posts, setPosts] = useState<any[]>([]);
 
-  /* user snapshot */
   useEffect(() => {
     if (!user?.uid) return;
-    return onSnapshot(doc(firestore,"usuarios",user.uid), (s) =>
+    return onSnapshot(doc(firestore, "usuarios", user.uid), (s) =>
       s.exists() && setInfo(s.data())
     );
   }, [user?.uid]);
 
-  /* my posts */
   useEffect(() => {
     if (!user?.uid) return;
     const q = query(
-      collection(firestore,"publicaciones"),
-      where("userId","==", user.uid),
-      orderBy("timestamp","desc")
+      collection(firestore, "publicaciones"),
+      where("userId", "==", user.uid),
+      orderBy("timestamp", "desc")
     );
     return onSnapshot(q, (snap) =>
-      setPosts(snap.docs.map((d)=>({id:d.id,...d.data()})))
+      setPosts(snap.docs.map((d) => ({ id: d.id, ...d.data() })))
     );
   }, [user?.uid]);
 
   if (!info)
     return <SafeAreaView style={styles.center}><Text>Cargando…</Text></SafeAreaView>;
 
-  /* counters */
   const seg  = info.seguidores?.length ?? 0;
   const sigo = info.siguiendo?.length  ?? 0;
 
   return (
     <SafeAreaView style={styles.container}>
-      {/* ─── NOMBRE + PLATAFORMA ─── */}
-      <View style={styles.nameBox}>
-        <Text style={styles.nameTxt}>{truncate(info.username)}</Text>
-        {info.plataformaFav && (
-          <Text style={styles.platform}>{info.plataformaFav}</Text>
-        )}
+      {/* —— NOMBRE + PLATAFORMA —— */}
+      <View style={styles.header}>
+        <Text style={styles.username}>{truncate(info.username)}</Text>
+        {info.plataformaFav && <Text style={styles.platformTxt}>{info.plataformaFav}</Text>}
       </View>
 
-      {/* ─── AVATAR + CONTADORES ─── */}
-      <View style={styles.row}>
+      {/* —— FOTO + ESTADÍSTICAS + CONFIG —— */}
+      <View style={styles.topRow}>
         <Image
-          source={{ uri: info.fotoPerfil ?? "https://i.pravatar.cc/150?u="+info.username }}
+          source={{ uri: info.fotoPerfil || "https://i.pravatar.cc/150?u=" + info.username }}
           style={styles.avatar}
         />
-
-        <View style={styles.statsRow}>
-          <Counter n={posts.length} label="Contenido" />
-          <Counter n={seg}          label="Seguidores" />
-          <Counter n={sigo}         label="Seguidos"   />
+        <View style={styles.statsBox}>
+          <Counter n={posts.length} label="Publicaciones" />
+          <Counter n={seg} label="Seguidores" />
+          <Counter n={sigo} label="Siguiendo" />
         </View>
-
-        <TouchableOpacity onPress={()=>router.push("/configuracion")} style={styles.gear}>
-          <Ionicons name="settings-outline" size={24} color="#fff" />
+        <TouchableOpacity onPress={() => router.push("/configuracion")} style={styles.btnGear}>
+          <Ionicons name="settings-outline" size={22} color="#fff" />
         </TouchableOpacity>
       </View>
 
-      {/* ─── GÉNEROS + BIO ─── */}
-      {info.generoFav && (
-        <Text style={styles.genres}>{info.generoFav}</Text>
-      )}
-      {info.descripcion && (
-        <Text style={styles.bio}>{info.descripcion}</Text>
-      )}
+      {/* —— BIO Y GÉNERO FAVORITO —— */}
+      {info.generoFav && <Text style={styles.genre}>{info.generoFav}</Text>}
+      {info.descripcion && <Text style={styles.bio}>{info.descripcion}</Text>}
 
-      {/* ─── GRID 2×n ─── */}
+      {/* —— GRID DE PUBLICACIONES —— */}
       <FlatList
         data={posts}
         numColumns={2}
-        keyExtractor={(p)=>p.id}
-        columnWrapperStyle={{ gap:4 }}
-        contentContainerStyle={{ gap:4, paddingBottom:90 }}
-        renderItem={({item})=>(
+        keyExtractor={(p) => p.id}
+        columnWrapperStyle={{ gap: 6 }}
+        contentContainerStyle={{ paddingBottom: 100, gap: 6 }}
+        renderItem={({ item }) => (
           <TouchableOpacity
-            activeOpacity={0.9}
-            onPress={()=>router.push({pathname:"/publicacion/[id]",params:{id:item.id}})}
+            activeOpacity={0.8}
+            onPress={() => router.push({ pathname: "/publicacion/[id]", params: { id: item.id } })}
           >
-            <Image source={{uri:item.mediaUrl}} style={styles.gridImg}/>
+            <Image source={{ uri: item.mediaUrl }} style={styles.gridImg} />
           </TouchableOpacity>
         )}
       />
@@ -114,31 +103,52 @@ export default function MyProfile() {
   );
 }
 
-/* ——————— perfil ajeno usa Counter tmb ——————— */
-function Counter({n,label}:{n:number,label:string}){
-  return(
-    <View style={{alignItems:"center"}}>
-      <Text style={{fontWeight:"700"}}>{n}</Text>
-      <Text style={{fontSize:12,color:"#555"}}>{label}</Text>
+function Counter({ n, label }: { n: number, label: string }) {
+  return (
+    <View style={{ alignItems: "center" }}>
+      <Text style={{ fontWeight: "700" }}>{n}</Text>
+      <Text style={{ fontSize: 12, color: "#555" }}>{label}</Text>
     </View>
   );
 }
 
-/* estilos propios + comunes */
+/* ——— estilos actualizados ——— */
 const styles = StyleSheet.create({
-  container:{flex:1,backgroundColor:"#fff",padding:16},
-  center:{flex:1,justifyContent:"center",alignItems:"center"},
-  nameBox:{alignItems:"center",marginBottom:12},
-  nameTxt:{fontSize:22,fontWeight:"700",color:"#000"},
-  platform:{color:"#888",marginTop:2},
-  row:{flexDirection:"row",alignItems:"center",marginBottom:14},
-  avatar:{width:PHOTO,height:PHOTO,borderRadius:PHOTO/2},
-  statsRow:{flex:1,flexDirection:"row",justifyContent:"space-around",marginLeft:GAP},
-  gear:{backgroundColor:"#000",padding:8,borderRadius:24},
-  genres:{fontWeight:"600",fontSize:15,marginBottom:4},
-  bio:{color:"#000",marginBottom:12},
-  gridImg:{width:IMG,height:IMG*1.2,borderRadius:10},
+  container: { flex: 1, backgroundColor: "#fff", padding: 16 },
+  center: { flex: 1, justifyContent: "center", alignItems: "center" },
+
+  header: { alignItems: "center", marginBottom: 10 },
+  username: { fontSize: 22, fontWeight: "bold", color: "#000" },
+  platformTxt: { color: "#888", marginTop: 2, fontSize: 14 },
+
+  topRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    marginBottom: 12,
+    justifyContent: "space-between",
+  },
+  avatar: { width: PHOTO, height: PHOTO, borderRadius: PHOTO / 2 },
+  statsBox: {
+    flex: 1,
+    flexDirection: "row",
+    justifyContent: "space-evenly",
+    marginLeft: 16,
+    marginRight: 16,
+  },
+  btnGear: {
+    backgroundColor: "#42BAFF",
+    padding: 8,
+    borderRadius: 20,
+  },
+
+  genre: { fontWeight: "600", fontSize: 15, marginBottom: 4, textAlign: "center" },
+  bio: { color: "#000", marginBottom: 12, textAlign: "center", paddingHorizontal: 16 },
+
+  gridImg: {
+    width: IMG,
+    height: IMG * 1.2,
+    borderRadius: 10,
+  },
 });
 
-/* – estilos comunes para compartir – */
 export const stylesCommon = { PHOTO, IMG, GAP };
