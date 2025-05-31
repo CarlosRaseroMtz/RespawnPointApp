@@ -139,7 +139,7 @@ export default function RegisterScreen() {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Image
-        source={require("../../../assets/images/logo.png")}
+        source={require("../../assets/images/logo.png")}
         style={styles.logo}
       />
       <Text style={styles.title}>Regístrate</Text>

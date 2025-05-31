@@ -1,20 +1,22 @@
-import { Ionicons } from "@expo/vector-icons";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import { Image } from "expo-image";
+import { useLocalSearchParams } from "expo-router";
 import {
   addDoc,
+  arrayRemove,
+  arrayUnion,
   collection,
-  deleteDoc,
   doc,
   getDoc,
   onSnapshot,
+  orderBy,
+  query,
   Timestamp,
   updateDoc,
 } from "firebase/firestore";
-import React, { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
-  Alert,
+  ActivityIndicator,
   FlatList,
-  Image,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -26,269 +28,196 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import { firestore } from "../../../config/firebase-config";
 import { useAuth } from "../../../hooks/useAuth";
-import { crearNotificacion } from "../../../utils/crear-notificacion";
+import PostCard from "../../comp/post-card";
 
+type Publicacion = {
+  id: string;
+  userId: string;
+  mediaUrl: string;
+  contenido: string;
+  categoria?: string;
+  likes: string[];
+  timestamp: Timestamp;
+};
+type Comentario = {
+  id: string;
+  userId: string;
+  texto: string;
+  timestamp: Timestamp;
+  autor: { username: string; fotoPerfil?: string };
+};
 
-export default function PublicacionScreen() {
-  const { id } = useLocalSearchParams();
+export default function PublicacionDetalle() {
+  const { id } = useLocalSearchParams<{ id: string }>();
   const { user } = useAuth();
-  const router = useRouter();
 
-  const [post, setPost] = useState<any>(null);
-  const [comentarios, setComentarios] = useState<any[]>([]);
-  const [nuevoComentario, setNuevoComentario] = useState("");
-  const [editandoId, setEditandoId] = useState<string | null>(null);
-  const [textoEditado, setTextoEditado] = useState("");
+  const [post, setPost] = useState<Publicacion>();
+  const [autor, setAutor] = useState<any>();
+  const [comentarios, setComs] = useState<Comentario[]>([]);
+  const [texto, setTexto] = useState("");
+  const [loading, setLoading] = useState(true);
 
+  const flatRef = useRef<FlatList>(null);
+
+  /* —— snapshot publicación + autor + likes —— */
   useEffect(() => {
     if (!id) return;
-    const cargarPublicacion = async () => {
-      const ref = doc(firestore, "publicaciones", id as string);
-      const snap = await getDoc(ref);
-      if (snap.exists()) setPost(snap.data());
-    };
-    cargarPublicacion();
-  }, [id]);
+    const ref = doc(firestore, "publicaciones", id);
 
-  useEffect(() => {
-    if (!id) return;
-    const ref = collection(firestore, "publicaciones", id as string, "comentarios");
-    const unsubscribe = onSnapshot(ref, async (snap) => {
-      const rawComentarios = snap.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    const unsub = onSnapshot(ref, async (snap) => {
+      if (!snap.exists()) return;
+      const data = { id: snap.id, ...snap.data() } as Publicacion;
+      setPost(data);
 
-      const enriched = await Promise.all(
-        rawComentarios.map(async (comentario: any) => {
-          try {
-            const userSnap = await getDoc(doc(firestore, "usuarios", comentario.userId));
-            const perfil = userSnap.exists() ? userSnap.data() : null;
-            return {
-              ...comentario,
-              autor: {
-                username: perfil?.username || "Usuario",
-                fotoPerfil: perfil?.fotoPerfil || "https://i.pravatar.cc/150?img=1",
-              },
-            };
-          } catch {
-            return comentario;
-          }
-        })
-      );
-
-      // Ordenar por fecha descendente
-      setComentarios(enriched.sort((a, b) => b.timestamp?.seconds - a.timestamp?.seconds));
+      const uSnap = await getDoc(doc(firestore, "usuarios", data.userId));
+      uSnap.exists() && setAutor(uSnap.data());
+      setLoading(false);
     });
 
-    return () => unsubscribe();
+    return unsub;
   }, [id]);
 
-  const enviarComentario = async () => {
-    if (!nuevoComentario.trim() || !user) return;
+  /* —— comentarios con avatar y fecha —— */
+  useEffect(() => {
+    if (!id) return;
+    const q = query(
+      collection(firestore, "publicaciones", id, "comentarios"),
+      orderBy("timestamp", "asc")
+    );
 
-    const comentario = {
-      contenido: nuevoComentario.trim(),
-      userId: user.uid,
-      timestamp: Timestamp.now(),
-    };
+    const unsub = onSnapshot(q, async (snap) => {
+      const arr = await Promise.all(
+        snap.docs.map(async (d) => {
+          const c = d.data();
+          const textoReal = c.texto ?? c.mensaje ?? c.contenido ?? "";
+          const usnap = await getDoc(doc(firestore, "usuarios", c.userId));
+          const autor = usnap.exists()
+            ? { username: usnap.data().username, fotoPerfil: usnap.data().fotoPerfil }
+            : { username: "Player" };
 
-    try {
-      await addDoc(
-        collection(firestore, "publicaciones", id as string, "comentarios"),
-        comentario
+          return { id: d.id, ...c, texto: textoReal, autor } as Comentario;
+        })
       );
-      setNuevoComentario("");
+      arr.sort((a, b) => a.timestamp.toMillis() - b.timestamp.toMillis());
+      setComs(arr);
+    });
 
-      if (post?.userId && user?.uid !== post.userId) {
-        await crearNotificacion({
-          paraUid: post.userId,
-          deUid: user.uid,
-          contenido: "ha comentado tu publicación",
-          tipo: "comentario",
-        });
-      }
+    return unsub;
+  }, [id]);
 
-    } catch (error) {
-      console.error("❌ Error al comentar:", error);
-    }
+  /* —— like / unlike —— */
+  const toggleLike = async () => {
+    if (!post || !user) return;
+    const ref = doc(firestore, "publicaciones", post.id);
+    const ya = post.likes.includes(user.uid);
+    await updateDoc(ref, {
+      likes: ya ? arrayRemove(user.uid) : arrayUnion(user.uid),
+    });
   };
 
-
-  const eliminarComentario = async (comentarioId: string) => {
-    try {
-      const ref = doc(firestore, "publicaciones", id as string, "comentarios", comentarioId);
-      await deleteDoc(ref);
-    } catch (error) {
-      console.error("❌ Error al eliminar comentario:", error);
-    }
+  /* —— enviar comentario —— */
+  const enviarComentario = async () => {
+    if (!texto.trim() || !user || !id) return;
+    await addDoc(collection(firestore, "publicaciones", id, "comentarios"), {
+      userId: user.uid,
+      texto: texto.trim(),
+      timestamp: Timestamp.now(),
+    });
+    setTexto("");
+    setTimeout(() => flatRef.current?.scrollToEnd({ animated: true }), 100);
   };
 
-  const editarComentario = async (comentarioId: string) => {
-    try {
-      const ref = doc(firestore, "publicaciones", id as string, "comentarios", comentarioId);
-      await updateDoc(ref, { contenido: textoEditado });
-      setEditandoId(null);
-      setTextoEditado("");
-    } catch (error) {
-      console.error("❌ Error al editar comentario:", error);
-    }
-  };
-
-  if (!post) return <Text style={{ padding: 20 }}>Cargando publicación...</Text>;
+  if (loading) return <ActivityIndicator style={{ flex: 1 }} />;
 
   return (
     <KeyboardAvoidingView
       style={{ flex: 1, backgroundColor: "#fff" }}
       behavior={Platform.OS === "ios" ? "padding" : undefined}
     >
-      <View style={styles.container}>
-        <TouchableOpacity onPress={() => router.back()} style={styles.back}>
-          <Ionicons name="chevron-back" size={24} color="#000" />
-        </TouchableOpacity>
-
-        <Image source={{ uri: post.mediaUrl }} style={styles.imagen} />
-        <Text style={styles.texto}>{post.contenido}</Text>
-
-        <View style={styles.divisor} />
-        <FlatList
-          data={comentarios}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={{ paddingBottom: 100 }}
-          renderItem={({ item }) => (
-            <TouchableOpacity
-              onLongPress={() => {
-                if (item.userId === user?.uid) {
-                  Alert.alert("Comentario", "¿Qué deseas hacer?", [
-                    { text: "Cancelar", style: "cancel" },
-                    {
-                      text: "Editar",
-                      onPress: () => {
-                        setEditandoId(item.id);
-                        setTextoEditado(item.contenido);
-                      },
-                    },
-                    {
-                      text: "Eliminar",
-                      style: "destructive",
-                      onPress: () => eliminarComentario(item.id),
-                    },
-                  ]);
-                }
+      <FlatList
+        ref={flatRef}
+        data={comentarios}
+        keyExtractor={(c) => c.id}
+        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
+        ListHeaderComponent={
+          <PostCard
+            post={post!}
+            autor={autor}
+            inDetail
+            likes={post!.likes}
+            isLiked={post!.likes.includes(user?.uid ?? "")}
+            onLike={toggleLike}
+            onComment={() => flatRef.current?.scrollToEnd({ animated: true })}
+            onPress={() => { }}
+          />
+        }
+        renderItem={({ item }) => (
+          <View style={styles.coment}>
+            <Image
+              source={{
+                uri:
+                  item.autor.fotoPerfil ??
+                  "https://i.pravatar.cc/100?u=" + item.autor.username,
               }}
-              delayLongPress={500}
-            >
-              <View style={styles.comentario}>
-                <Image source={{ uri: item.autor?.fotoPerfil }} style={styles.avatar} />
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.username}>{item.autor?.username}</Text>
+              style={styles.comAvatar}
+            />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.comAutor}>{item.autor.username}</Text>
+              <Text style={styles.comTexto}>{item.texto}</Text>
+              <Text style={styles.comFecha}>
+                {item.timestamp.toDate().toLocaleDateString("es-ES", {
+                  day: "2-digit",
+                  month: "short",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </Text>
+            </View>
+          </View>
+        )}
+      />
+      {user && (
+        <SafeAreaView edges={["bottom"]} style={styles.inputRow}>
+          <TextInput
+            style={styles.input}
+            placeholder="Escribe un comentario…"
+            value={texto}
+            onChangeText={setTexto}
+          />
+          <TouchableOpacity onPress={enviarComentario}>
+            <Text style={styles.enviar}>Enviar</Text>
+          </TouchableOpacity>
+        </SafeAreaView>
+      )}
 
-                  {editandoId === item.id ? (
-                    <>
-                      <TextInput
-                        style={[styles.input, { marginBottom: 4 }]}
-                        value={textoEditado}
-                        onChangeText={setTextoEditado}
-                      />
-                      <TouchableOpacity
-                        onPress={() => editarComentario(item.id)}
-                        style={[styles.sendBtn, { alignSelf: "flex-end" }]}
-                      >
-                        <Ionicons name="checkmark" size={18} color="#fff" />
-                      </TouchableOpacity>
-                    </>
-                  ) : (
-                    <>
-                      <Text style={styles.comentarioTexto}>{item.contenido}</Text>
-                      <Text style={styles.comentarioHora}>
-                        {item.timestamp?.toDate().toLocaleString("es-ES")}
-                      </Text>
-                    </>
-                  )}
-                </View>
-              </View>
-            </TouchableOpacity>
-          )}
-        />
-      </View>
-
-      <SafeAreaView edges={["bottom"]} style={styles.inputArea}>
-        <TextInput
-          style={styles.input}
-          placeholder="Escribe un comentario..."
-          value={nuevoComentario}
-          onChangeText={setNuevoComentario}
-        />
-        <TouchableOpacity onPress={enviarComentario} style={styles.sendBtn}>
-          <Ionicons name="send" size={22} color="#fff" />
-        </TouchableOpacity>
-      </SafeAreaView>
     </KeyboardAvoidingView>
   );
 }
 
+/* —— estilos —— */
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
-  back: { marginBottom: 10 },
-  imagen: {
-    width: "100%",
-    height: 200,
-    borderRadius: 12,
+  coment: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    gap: 8,
     marginBottom: 12,
   },
-  texto: {
-    fontSize: 15,
-    color: "#000",
-    marginBottom: 10,
-  },
-  divisor: {
-    height: 1,
-    backgroundColor: "#ccc",
-    marginVertical: 10,
-  },
-  comentario: {
+  comAvatar: { width: 32, height: 32, borderRadius: 16 },
+  comTexto: { color: "#000", marginTop: 2 },
+  comAutor: { fontWeight: "600" },
+  comFecha: { fontSize: 10, color: "#888", marginTop: 2 },
+  inputRow: {
     flexDirection: "row",
-    gap: 10,
-    marginBottom: 16,
-    alignItems: "flex-start",
-  },
-  avatar: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    marginRight: 8,
-  },
-  username: {
-    fontWeight: "600",
-    fontSize: 13,
-    color: "#000",
-    marginBottom: 2,
-  },
-  comentarioTexto: {
-    color: "#000",
-    fontSize: 14,
-  },
-  comentarioHora: {
-    fontSize: 11,
-    color: "#999",
-  },
-  inputArea: {
-    flexDirection: "row",
-    paddingHorizontal: 16,
-    paddingVertical: 10,
     borderTopWidth: 1,
     borderColor: "#eee",
-    alignItems: "center",
-    backgroundColor: "#fff",
+    padding: 10,
   },
   input: {
     flex: 1,
     backgroundColor: "#f1f1f1",
     borderRadius: 20,
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingHorizontal: 14,
     marginRight: 8,
   },
-  sendBtn: {
-    backgroundColor: "#FF66C4",
-    padding: 10,
-    borderRadius: 50,
-  },
+  enviar: { color: "#FF66C4", fontWeight: "600" },
 });
