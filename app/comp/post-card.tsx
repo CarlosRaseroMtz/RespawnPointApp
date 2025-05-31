@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
     padding: 12,
     gap: 8,
   },
-  avatar: { width: 32, height: 32, borderRadius: 16 },
+  avatar: { width: 32, height: 32, borderRadius: 16, borderColor: "#FF66C4", },
   username: { fontWeight: "600", color: "#000" },
 
   media: { width: "100%", height: 240, backgroundColor: "#ddd" },

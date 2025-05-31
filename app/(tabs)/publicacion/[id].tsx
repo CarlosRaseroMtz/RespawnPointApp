@@ -228,7 +228,7 @@ const styles = StyleSheet.create({
     gap: 8,
     marginBottom: 12,
   },
-  comAvatar: { width: 32, height: 32, borderRadius: 16 },
+  comAvatar: { width: 32, height: 32, borderRadius: 16, borderWidth: 1, borderColor: "#FF66C4",},
   comTexto: { color: "#000", marginTop: 2 },
   comAutor: { fontWeight: "600" },
   comFecha: { fontSize: 10, color: "#888", marginTop: 2 },

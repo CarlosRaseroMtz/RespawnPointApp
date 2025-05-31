@@ -16,8 +16,8 @@ import BottomTabBar from "../comp/bottom-tab-bar";
 /* helpers */
 const { width } = Dimensions.get("window");
 const PHOTO = 80;
-const GAP   = 18;
-const IMG   = (width - 36) / 2;
+const GAP = 18;
+const IMG = (width - 36) / 2;
 const truncate = (t: string, n = 26) =>
   t.length > n ? t.slice(0, n - 1) + "…" : t;
 
@@ -26,7 +26,7 @@ export default function MyProfile() {
   const router = useRouter();
   const { user } = useAuth();
 
-  const [info,  setInfo]  = useState<any>();
+  const [info, setInfo] = useState<any>();
   const [posts, setPosts] = useState<any[]>([]);
 
   useEffect(() => {
@@ -51,8 +51,8 @@ export default function MyProfile() {
   if (!info)
     return <SafeAreaView style={styles.center}><Text>Cargando…</Text></SafeAreaView>;
 
-  const seg  = info.seguidores?.length ?? 0;
-  const sigo = info.siguiendo?.length  ?? 0;
+  const seg = info.seguidores?.length ?? 0;
+  const sigo = info.siguiendo?.length ?? 0;
 
   return (
     <SafeAreaView style={styles.container}>
@@ -61,6 +61,9 @@ export default function MyProfile() {
         <Text style={styles.username}>{truncate(info.username)}</Text>
         {info.plataformaFav && <Text style={styles.platformTxt}>{info.plataformaFav}</Text>}
       </View>
+      <TouchableOpacity onPress={() => router.push("/configuracion")} style={styles.btnGear}>
+        <Ionicons name="settings-outline" size={22} color="#fff" />
+      </TouchableOpacity>
 
       {/* —— FOTO + ESTADÍSTICAS + CONFIG —— */}
       <View style={styles.topRow}>
@@ -73,9 +76,6 @@ export default function MyProfile() {
           <Counter n={seg} label="Seguidores" />
           <Counter n={sigo} label="Siguiendo" />
         </View>
-        <TouchableOpacity onPress={() => router.push("/configuracion")} style={styles.btnGear}>
-          <Ionicons name="settings-outline" size={22} color="#fff" />
-        </TouchableOpacity>
       </View>
 
       {/* —— BIO Y GÉNERO FAVORITO —— */}
@@ -98,7 +98,7 @@ export default function MyProfile() {
           </TouchableOpacity>
         )}
       />
-      <BottomTabBar/>
+      <BottomTabBar />
     </SafeAreaView>
   );
 }
@@ -127,16 +127,20 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     justifyContent: "space-between",
   },
-  avatar: { width: PHOTO, height: PHOTO, borderRadius: PHOTO / 2 },
+  avatar: { width: PHOTO, height: PHOTO, borderRadius: PHOTO / 2, borderColor: "#FF66C4", },
   statsBox: {
     flex: 1,
     flexDirection: "row",
-    justifyContent: "space-evenly",
-    marginLeft: 16,
-    marginRight: 16,
+    justifyContent: "space-around",
+    alignItems: "center",
+    marginLeft: 4,
+    marginRight: 4,
   },
   btnGear: {
     backgroundColor: "#42BAFF",
+    position: "absolute",
+    top: 16,
+    right: 16,
     padding: 8,
     borderRadius: 20,
   },

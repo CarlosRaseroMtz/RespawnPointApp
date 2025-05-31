@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
   },
   chatItem: { marginBottom: 20 },
   chatRow: { flexDirection: "row", alignItems: "center" },
-  avatar: { width: 52, height: 52, borderRadius: 26, marginRight: 12 },
+  avatar: { width: 52, height: 52, borderRadius: 26, marginRight: 12, borderColor: "#FF66C4", borderWidth: 1 },
   chatInfo: { flex: 1 },
   name: { fontWeight: "600", color: "#000", fontSize: 16 },
   message: { color: "#555", marginTop: 2 },

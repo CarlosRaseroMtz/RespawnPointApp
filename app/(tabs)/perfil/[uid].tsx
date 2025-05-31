@@ -181,7 +181,7 @@ const s = StyleSheet.create({
     gap: 16,              // ⬅️ un poco más compacto
   },
   row: { flexDirection: "row", alignItems: "center", marginBottom: 14 },
-  avatar: { width: C.PHOTO, height: C.PHOTO, borderRadius: C.PHOTO / 2 },
+  avatar: { width: C.PHOTO, height: C.PHOTO, borderRadius: C.PHOTO / 2, borderWidth: 1, borderColor: "#FF66C4", },
   genres: { fontWeight: "600", fontSize: 15, marginBottom: 4 },
   bio: { color: "#000", marginBottom: 12 },
   gridImg: { width: IMG, height: IMG * 1.2, borderRadius: 10 },
