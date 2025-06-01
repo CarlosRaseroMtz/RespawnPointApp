@@ -117,7 +117,7 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff" },
+  container: { flex: 1, backgroundColor: "#fff", paddingTop: 16 },
   tabs: {
     flexDirection: "row",
     justifyContent: "space-around",

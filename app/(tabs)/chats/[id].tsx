@@ -21,22 +21,18 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
-
-/* ⬇️  ruta intacta: dos niveles arriba desde app/chats */
+import FondoLayout from "../../../src/components/FondoLayout";
 import { firestore } from "../../../src/config/firebase-config";
 import { useAuth } from "../../../src/hooks/useAuth";
 
 export default function ChatScreen() {
-  /* tipamos el parámetro */
   const { id } = useLocalSearchParams<{ id: string }>();
-
   const { user } = useAuth();
+
   const [mensajes, setMensajes] = useState<any[]>([]);
   const [texto, setTexto] = useState("");
   const flatListRef = useRef<FlatList>(null);
 
-  /* ----------- listener de mensajes ----------- */
   useEffect(() => {
     if (!id || !user?.uid) return;
 
@@ -49,7 +45,6 @@ export default function ChatScreen() {
       const data = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
       setMensajes(data);
 
-      /* marcar como leído */
       data.forEach(async (msg: any) => {
         if (msg.userId !== user.uid && !msg.leidoPor?.includes(user.uid)) {
           try {
@@ -63,14 +58,12 @@ export default function ChatScreen() {
         }
       });
 
-      /* scroll al final */
       setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 100);
     });
 
     return unsub;
   }, [id, user?.uid]);
 
-  /* ----------- enviar mensaje ----------- */
   const enviar = async () => {
     if (!texto.trim() || !user || !id) return;
 
@@ -78,9 +71,9 @@ export default function ChatScreen() {
 
     await addDoc(collection(chatRef, "mensajes"), {
       userId: user.uid,
-      contenido: texto.trim(),
+      contenido: texto.trim(), // 👈 importante: lo llamaste "contenido"
       timestamp: serverTimestamp(),
-      leidoPor: [user.uid], // Marcar como leído por mí
+      leidoPor: [user.uid],
     });
 
     await updateDoc(chatRef, {
@@ -91,13 +84,13 @@ export default function ChatScreen() {
     setTexto("");
   };
 
-  /* ----------- UI ----------- */
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1, backgroundColor: "#fff" }}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-    >
-      <SafeAreaView style={{ flex: 1 }}>
+    <FondoLayout>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : undefined}
+        keyboardVerticalOffset={90} // ajusta según tu UI
+      >
         <FlatList
           ref={flatListRef}
           data={mensajes}
@@ -110,7 +103,9 @@ export default function ChatScreen() {
                 item.userId === user?.uid ? styles.mia : styles.suya,
               ]}
             >
-              <Text style={styles.texto}>{item.texto}</Text>
+              <Text style={styles.texto}>
+                {item.contenido || item.texto || "(sin contenido)"}
+              </Text>
               <Text style={styles.hora}>
                 {item.timestamp?.toDate().toLocaleTimeString("es-ES", {
                   hour: "2-digit",
@@ -121,23 +116,23 @@ export default function ChatScreen() {
           )}
         />
 
-        <SafeAreaView edges={["bottom"]} style={styles.inputArea}>
+        <View style={styles.inputArea}>
           <TextInput
             style={styles.input}
             placeholder="Escribe un mensaje..."
             value={texto}
             onChangeText={setTexto}
+            placeholderTextColor="#666"
           />
           <TouchableOpacity style={styles.btn} onPress={enviar}>
             <Text style={{ color: "#fff" }}>Enviar</Text>
           </TouchableOpacity>
-        </SafeAreaView>
-      </SafeAreaView>
-    </KeyboardAvoidingView>
+        </View>
+      </KeyboardAvoidingView>
+    </FondoLayout>
   );
 }
 
-/* ----------- estilos ----------- */
 const styles = StyleSheet.create({
   burbuja: {
     maxWidth: "75%",
@@ -146,11 +141,11 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   mia: {
-    backgroundColor: "#FF66C4",
+    backgroundColor: "#f9a6d9",
     alignSelf: "flex-end",
   },
   suya: {
-    backgroundColor: "#eee",
+    backgroundColor: "#87cbf2",
     alignSelf: "flex-start",
   },
   texto: { color: "#000" },
@@ -160,7 +155,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderTopWidth: 1,
     borderColor: "#ddd",
-    backgroundColor: "#fff",
+    backgroundColor: "rgba(255,255,255,0.9)",
     alignItems: "center",
   },
   input: {

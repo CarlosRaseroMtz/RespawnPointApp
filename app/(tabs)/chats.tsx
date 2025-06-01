@@ -38,15 +38,15 @@ export default function ChatsScreen() {
   const chats = useChats();
 
   /* ---------- búsqueda de usuarios ---------- */
-const handleBuscarUsuarios = async (text: string) => {
-  setBusqueda(text);
-  if (text.length >= 2 && user?.uid) {
-    const resultadosFiltrados = await buscarUsuarios(text, user.uid);
-    setResultados(resultadosFiltrados);
-  } else {
-    setResultados([]);
-  }
-};
+  const handleBuscarUsuarios = async (text: string) => {
+    setBusqueda(text);
+    if (text.length >= 2 && user?.uid) {
+      const resultadosFiltrados = await buscarUsuarios(text, user.uid);
+      setResultados(resultadosFiltrados);
+    } else {
+      setResultados([]);
+    }
+  };
 
 
   /* ---------- iniciar chat ---------- */
@@ -78,7 +78,7 @@ const handleBuscarUsuarios = async (text: string) => {
       lastMessage: "",
     });
 
-    router.push(`./chats/${chatId}`);                // ✅
+    router.push(`/chats/${chatId}`);                // ✅
   };
 
   /* ---------- filtros de pestaña ---------- */
@@ -150,6 +150,7 @@ const handleBuscarUsuarios = async (text: string) => {
       <ScrollView>
         {chatsToShow.map((chat) => (
           <ChatItem
+            key={chat.id}
             id={chat.id}
             avatar={chat.avatar}
             nombre={chat.nombre}

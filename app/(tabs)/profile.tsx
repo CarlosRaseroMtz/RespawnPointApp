@@ -35,14 +35,15 @@ export default function MyProfile() {
 
   return (
     <SafeAreaView style={styles.container}>
+      {/* —— BOTÓN DE CONFIGURACIÓN —— */}
+      <TouchableOpacity onPress={() => router.push("/configuracion")} style={styles.btnGear}>
+        <Ionicons name="settings-outline" size={22} color="#fff" />
+      </TouchableOpacity>
       {/* —— NOMBRE + PLATAFORMA —— */}
       <View style={styles.header}>
         <Text style={styles.username}>{truncate(info.username)}</Text>
         {info.plataformaFav && <Text style={styles.platformTxt}>{info.plataformaFav}</Text>}
       </View>
-      <TouchableOpacity onPress={() => router.push("/configuracion")} style={styles.btnGear}>
-        <Ionicons name="settings-outline" size={22} color="#fff" />
-      </TouchableOpacity>
 
       {/* —— FOTO + ESTADÍSTICAS + CONFIG —— */}
       <View style={styles.topRow}>
@@ -91,8 +92,8 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff", padding: 16 },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
 
-  header: { alignItems: "center", marginBottom: 10 },
-  username: { fontSize: 19, fontWeight: "bold", color: "#000", textAlign: "center" },
+  header: { alignItems: "center", marginBottom: 6, paddingTop: 16 },
+  username: { fontSize: 19, fontWeight: "bold", color: "#000", textAlign: "center", paddingTop: 8 },
   platformTxt: { color: "#888", marginTop: 2, fontSize: 14, textAlign: "center" },
 
   topRow: {
