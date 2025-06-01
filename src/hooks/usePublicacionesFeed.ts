@@ -1,10 +1,10 @@
 import {
-    collection,
-    doc,
-    getDoc,
-    onSnapshot,
-    orderBy,
-    query,
+  collection,
+  doc,
+  getDoc,
+  onSnapshot,
+  orderBy,
+  query,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { firestore } from "../config/firebase-config";
@@ -37,7 +37,7 @@ export function usePublicacionesFeed() {
             autor: {
               uid: data.userId,
               username: autor.username ?? "Player",
-              fotoPerfil: autor.fotoPerfil ?? null,
+              fotoPerfil: autor.fotoPerfil ?? "../../assets/images/foto-perfil-isi.png",
             },
           } as PostConAutor;
         })
