@@ -1,10 +1,11 @@
+import { router } from "expo-router";
 import React from "react";
 import {
-    Image,
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 interface ChatItemProps {
@@ -25,7 +26,8 @@ const ChatItem = ({
   onPress,
 }: ChatItemProps) => {
   return (
-    <TouchableOpacity key={id} style={styles.chatItem} onPress={onPress}>
+    <TouchableOpacity key={id} style={styles.chatItem} onPress={() => router.push(`/chats/${id}`)}
+>
       <View style={styles.chatRow}>
         <Image source={{ uri: avatar }} style={styles.avatar} />
         <View style={styles.chatInfo}>

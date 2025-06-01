@@ -65,7 +65,7 @@ const handleBuscarUsuarios = async (text: string) => {
     });
 
     if (existente) {
-      router.push(`./chats/${existente.id}`);         // ✅ ruta absoluta
+      router.push(`/chats/${existente.id}`);         // ✅ ruta absoluta
       return;
     }
 
@@ -133,7 +133,7 @@ const handleBuscarUsuarios = async (text: string) => {
       {/* resultados de búsqueda */}
       {resultados.map((u) => (
         <TouchableOpacity
-          key={u.id}
+          key={u.id ?? u.username}
           style={styles.searchItem}
           onPress={() => iniciarChatCon(u)}
           disabled={u.id === "no-results"}

@@ -67,15 +67,14 @@ export default function HomeScreen() {
         autor={item.autor}
         likes={item.likes || []}
         isLiked={item.likes?.includes(user?.uid)}
-        onLike={() =>
+        onLike={() => {
+          if (!user) return;                     // no llames sin uid
           FeedActions.toggleLike({
             postId: item.id,
-            userUid: user?.uid || "",
+            userUid: user.uid,                   // ✅ uid real, sin fallback ""
             likes: item.likes || [],
-          })
-        }
-
-
+          });
+        }}
         onComment={() =>
           router.push({ pathname: "/publicacion/[id]", params: { id: item.id } })
         }

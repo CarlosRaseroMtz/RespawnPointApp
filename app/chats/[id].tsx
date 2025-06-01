@@ -77,9 +77,9 @@ export default function ChatScreen() {
 
     await addDoc(collection(chatRef, "mensajes"), {
       userId: user.uid,
-      texto: texto.trim(),
+      contenido: texto.trim(),
       timestamp: Timestamp.now(),
-      leidoPor: [],
+      leidoPor: [user.uid], // Marcar como leído por mí
     });
 
     await updateDoc(chatRef, {
