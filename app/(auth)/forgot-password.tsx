@@ -1,5 +1,4 @@
 import { useRouter } from "expo-router";
-import { sendPasswordResetEmail } from "firebase/auth";
 import { useState } from "react";
 import {
   Alert,
@@ -10,23 +9,17 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
-/* ⬇️  ruta correcta (dos niveles arriba desde (auth)) */
-import { auth } from "../../config/firebase-config";
+import { sendResetLink } from "../../src/utils/auth-reset-password";
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
   const [email, setEmail] = useState("");
 
   const handleRecovery = async () => {
-    if (!email) {
-      Alert.alert("Error", "Introduce tu correo.");
-      return;
-    }
     try {
-      await sendPasswordResetEmail(auth, email.trim());
+      await sendResetLink(email);
       Alert.alert("Recuperación enviada", "Revisa tu bandeja de entrada.");
-      router.replace("/login");        
+      router.replace("/login");
     } catch (e) {
       console.error("❌ Recuperación:", e);
       Alert.alert("Error", "No se pudo enviar el correo. ¿Está bien escrito?");
@@ -67,7 +60,7 @@ export default function ForgotPasswordScreen() {
         ¿Aún no tienes cuenta?{" "}
         <Text
           style={styles.pink}
-          onPress={() => router.push("/register")} 
+          onPress={() => router.push("/register")}
         >
           Regístrate aquí
         </Text>

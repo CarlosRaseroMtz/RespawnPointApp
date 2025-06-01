@@ -13,8 +13,8 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { firestore } from "../../../config/firebase-config";
-import { useAuth } from "../../../hooks/useAuth";
+import { firestore } from "../../../src/config/firebase-config";
+import { useAuth } from "../../../src/hooks/useAuth";
 
 const platforms = [
   "Xbox 360", "Xbox One", "Xbox Series X/S",

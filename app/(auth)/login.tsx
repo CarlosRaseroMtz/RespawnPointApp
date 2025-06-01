@@ -1,6 +1,5 @@
 import { AntDesign } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { signInWithEmailAndPassword } from "firebase/auth";
 import { useState } from "react";
 import {
   Dimensions,
@@ -12,9 +11,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { loginWithEmail } from "../../src/utils/auth-login";
 
 /* 👈 Ruta actualizada (estás un nivel más profundo) */
-import { auth } from "../../config/firebase-config";
 
 const { width } = Dimensions.get("window");
 
@@ -26,14 +25,9 @@ export default function LoginScreen() {
   const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async () => {
-    if (!email || !password) {
-      alert("Por favor, completa todos los campos.");
-      return;
-    }
-
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      router.replace("/home");            // 👈 ruta nueva
+      await loginWithEmail(email, password);
+      router.replace("/home");           // 👈 ruta nueva
     } catch (err: any) {
       let message = "Error al iniciar sesión.";
       switch (err.code) {

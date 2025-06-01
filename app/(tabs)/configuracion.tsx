@@ -1,104 +1,39 @@
 import { useRouter } from "expo-router";
-import { deleteUser, signOut } from "firebase/auth";
-import { deleteDoc, doc, onSnapshot } from "firebase/firestore";
-import { useEffect, useState } from "react";
 import {
-  Alert,
-  Image,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 
 /* 👈 nueva ruta (dos niveles arriba desde app/(tabs)/) */
-import { auth, firestore } from "../../config/firebase-config";
-import { useAuth } from "../../hooks/useAuth";
+import UserHeader from "../../src/components/UserHeader";
+import { useAuth } from "../../src/hooks/useAuth";
+import { usePerfilUsuario } from "../../src/hooks/usePerfilUsuario";
+import { cerrarSesion, eliminarCuenta } from "../../src/utils/auth-actions";
 
 export default function ConfiguracionScreen() {
   const router = useRouter();
   const { user } = useAuth();
-  const [perfil, setPerfil] = useState<any>(null);
 
   /* ----------- listener de perfil ----------- */
-  useEffect(() => {
-    if (!user?.uid) return;
-
-    const ref = doc(firestore, "usuarios", user.uid);
-    const unsub = onSnapshot(
-      ref,
-      (snap) => snap.exists() && setPerfil(snap.data()),
-      (e) =>
-        e.code === "permission-denied"
-          ? console.warn("⛔ Permiso denegado")
-          : console.error("❌ Listener:", e)
-    );
-
-    return unsub;
-  }, [user?.uid]);
+  const perfil = usePerfilUsuario();
 
   /* ----------- acciones ----------- */
-  const cerrarSesion = async () => {
-    try {
-      await signOut(auth);
-      router.replace("/login");
-    } catch (e) {
-      console.error("❌ Sign-out:", e);
-    }
-  };
 
-  const eliminarCuenta = async () => {
-    Alert.alert(
-      "¿Eliminar cuenta?",
-      "Esta acción es irreversible.",
-      [
-        { text: "Cancelar", style: "cancel" },
-        {
-          text: "Eliminar",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              const uid = user?.uid;
-              if (!uid) return;
-
-              await deleteDoc(doc(firestore, "usuarios", uid));
-              if (auth.currentUser) await deleteUser(auth.currentUser);
-
-              Alert.alert("✅ Cuenta eliminada");
-              router.replace("/login");
-            } catch (e) {
-              console.error("❌ Delete account:", e);
-              Alert.alert("Error", "No se pudo eliminar la cuenta.");
-            }
-          },
-        },
-      ]
-    );
-  };
 
   /* ----------- UI ----------- */
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
         {/* perfil */}
-        <View style={styles.header}>
-          <Image
-            source={{
-              uri: perfil?.fotoPerfil || "https://i.pravatar.cc/150?img=12",
-            }}
-            style={styles.avatar}
-          />
-          <View>
-            <Text style={styles.username}>
-              {perfil?.username || "Cargando..."}
-            </Text>
-            <Text style={styles.platform}>
-              🎮 {perfil?.plataformaFav || "Sin plataforma"}
-            </Text>
-          </View>
-        </View>
+        <UserHeader
+          username={perfil?.username || "Cargando..."}
+          plataforma={perfil?.plataformaFav}
+          avatarUrl={perfil?.fotoPerfil || "https://i.pravatar.cc/150?img=12"}
+        />
 
         {/* ajustes */}
         <Text style={styles.sectionTitle}>Configuración</Text>
@@ -147,14 +82,16 @@ export default function ConfiguracionScreen() {
             Añadir cuenta (próximamente)
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={cerrarSesion}>
+        <TouchableOpacity onPress={() => cerrarSesion(router)}>
           <Text style={[styles.item, { color: "red" }]}>Cerrar sesión</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={eliminarCuenta}>
+
+        <TouchableOpacity onPress={() => eliminarCuenta(user?.uid, router)}>
           <Text style={[styles.item, { color: "#FF66C4" }]}>
             Eliminar cuenta para siempre
           </Text>
         </TouchableOpacity>
+
       </ScrollView>
     </SafeAreaView>
   );

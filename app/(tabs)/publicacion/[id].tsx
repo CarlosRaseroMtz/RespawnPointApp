@@ -27,9 +27,9 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { firestore } from "../../../config/firebase-config";
-import { useAuth } from "../../../hooks/useAuth";
-import PostCard from "../../comp/post-card";
+import PostCard from "../../../src/components/post-card";
+import { firestore } from "../../../src/config/firebase-config";
+import { useAuth } from "../../../src/hooks/useAuth";
 
 /* —— tipos —— */
 type Publicacion = {

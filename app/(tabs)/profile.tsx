@@ -1,17 +1,14 @@
 /* -----------------  MI PERFIL (REDISEÑADO) ----------------- */
+import { useMiPerfil } from "@/src/hooks/useMiPerfil";
+import { useMisPublicaciones } from "@/src/hooks/useMisPublicaciones";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import {
-  collection, doc, onSnapshot, orderBy, query, where
-} from "firebase/firestore";
-import { useEffect, useState } from "react";
 import {
   Dimensions, FlatList, Image, SafeAreaView,
   StyleSheet, Text, TouchableOpacity, View
 } from "react-native";
-import { firestore } from "../../config/firebase-config";
-import { useAuth } from "../../hooks/useAuth";
-import BottomTabBar from "../comp/bottom-tab-bar";
+import PostGridItem from "../../src/components/PostGridItem";
+import { useAuth } from "../../src/hooks/useAuth";
 
 /* helpers */
 const { width } = Dimensions.get("window");
@@ -26,27 +23,9 @@ export default function MyProfile() {
   const router = useRouter();
   const { user } = useAuth();
 
-  const [info, setInfo] = useState<any>();
-  const [posts, setPosts] = useState<any[]>([]);
 
-  useEffect(() => {
-    if (!user?.uid) return;
-    return onSnapshot(doc(firestore, "usuarios", user.uid), (s) =>
-      s.exists() && setInfo(s.data())
-    );
-  }, [user?.uid]);
-
-  useEffect(() => {
-    if (!user?.uid) return;
-    const q = query(
-      collection(firestore, "publicaciones"),
-      where("userId", "==", user.uid),
-      orderBy("timestamp", "desc")
-    );
-    return onSnapshot(q, (snap) =>
-      setPosts(snap.docs.map((d) => ({ id: d.id, ...d.data() })))
-    );
-  }, [user?.uid]);
+  const info = useMiPerfil();
+  const posts = useMisPublicaciones();
 
   if (!info)
     return <SafeAreaView style={styles.center}><Text>Cargando…</Text></SafeAreaView>;
@@ -90,15 +69,10 @@ export default function MyProfile() {
         columnWrapperStyle={{ gap: 6 }}
         contentContainerStyle={{ paddingBottom: 100, gap: 6 }}
         renderItem={({ item }) => (
-          <TouchableOpacity
-            activeOpacity={0.8}
-            onPress={() => router.push({ pathname: "/publicacion/[id]", params: { id: item.id } })}
-          >
-            <Image source={{ uri: item.mediaUrl }} style={styles.gridImg} />
-          </TouchableOpacity>
+          <PostGridItem id={item.id} mediaUrl={item.mediaUrl} />
         )}
+
       />
-      <BottomTabBar />
     </SafeAreaView>
   );
 }
@@ -118,8 +92,8 @@ const styles = StyleSheet.create({
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
 
   header: { alignItems: "center", marginBottom: 10 },
-  username: { fontSize: 22, fontWeight: "bold", color: "#000" },
-  platformTxt: { color: "#888", marginTop: 2, fontSize: 14 },
+  username: { fontSize: 19, fontWeight: "bold", color: "#000", textAlign: "center" },
+  platformTxt: { color: "#888", marginTop: 2, fontSize: 14, textAlign: "center" },
 
   topRow: {
     flexDirection: "row",

@@ -1,61 +1,28 @@
-import { formatDistanceToNow } from "date-fns";
-import { es } from "date-fns/locale";
+import { useNotificaciones } from "@/src/hooks/useNotificaciones";
 import { getAuth } from "firebase/auth";
-import { collection, getFirestore, onSnapshot, updateDoc } from "firebase/firestore";
-import React, { useEffect, useState } from "react";
+import { getFirestore } from "firebase/firestore";
+import React, { useState } from "react";
 import {
-  Image,
   SafeAreaView,
   ScrollView,
   StyleSheet,
   Text,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
-import { app } from "../../config/firebase-config";
-import BottomTabBar from "../comp/bottom-tab-bar";
+import NotificationItem from "../../src/components/NotificacionesItem"; // ajusta el path según tu estructura
+import { app } from "../../src/config/firebase-config";
 
 const tabs = ["Usuarios", "Comunidades", "Torneos"];
 
 export default function NotificacionesScreen() {
   const [activeTab, setActiveTab] = useState("Usuarios");
   const [seguidos, setSeguidos] = useState<{ [key: string]: boolean }>({});
-  const [notifications, setNotifications] = useState<any[]>([]);
+  const notifications = useNotificaciones(activeTab);
 
   const db = getFirestore(app);
   const auth = getAuth(app);
 
-  useEffect(() => {
-    const user = auth.currentUser;
-    if (!user) return;
-
-    const itemsRef = collection(db, "notificaciones", user.uid, "items");
-
-    const unsubscribe = onSnapshot(itemsRef, (snapshot) => {
-      const notifList = snapshot.docs
-        .map((doc) => {
-          const data = doc.data();
-          return {
-            id: doc.id,
-            ...data,
-            seconds: data.time?.seconds || 0, // extra para ordenación
-          };
-        })
-        .sort((a, b) => b.seconds - a.seconds); // más recientes primero
-
-      setNotifications(notifList);
-
-      // 🔵 Marcar como leídas
-      snapshot.docs.forEach((doc) => {
-        const data = doc.data();
-        if (!data.leida) {
-          updateDoc(doc.ref, { leida: true });
-        }
-      });
-    });
-
-    return () => unsubscribe();
-  }, []);
 
   const toggleSeguir = (id: string) => {
     setSeguidos((prev) => ({
@@ -107,46 +74,22 @@ export default function NotificacionesScreen() {
             </Text>
           ) : (
             filteredNotifications.map((item) => (
-              <View key={item.id} style={[styles.notification, { position: "relative" }]}>
-                {!item.leida && (
-                  <View style={styles.unreadDot} />
-                )}
-
-                <Image
-                  source={{ uri: item.avatar }}
-                  style={styles.avatar}
-                />
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.user}>
-                    {item.user}{" "}
-                    <Text style={styles.time}>
-                      {item.time?.toDate
-                        ? formatDistanceToNow(item.time.toDate(), { locale: es, addSuffix: true })
-                        : "sin fecha"}
-                    </Text>
-                  </Text>
-
-                  <Text style={styles.message}>{item.message}</Text>
-                </View>
-                {item.action === "seguir" && (
-                  <TouchableOpacity
-                    style={[
-                      styles.followBtn,
-                      seguidos[item.id] && { backgroundColor: "#FF66C4" },
-                    ]}
-                    onPress={() => toggleSeguir(item.id)}
-                  >
-                    <Text style={styles.followText}>
-                      {seguidos[item.id] ? "Seguido" : "Seguir"}
-                    </Text>
-                  </TouchableOpacity>
-                )}
-              </View>
+              <NotificationItem
+                key={item.id}
+                id={item.id}
+                user={item.user}
+                avatar={item.avatar}
+                message={item.message}
+                time={item.time}
+                leida={item.leida}
+                action={item.action}
+                seguido={seguidos[item.id]}
+                onToggleSeguir={toggleSeguir} seconds={undefined} />
             ))
+
           )}
         </ScrollView>
       </View>
-      <BottomTabBar />
     </SafeAreaView>
   );
 }

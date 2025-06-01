@@ -2,15 +2,12 @@ import { useRouter } from "expo-router";
 import {
   collection,
   doc,
-  getDoc,
   getDocs,
-  onSnapshot,
-  orderBy,
   query,
   setDoc,
-  where,
+  where
 } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   Image,
   SafeAreaView,
@@ -21,15 +18,11 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-
-/* 👈 sigue siendo dos niveles arriba desde (tabs) */
-import { firestore } from "../../config/firebase-config";
-import { useAuth } from "../../hooks/useAuth";
-
-/* ❌ BottomTabBar ya no hace falta porque usamos <Tabs>.
-   Si todavía lo quieres como extra UI, importa con:
-   import BottomTabBar from "../../comp/bottom-tab-bar";
-*/
+import ChatItem from "../../src/components/ChatItem";
+import { firestore } from "../../src/config/firebase-config";
+import { useAuth } from "../../src/hooks/useAuth";
+import { useChats } from "../../src/hooks/useChats";
+import { buscarUsuarios } from "../../src/utils/buscar-usuarios";
 
 const tabs = ["Usuarios", "Comunidades", "Torneos"];
 
@@ -38,67 +31,23 @@ export default function ChatsScreen() {
   const { user } = useAuth();
 
   const [activeTab, setActiveTab] = useState("Usuarios");
-  const [chats, setChats] = useState<any[]>([]);
   const [busqueda, setBusqueda] = useState("");
   const [resultados, setResultados] = useState<any[]>([]);
 
   /* ---------- listener de todos mis chats ---------- */
-  useEffect(() => {
-    if (!user) return;
-
-    const q = query(
-      collection(firestore, "chats"),
-      where("participantes", "array-contains", user.uid),
-      orderBy("timestamp", "desc")
-    );
-
-    const unsub = onSnapshot(q, async (snap) => {
-      const res = await Promise.all(
-        snap.docs.map(async (d) => {
-          const data = d.data();
-          const otroUid = data.participantes.find((uid: string) => uid !== user.uid);
-          const otroSnap = await getDoc(doc(firestore, "usuarios", otroUid));
-          const userInfo = otroSnap.exists() ? otroSnap.data() : {};
-
-          return {
-            id: d.id,
-            tipo: data.tipo ?? "usuario",
-            nombre: userInfo.username ?? "Usuario",
-            avatar: userInfo.fotoPerfil ?? "https://i.pravatar.cc/150?img=2",
-            lastMessage: data.lastMessage ?? "",
-            timestamp:
-              data.timestamp?.toDate().toLocaleTimeString("es-ES", {
-                hour: "2-digit",
-                minute: "2-digit",
-              }) ?? "",
-          };
-        })
-      );
-      setChats(res);
-    });
-
-    return unsub;
-  }, [user]);
+  const chats = useChats();
 
   /* ---------- búsqueda de usuarios ---------- */
-  const buscarUsuarios = async () => {
-    const snap = await getDocs(collection(firestore, "usuarios"));
+const handleBuscarUsuarios = async (text: string) => {
+  setBusqueda(text);
+  if (text.length >= 2 && user?.uid) {
+    const resultadosFiltrados = await buscarUsuarios(text, user.uid);
+    setResultados(resultadosFiltrados);
+  } else {
+    setResultados([]);
+  }
+};
 
-    const encontrados = snap.docs.map((d) => ({
-      id: d.id,
-      ...d.data(),
-    })) as { id: string; username: string; fotoPerfil?: string }[];
-
-    const filtrados = encontrados.filter(
-      (u) =>
-        u.username?.toLowerCase().includes(busqueda.toLowerCase()) &&
-        u.id !== user?.uid
-    );
-
-    setResultados(
-      filtrados.length ? filtrados : [{ id: "no-results", username: "No se encontraron usuarios" }]
-    );
-  };
 
   /* ---------- iniciar chat ---------- */
   const iniciarChatCon = async (usuario: any) => {
@@ -133,15 +82,15 @@ export default function ChatsScreen() {
   };
 
   /* ---------- filtros de pestaña ---------- */
-  const userChats  = chats.filter((c) => c.tipo === "usuario");
-  const groupChats = chats.filter((c) => c.tipo === "grupo");
+  const userChats = chats.filter((c: { tipo: string; }) => c.tipo === "usuario");
+  const groupChats = chats.filter((c: { tipo: string; }) => c.tipo === "grupo");
 
   const chatsToShow =
     activeTab === "Usuarios"
       ? userChats
       : activeTab === "Comunidades"
-      ? groupChats
-      : [];
+        ? groupChats
+        : [];
 
   /* ---------- UI ---------- */
   return (
@@ -178,11 +127,7 @@ export default function ChatsScreen() {
         placeholder="Buscar usuarios..."
         style={styles.search}
         value={busqueda}
-        onChangeText={(text) => {
-          setBusqueda(text);
-          if (text.length >= 2) buscarUsuarios();
-          else setResultados([]);
-        }}
+        onChangeText={handleBuscarUsuarios}
       />
 
       {/* resultados de búsqueda */}
@@ -204,28 +149,19 @@ export default function ChatsScreen() {
       {/* lista de chats */}
       <ScrollView>
         {chatsToShow.map((chat) => (
-          <TouchableOpacity
-            key={chat.id}
-            style={styles.chatItem}
-            onPress={() => router.push(`./chats/${chat.id}`)}
-          >
-            <View style={styles.chatRow}>
-              <Image source={{ uri: chat.avatar }} style={styles.avatar} />
-              <View style={styles.chatInfo}>
-                <Text style={styles.name}>
-                  {chat.nombre}{" "}
-                  <Text style={styles.time}>{chat.timestamp}</Text>
-                </Text>
-                <Text style={styles.message}>{chat.lastMessage}</Text>
-              </View>
-            </View>
-          </TouchableOpacity>
+          <ChatItem
+            id={chat.id}
+            avatar={chat.avatar}
+            nombre={chat.nombre}
+            lastMessage={chat.lastMessage}
+            timestamp={chat.timestamp}
+            onPress={() => router.push(`/chats/${chat.id}`)}
+          />
         ))}
       </ScrollView>
     </SafeAreaView>
   );
 }
-
 /* ---------- estilos ---------- */
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff", paddingHorizontal: 16, paddingTop: 16 },
