@@ -23,8 +23,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 /* ⬇️  ruta intacta: dos niveles arriba desde app/chats */
-import { firestore } from "../../config/firebase-config";
-import { useAuth } from "../../hooks/useAuth";
+import { firestore } from "../../src/config/firebase-config";
+import { useAuth } from "../../src/hooks/useAuth";
 
 export default function ChatScreen() {
   /* tipamos el parámetro */

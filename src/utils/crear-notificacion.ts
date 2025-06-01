@@ -1,5 +1,5 @@
 import { addDoc, collection, doc, getDoc, serverTimestamp } from "firebase/firestore";
-import { firestore } from "../config/firebase-config";
+import { firestore } from "../../src/config/firebase-config";
 
 export type TipoNoti = "like" | "comentario" | "seguimiento" | "mensaje";
 
@@ -27,23 +27,24 @@ export const crearNotificacion = async ({
     const perfil = perfilSnap.exists() ? perfilSnap.data() : {};
 
     console.log("📦 Perfil cargado para notificación:", {
-  username: perfil.username,
-  fotoPerfil: perfil.fotoPerfil,
-});
+      username: perfil.username,
+      fotoPerfil: perfil.fotoPerfil,
+    });
 
     const categoria = ["like", "comentario", "mensaje", "seguimiento"].includes(tipo)
       ? "Usuarios"
       : "Comunidades";
 
     await addDoc(collection(firestore, "notificaciones", paraUid, "items"), {
-      user: perfil.username || "Desconocido",
-      avatar: perfil.fotoPerfil || "https://i.pravatar.cc/150?img=12",
+      user: perfil.username || null,
+      avatar: perfil.fotoPerfil || null,
       message: contenido,
+      tipo,
       categoria,
-      action: tipo === "seguimiento" ? "seguir" : null,
       leida: false,
       time: serverTimestamp(),
     });
+
   } catch (error) {
     console.error("❌ Error al crear notificación:", error);
   }

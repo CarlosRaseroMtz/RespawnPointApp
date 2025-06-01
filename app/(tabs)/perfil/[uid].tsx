@@ -12,8 +12,8 @@ import {
   Dimensions, FlatList, Image, SafeAreaView,
   StyleSheet, Text, TouchableOpacity, View
 } from "react-native";
-import { firestore } from "../../../config/firebase-config";
-import { useAuth } from "../../../hooks/useAuth";
+import { firestore } from "../../../src/config/firebase-config";
+import { useAuth } from "../../../src/hooks/useAuth";
 import { stylesCommon as C } from "../profile"; // reutilizamos tamaños
 
 const { width } = Dimensions.get("window");

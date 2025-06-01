@@ -2,15 +2,11 @@ import { useRouter } from "expo-router";
 import {
   arrayRemove,
   arrayUnion,
-  collection,
   doc,
   getDoc,
-  onSnapshot,
-  orderBy,
-  query,
   updateDoc
 } from "firebase/firestore";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import {
   FlatList,
   SafeAreaView,
@@ -19,48 +15,23 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { firestore } from "../../config/firebase-config";
-import { useAuth } from "../../hooks/useAuth";
-import { crearNotificacion } from "../../utils/crear-notificacion";
-import BottomTabBar from "../comp/bottom-tab-bar";
-import PostCard from "../comp/post-card"; // ⬅️ nuevo
+import { firestore } from "../../src/config/firebase-config";
+import { useAuth } from "../../src/hooks/useAuth";
+import { usePublicacionesFeed } from "../../src/hooks/usePublicacionesFeed";
+import { crearNotificacion } from "../../src/utils/crear-notificacion";
+import * as FeedActions from "../../src/utils/feed-actions";
+
+import PostCard from "../../src/components/post-card"; // ⬅️ nuevo
 
 const tabs = ["Juegos", "Para ti", "Memes"];
 
 export default function HomeScreen() {
   const [activeTab, setActiveTab] = useState("Para ti");
-  const [posts, setPosts] = useState<any[]>([]);
   const router = useRouter();
   const { user } = useAuth();
 
   /* —— carga publicaciones + autor —— */
-  useEffect(() => {
-    const q = query(
-      collection(firestore, "publicaciones"),
-      orderBy("timestamp", "desc")
-    );
-
-    const unsub = onSnapshot(q, async (snap) => {
-      const arr = await Promise.all(
-        snap.docs.map(async (d) => {
-          const data = d.data();
-          const usnap = await getDoc(doc(firestore, "usuarios", data.userId));
-          const autor = usnap.exists() ? usnap.data() : {};
-          return {
-            id: d.id,
-            ...data,
-            autor: {
-              uid: data.userId,
-              username: autor.username ?? "Player",
-              fotoPerfil: autor.fotoPerfil ?? null,
-            },
-          };
-        })
-      );
-      setPosts(arr);
-    });
-    return unsub;
-  }, []);
+  const posts = usePublicacionesFeed();
 
   /* —— like / unlike —— */
   const toggleLike = async (postId: string, likes: string[]) => {
@@ -96,7 +67,15 @@ export default function HomeScreen() {
         autor={item.autor}
         likes={item.likes || []}
         isLiked={item.likes?.includes(user?.uid)}
-        onLike={() => toggleLike(item.id, item.likes || [])}
+        onLike={() =>
+          FeedActions.toggleLike({
+            postId: item.id,
+            userUid: user?.uid || "",
+            likes: item.likes || [],
+          })
+        }
+
+
         onComment={() =>
           router.push({ pathname: "/publicacion/[id]", params: { id: item.id } })
         }
@@ -134,8 +113,6 @@ export default function HomeScreen() {
         contentContainerStyle={{ padding: 16 }}
         showsVerticalScrollIndicator={false}
       />
-
-      <BottomTabBar />
     </SafeAreaView>
   );
 }

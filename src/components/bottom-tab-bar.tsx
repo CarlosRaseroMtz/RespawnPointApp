@@ -2,83 +2,18 @@
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { usePathname, useRouter } from "expo-router";
 import { getAuth } from "firebase/auth";
-import {
-  collection,
-  getFirestore,
-  onSnapshot,
-} from "firebase/firestore";
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useUnreadCounters } from "../hooks/useUnreadCounters";
 
 export default function BottomTabBar() {
   const router = useRouter();
   const pathname = usePathname();
+  const isActive = (route: string) => pathname === route;
   const insets = useSafeAreaInsets(); // <- esto añade soporte para padding dinámico
 
-  const isActive = (route: string) => pathname === route;
-  const [unreadNotis, setUnreadNotis] = useState(0);
-  const [unreadChats, setUnreadChats] = useState(0);
-
-  useEffect(() => {
-    const auth = getAuth();
-    const db = getFirestore();
-    const user = auth.currentUser;
-    if (!user) return;
-
-    // 🔔 Notificaciones
-    const notiRef = collection(db, "notificaciones", user.uid, "items");
-    const unsubNotis = onSnapshot(notiRef, (snap) => {
-      const count = snap.docs.filter((doc) => !doc.data().leida).length;
-      setUnreadNotis(count);
-    });
-
-    const chatsRef = collection(db, "chats");
-    const unsubChats = onSnapshot(chatsRef, (chatsSnap) => {
-      const listeners: (() => void)[] = [];
-
-      let chatsConMensajesNoLeidos = 0;
-
-      let chatsProcesados = 0;
-      const totalChats = chatsSnap.docs.length;
-
-      chatsSnap.docs.forEach((chatDoc) => {
-        const mensajesRef = collection(chatDoc.ref, "mensajes");
-
-        const unsubMensajes = onSnapshot(mensajesRef, (msgSnap) => {
-          const hayNoLeidos = msgSnap.docs.some((msg) => {
-            const data = msg.data();
-            return (
-              !data.leidoPor?.includes(user.uid) &&
-              data.userId !== user.uid
-            );
-          });
-
-          if (hayNoLeidos) chatsConMensajesNoLeidos++;
-
-          chatsProcesados++;
-
-          // Solo actualizamos el contador cuando hayamos procesado todos los chats
-          if (chatsProcesados === totalChats) {
-            setUnreadChats(chatsConMensajesNoLeidos);
-          }
-        });
-
-        listeners.push(unsubMensajes);
-      });
-
-      return () => listeners.forEach((unsub) => unsub());
-    });
-
-
-
-    return () => {
-      unsubNotis();
-      unsubChats();
-    };
-  }, []);
-
+  const { unreadNotis, unreadChats } = useUnreadCounters(getAuth().currentUser?.uid);
 
   return (
     <View style={[styles.bottomTabBar, { paddingBottom: insets.bottom || 10 }]}>

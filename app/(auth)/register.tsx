@@ -1,11 +1,6 @@
 import { AntDesign } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { useRouter } from "expo-router";
-import {
-  createUserWithEmailAndPassword,
-  updateProfile,
-} from "firebase/auth";
-import { doc, setDoc } from "firebase/firestore";
 import { useState } from "react";
 import {
   Alert,
@@ -17,9 +12,9 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { registerUser } from "../../src/utils/auth-register";
 
 /* ⬇️  ruta correcta: 2 niveles arriba desde (auth) */
-import { auth, firestore } from "../../config/firebase-config";
 
 const platforms = ["Xbox 360",
   "Xbox One",
@@ -99,30 +94,19 @@ export default function RegisterScreen() {
       );
       return;
     }
-
+    
     try {
-      const { user } = await createUserWithEmailAndPassword(
-        auth, email.trim(), password
-      );
-      await updateProfile(user, { displayName: fullName });
-
-      await setDoc(doc(firestore, "usuarios", user.uid), {
+      await registerUser({
+        email: email.trim(),
+        password,
+        fullName,
         username,
-        email: user.email,
-        fotoPerfil: "https://i.pravatar.cc/150?img=12",
-        plataformaFav: platform,
-        generoFav: selectedGenres.join(", "),
-        seguidores: [],     // 👈
-        siguiendo: [],
-        descripcion: "Nuevo jugador registrado.",
-        nivel: null,
-        reputacion: 1,
-        rol: "jugador",
-        comunidades: [],
+        platform,
+        selectedGenres,
       });
 
       Alert.alert("Registro exitoso", "¡Bienvenido!");
-      router.replace("/login");          // ✔️  usa ruta absoluta
+      router.replace("/login");
     } catch (e: any) {
       console.error("❌ Registro:", e);
       const msg =
@@ -135,6 +119,7 @@ export default function RegisterScreen() {
               : "Ocurrió un error.";
       Alert.alert("Error de registro", msg);
     }
+
   };
 
   /* —— UI —— */
