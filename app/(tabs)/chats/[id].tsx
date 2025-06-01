@@ -6,6 +6,7 @@ import {
   onSnapshot,
   orderBy,
   query,
+  serverTimestamp,
   Timestamp,
   updateDoc,
 } from "firebase/firestore";
@@ -23,8 +24,8 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 
 /* ⬇️  ruta intacta: dos niveles arriba desde app/chats */
-import { firestore } from "../../src/config/firebase-config";
-import { useAuth } from "../../src/hooks/useAuth";
+import { firestore } from "../../../src/config/firebase-config";
+import { useAuth } from "../../../src/hooks/useAuth";
 
 export default function ChatScreen() {
   /* tipamos el parámetro */
@@ -78,7 +79,7 @@ export default function ChatScreen() {
     await addDoc(collection(chatRef, "mensajes"), {
       userId: user.uid,
       contenido: texto.trim(),
-      timestamp: Timestamp.now(),
+      timestamp: serverTimestamp(),
       leidoPor: [user.uid], // Marcar como leído por mí
     });
 
