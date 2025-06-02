@@ -9,7 +9,11 @@ import {
   where
 } from "firebase/firestore";
 import { useState } from "react";
+
+import { addDoc } from "firebase/firestore";
+
 import {
+  GestureResponderEvent,
   Image,
   SafeAreaView,
   ScrollView,
@@ -34,6 +38,36 @@ export default function ChatsScreen() {
   const [activeTab, setActiveTab] = useState("Usuarios");
   const [busqueda, setBusqueda] = useState("");
   const [resultados, setResultados] = useState<any[]>([]);
+  const [modoCrearGrupo, setModoCrearGrupo] = useState(false);
+  const [participantesGrupo, setParticipantesGrupo] = useState<string[]>([]);
+
+  const toggleSeleccionUsuario = (id: string) => {
+    setParticipantesGrupo(prev =>
+      prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
+    );
+
+    const crearGrupo = async () => {
+      if (!user || participantesGrupo.length < 1) return;
+
+      const nuevoChatRef = await addDoc(collection(firestore, "chats"), {
+        participantes: [user.uid, ...participantesGrupo],
+        tipo: "grupo",
+        timestamp: new Date(),
+        lastMessage: "",
+      });
+
+      setModoCrearGrupo(false);
+      setParticipantesGrupo([]);
+      router.push(`/chats/${nuevoChatRef.id}`);
+
+
+      setModoCrearGrupo(false);
+      setParticipantesGrupo([]);
+      router.push(`/chats/${nuevoChatRef.id}`);
+    };
+
+  };
+
 
   /* ---------- listener de todos mis chats ---------- */
   const chats = useChats();
@@ -93,6 +127,10 @@ export default function ChatsScreen() {
         ? groupChats
         : [];
 
+  function crearGrupo(event: GestureResponderEvent): void {
+    throw new Error("Function not implemented.");
+  }
+
   /* ---------- UI ---------- */
   return (
     <FondoLayout>
@@ -131,22 +169,62 @@ export default function ChatsScreen() {
           value={busqueda}
           onChangeText={handleBuscarUsuarios}
         />
+        {/* Solo si estamos en "Comunidades" */}
+        {activeTab === "Comunidades" && (
+          <>
+            {!modoCrearGrupo ? (
+              <TouchableOpacity
+                style={{ backgroundColor: "#FF66C4", padding: 10, borderRadius: 8, marginBottom: 10 }}
+                onPress={() => setModoCrearGrupo(true)}
+              >
+                <Text style={{ color: "white", textAlign: "center" }}>➕ Crear grupo</Text>
+              </TouchableOpacity>
+            ) : (
+              <>
+                <TouchableOpacity
+                  style={{ backgroundColor: "#42BAFF", padding: 10, borderRadius: 8, marginBottom: 10 }}
+                  onPress={crearGrupo}
+                >
+                  <Text style={{ color: "white", textAlign: "center" }}>✅ Confirmar grupo ({participantesGrupo.length})</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  onPress={() => {
+                    setModoCrearGrupo(false);
+                    setParticipantesGrupo([]);
+                  }}
+                >
+                  <Text style={{ color: "#888", marginBottom: 10 }}>❌ Cancelar</Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </>
+        )}
+
 
         {/* resultados de búsqueda */}
-        {resultados.map((u) => (
-          <TouchableOpacity
-            key={u.id ?? u.username}
-            style={styles.searchItem}
-            onPress={() => iniciarChatCon(u)}
-            disabled={u.id === "no-results"}
-          >
-            <Image
-              source={{ uri: u.fotoPerfil ?? "https://i.pravatar.cc/150?img=1" }}
-              style={styles.avatar}
-            />
-            <Text style={styles.name}>{u.username}</Text>
-          </TouchableOpacity>
-        ))}
+        {resultados.map((u) => {
+          const seleccionado = participantesGrupo.includes(u.id);
+          return (
+            <TouchableOpacity
+              key={u.id ?? u.username}
+              style={[styles.searchItem, { opacity: u.id === "no-results" ? 0.5 : 1 }]}
+              onPress={() => modoCrearGrupo ? toggleSeleccionUsuario(u.id) : iniciarChatCon(u)}
+              disabled={u.id === "no-results"}
+            >
+              <Image
+                source={{ uri: u.fotoPerfil ?? "https://i.pravatar.cc/150?img=1" }}
+                style={styles.avatar}
+              />
+              <Text style={styles.name}>{u.username}</Text>
+              {modoCrearGrupo && (
+                <Text style={{ marginLeft: 10, color: seleccionado ? "#42BAFF" : "#aaa" }}>
+                  {seleccionado ? "✔️" : "➕"}
+                </Text>
+              )}
+            </TouchableOpacity>
+          );
+        })}
+
 
         {/* lista de chats */}
         <ScrollView>

@@ -22,7 +22,17 @@ export default function HomeScreen() {
   const { user } = useAuth();
 
   /* —— carga publicaciones + autor —— */
-  const posts = usePublicacionesFeed();
+const allPosts = usePublicacionesFeed();
+
+const posts = allPosts.filter((post) => {
+  const categoria = post.categoria?.toLowerCase?.() || "";
+  if (activeTab === "Para ti") return true;
+  if (activeTab === "Juegos") return categoria === "videojuego";
+  if (activeTab === "Memes") return categoria === "meme";
+  return true;
+});
+
+
 
   /* —— render —— */
   const renderPost = ({ item }: any) => (

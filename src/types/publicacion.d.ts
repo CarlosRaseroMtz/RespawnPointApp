@@ -6,6 +6,8 @@ export interface Publicacion {
   mediaUrl: string;
   contenido?: string;
   comunidadId?: string;
+  categoria?: string; // opcional, puede ser "general", "juegos", etc.
+  commentsCount?: number; // opcional, cuenta de comentarios
   likes?: string[]; // array de UIDs que dieron like
   timestamp: Timestamp; // puedes usar Timestamp si importas de Firebase
 }
