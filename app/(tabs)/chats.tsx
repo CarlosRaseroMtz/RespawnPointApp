@@ -1,3 +1,4 @@
+import FondoLayout from "@/src/components/FondoLayout";
 import { useRouter } from "expo-router";
 import {
   collection,
@@ -94,78 +95,80 @@ export default function ChatsScreen() {
 
   /* ---------- UI ---------- */
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>Chats</Text>
+    <FondoLayout>
+      <SafeAreaView style={styles.container}>
+        <Text style={styles.title}>Chats</Text>
 
-      {/* pestañas */}
-      <View style={styles.tabs}>
-        {tabs.map((tab) => (
-          <TouchableOpacity
-            key={tab}
-            onPress={() => tab === "Torneos" ? null : setActiveTab(tab)}
-            disabled={tab === "Torneos"}
-            style={[
-              styles.tab,
-              activeTab === tab && styles.activeTab,
-              tab === "Torneos" && { opacity: 0.5 },
-            ]}
-          >
-            <Text
+        {/* pestañas */}
+        <View style={styles.tabs}>
+          {tabs.map((tab) => (
+            <TouchableOpacity
+              key={tab}
+              onPress={() => tab === "Torneos" ? null : setActiveTab(tab)}
+              disabled={tab === "Torneos"}
               style={[
-                styles.tabText,
-                activeTab === tab && styles.activeTabText,
+                styles.tab,
+                activeTab === tab && styles.activeTab,
+                tab === "Torneos" && { opacity: 0.5 },
               ]}
             >
-              {tab}
-            </Text>
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === tab && styles.activeTabText,
+                ]}
+              >
+                {tab}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        {/* búsqueda */}
+        <TextInput
+          placeholder="Buscar usuarios..."
+          style={styles.search}
+          value={busqueda}
+          onChangeText={handleBuscarUsuarios}
+        />
+
+        {/* resultados de búsqueda */}
+        {resultados.map((u) => (
+          <TouchableOpacity
+            key={u.id ?? u.username}
+            style={styles.searchItem}
+            onPress={() => iniciarChatCon(u)}
+            disabled={u.id === "no-results"}
+          >
+            <Image
+              source={{ uri: u.fotoPerfil ?? "https://i.pravatar.cc/150?img=1" }}
+              style={styles.avatar}
+            />
+            <Text style={styles.name}>{u.username}</Text>
           </TouchableOpacity>
         ))}
-      </View>
 
-      {/* búsqueda */}
-      <TextInput
-        placeholder="Buscar usuarios..."
-        style={styles.search}
-        value={busqueda}
-        onChangeText={handleBuscarUsuarios}
-      />
-
-      {/* resultados de búsqueda */}
-      {resultados.map((u) => (
-        <TouchableOpacity
-          key={u.id ?? u.username}
-          style={styles.searchItem}
-          onPress={() => iniciarChatCon(u)}
-          disabled={u.id === "no-results"}
-        >
-          <Image
-            source={{ uri: u.fotoPerfil ?? "https://i.pravatar.cc/150?img=1" }}
-            style={styles.avatar}
-          />
-          <Text style={styles.name}>{u.username}</Text>
-        </TouchableOpacity>
-      ))}
-
-      {/* lista de chats */}
-      <ScrollView>
-        {chatsToShow.map((chat) => (
-          <ChatItem
-            key={chat.id}
-            id={chat.id}
-            avatar={chat.avatar}
-            nombre={chat.nombre}
-            lastMessage={chat.lastMessage}
-            timestamp={chat.timestamp}
-            onPress={() => router.push(`/chats/${chat.id}`)}
-          />
-        ))}
-      </ScrollView>
-    </SafeAreaView>
+        {/* lista de chats */}
+        <ScrollView>
+          {chatsToShow.map((chat) => (
+            <ChatItem
+              key={chat.id}
+              id={chat.id}
+              avatar={chat.avatar}
+              nombre={chat.nombre}
+              lastMessage={chat.lastMessage}
+              timestamp={chat.timestamp}
+              onPress={() => router.push(`/chats/${chat.id}`)}
+            />
+          ))}
+        </ScrollView>
+      </SafeAreaView>
+    </FondoLayout>
   );
 }
 /* ---------- estilos ---------- */
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", paddingHorizontal: 16, paddingTop: 16 },
+  container: { flex: 1, paddingHorizontal: 16, paddingTop: 16 },
   title: { fontSize: 20, fontWeight: "600", marginBottom: 12 },
   tabs: { flexDirection: "row", marginBottom: 16 },
   tab: {

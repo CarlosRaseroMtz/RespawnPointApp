@@ -1,3 +1,4 @@
+import FondoLayout from "@/src/components/FondoLayout";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
@@ -24,7 +25,6 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
 import PostCard from "../../../src/components/post-card";
 import { firestore } from "../../../src/config/firebase-config";
 import { useAuth } from "../../../src/hooks/useAuth";
@@ -96,9 +96,9 @@ export default function PublicacionDetalle() {
           const usnap = await getDoc(doc(firestore, "usuarios", c.userId));
           const autor = usnap.exists()
             ? {
-                username: usnap.data().username,
-                fotoPerfil: usnap.data().fotoPerfil,
-              }
+              username: usnap.data().username,
+              fotoPerfil: usnap.data().fotoPerfil,
+            }
             : { username: "Player" };
 
           return { id: d.id, ...c, texto: textoReal, autor } as Comentario;
@@ -122,21 +122,21 @@ export default function PublicacionDetalle() {
   };
 
   /* —— enviar comentario —— */
-const enviarComentario = async () => {
-  if (!user || !texto.trim()) return;
+  const enviarComentario = async () => {
+    if (!user || !texto.trim()) return;
 
-  try {
-    await comentarPublicacion({
-      publicacionId: post?.id ?? "",
-      contenido: texto,
-      autorUid: user.uid,
-    });
+    try {
+      await comentarPublicacion({
+        publicacionId: post?.id ?? "",
+        contenido: texto,
+        autorUid: user.uid,
+      });
 
-    setTexto(""); // limpia input
-  } catch (error) {
-    console.error("❌ Error al comentar:", error);
-  }
-};
+      setTexto(""); // limpia input
+    } catch (error) {
+      console.error("❌ Error al comentar:", error);
+    }
+  };
 
 
   if (loading) return <ActivityIndicator style={{ flex: 1 }} />;
@@ -144,109 +144,112 @@ const enviarComentario = async () => {
   return (
     <>
       {/* —— lista + cabecera —— */}
-      <FlatList
-        ref={flatRef}
-        data={comentarios}
-        keyExtractor={(c) => c.id}
-        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
-        ListHeaderComponent={
-          post &&
-          autor && (
-            <PostCard
-              post={post}
-              autor={autor}
-              inDetail
-              likes={post.likes}
-              commentsCount={post.commentsCount ?? 0}
-              isLiked={post.likes.includes(user?.uid ?? "")}
-              onLike={toggleLike}
-              onComment={() =>
-                flatRef.current?.scrollToEnd({ animated: true })
-              }
-              onPress={() => {}}
-              onAuthorPress={() =>
-                router.push({
-                  pathname: "/perfil/[uid]",
-                  params: { uid: post.userId },
-                })
-              }
-            />
-          )
-        }
-        renderItem={({ item }) => (
-          <View style={styles.coment}>
-            <Image
-              source={{
-                uri:
-                  item.autor.fotoPerfil ??
-                  "https://i.pravatar.cc/100?u=" + item.autor.username,
-              }}
-              style={styles.comAvatar}
-            />
-            <View style={{ flex: 1 }}>
-              <Text style={styles.comAutor}>{item.autor.username}</Text>
-              <Text style={styles.comTexto}>{item.texto}</Text>
-              <Text style={styles.comFecha}>
-                {item.timestamp.toDate().toLocaleDateString("es-ES", {
-                  day: "2-digit",
-                  month: "short",
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })}
-              </Text>
+      <FondoLayout>
+        <FlatList
+          ref={flatRef}
+          data={comentarios}
+          keyExtractor={(c) => c.id}
+          contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
+          ListHeaderComponent={
+            post &&
+            autor && (
+              <PostCard
+                post={post}
+                autor={autor}
+                inDetail
+                likes={post.likes}
+                commentsCount={post.commentsCount ?? 0}
+                isLiked={post.likes.includes(user?.uid ?? "")}
+                onLike={toggleLike}
+                onComment={() =>
+                  flatRef.current?.scrollToEnd({ animated: true })
+                }
+                onPress={() => { }}
+                onAuthorPress={() =>
+                  router.push({
+                    pathname: "/perfil/[uid]",
+                    params: { uid: post.userId },
+                  })
+                }
+              />
+            )
+          }
+          renderItem={({ item }) => (
+            <View style={styles.coment}>
+              <Image
+                source={{
+                  uri:
+                    item.autor.fotoPerfil ??
+                    "https://i.pravatar.cc/100?u=" + item.autor.username,
+                }}
+                style={styles.comAvatar}
+              />
+              <View style={{ flex: 1 }}>
+                <Text style={styles.comAutor}>{item.autor.username}</Text>
+                <Text style={styles.comTexto}>{item.texto}</Text>
+                <Text style={styles.comFecha}>
+                  {item.timestamp.toDate().toLocaleDateString("es-ES", {
+                    day: "2-digit",
+                    month: "short",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </Text>
+              </View>
             </View>
-          </View>
-        )}
-      />
+          )}
+        />
 
-      {/* —— barra de entrada protegida —— */}
-      {user && (
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
-          keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 80}
-        >
-          <SafeAreaView edges={["bottom"]} style={styles.inputRow}>
-            <TextInput
-              style={styles.input}
-              placeholder="Escribe un comentario…"
-              value={texto}
-              onChangeText={setTexto}
-            />
-            <TouchableOpacity onPress={enviarComentario}>
-              <Text style={styles.enviar}>Enviar</Text>
-            </TouchableOpacity>
-          </SafeAreaView>
-        </KeyboardAvoidingView>
-      )}
-    </>
+        {/* —— barra de entrada protegida —— */}
+        {user && (
+          <KeyboardAvoidingView
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+            keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 80}
+          >
+            <View style={styles.inputRow}>
+              <TextInput
+                style={styles.input}
+                placeholder="Escribe un comentario…"
+                value={texto}
+                onChangeText={setTexto}
+              />
+              <TouchableOpacity onPress={enviarComentario}>
+                <Text style={styles.enviar}>Enviar</Text>
+              </TouchableOpacity>
+            </View>
+          </KeyboardAvoidingView>
+        )}
+      </FondoLayout></>
   );
 }
 
 /* —— estilos —— */
 const styles = StyleSheet.create({
   coment: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    gap: 8,
-    marginBottom: 12,
+    maxWidth: "75%",
+    padding: 10,
+    borderRadius: 12,
+    marginBottom: 10,
   },
-  comAvatar: { width: 32, height: 32, borderRadius: 16, borderWidth: 1, borderColor: "#FF66C4",},
+  comAvatar: { width: 32, height: 32, borderRadius: 16, borderWidth: 1, borderColor: "#FF66C4", },
   comTexto: { color: "#000", marginTop: 2 },
   comAutor: { fontWeight: "600" },
   comFecha: { fontSize: 10, color: "#888", marginTop: 2 },
 
   inputRow: {
     flexDirection: "row",
+    padding: 8,
     borderTopWidth: 1,
-    borderColor: "#eee",
-    padding: 10,
-    backgroundColor: "#fff",
+    borderColor: "#ddd",
+    backgroundColor: "rgba(255,255,255,0.9)",
+    alignItems: "center",
   },
   input: {
     flex: 1,
     backgroundColor: "#f1f1f1",
     borderRadius: 20,
-    paddingHorizontal: 14,
+    paddingHorizontal: 16,
+    paddingVertical: 8,
     marginRight: 8,
   },
   enviar: { color: "#FF66C4", fontWeight: "600" },

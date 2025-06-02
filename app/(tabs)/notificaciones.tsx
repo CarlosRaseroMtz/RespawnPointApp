@@ -1,3 +1,4 @@
+import FondoLayout from "@/src/components/FondoLayout";
 import { useNotificaciones } from "@/src/hooks/useNotificaciones";
 import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
@@ -38,59 +39,61 @@ export default function NotificacionesScreen() {
 
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-      <View style={styles.container}>
-        <Text style={styles.title}>Últimas notificaciones de</Text>
+    <FondoLayout>
+      <SafeAreaView style={{ flex: 1}}>
+        <View style={styles.container}>
+          <Text style={styles.title}>Últimas notificaciones de</Text>
 
-        <View style={styles.tabs}>
-          {tabs.map((tab) => (
-            <TouchableOpacity
-              key={tab}
-              onPress={() => tab !== "Torneos" && setActiveTab(tab)}
-              disabled={tab === "Torneos"}
-              style={[
-                styles.tab,
-                activeTab === tab && styles.activeTab,
-                tab === "Torneos" && { opacity: 0.5 }, // efecto visual de desactivado
-              ]}
-            >
-              <Text
+          <View style={styles.tabs}>
+            {tabs.map((tab) => (
+              <TouchableOpacity
+                key={tab}
+                onPress={() => tab !== "Torneos" && setActiveTab(tab)}
+                disabled={tab === "Torneos"}
                 style={[
-                  styles.tabText,
-                  activeTab === tab && styles.activeTabText,
+                  styles.tab,
+                  activeTab === tab && styles.activeTab,
+                  tab === "Torneos" && { opacity: 0.5 }, // efecto visual de desactivado
                 ]}
               >
-                {tab}
+                <Text
+                  style={[
+                    styles.tabText,
+                    activeTab === tab && styles.activeTabText,
+                  ]}
+                >
+                  {tab}
+                </Text>
+              </TouchableOpacity>
+            ))}
+
+          </View>
+
+          <ScrollView style={{ flex: 1 }}>
+            {filteredNotifications.length === 0 ? (
+              <Text style={{ color: "#888", textAlign: "center", marginTop: 20 }}>
+                No hay notificaciones en esta categoría.
               </Text>
-            </TouchableOpacity>
-          ))}
+            ) : (
+              filteredNotifications.map((item) => (
+                <NotificationItem
+                  key={item.id}
+                  id={item.id}
+                  user={item.user}
+                  avatar={item.avatar}
+                  message={item.message}
+                  time={item.time}
+                  leida={item.leida}
+                  action={item.action}
+                  seguido={seguidos[item.id]}
+                  onToggleSeguir={toggleSeguir} seconds={undefined} tipo={"like"} />
+              ))
 
+            )}
+          </ScrollView>
         </View>
-
-        <ScrollView style={{ flex: 1 }}>
-          {filteredNotifications.length === 0 ? (
-            <Text style={{ color: "#888", textAlign: "center", marginTop: 20 }}>
-              No hay notificaciones en esta categoría.
-            </Text>
-          ) : (
-            filteredNotifications.map((item) => (
-              <NotificationItem
-                key={item.id}
-                id={item.id}
-                user={item.user}
-                avatar={item.avatar}
-                message={item.message}
-                time={item.time}
-                leida={item.leida}
-                action={item.action}
-                seguido={seguidos[item.id]}
-                onToggleSeguir={toggleSeguir} seconds={undefined} tipo={"like"} />
-            ))
-
-          )}
-        </ScrollView>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </FondoLayout>
   );
 }
 

@@ -1,3 +1,4 @@
+import FondoLayout from "@/src/components/FondoLayout";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import {
@@ -97,62 +98,64 @@ export default function CreatePostScreen() {
 
   /* ---------- UI ---------- */
   return (
-    <View style={styles.container}>
-      <View style={styles.box}>
-        {/* selector de imagen */}
-        <Pressable style={styles.uploadArea} onPress={pickImage}>
-          {imagen ? (
-            <Image source={{ uri: imagen }} style={styles.preview} />
-          ) : (
-            <Text style={styles.uploadText}>Pulsa para elegir imagen</Text>
-          )}
-        </Pressable>
+    <FondoLayout>
+      <View style={styles.container}>
+        <View style={styles.box}>
+          {/* selector de imagen */}
+          <Pressable style={styles.uploadArea} onPress={pickImage}>
+            {imagen ? (
+              <Image source={{ uri: imagen }} style={styles.preview} />
+            ) : (
+              <Text style={styles.uploadText}>Pulsa para elegir imagen</Text>
+            )}
+          </Pressable>
 
-        {/* mensaje */}
-        <TextInput
-          style={styles.input}
-          placeholder="Escribe algo..."
-          placeholderTextColor="#888"
-          multiline
-          value={texto}
-          onChangeText={setTexto}
-        />
+          {/* mensaje */}
+          <TextInput
+            style={styles.input}
+            placeholder="Escribe algo..."
+            placeholderTextColor="#888"
+            multiline
+            value={texto}
+            onChangeText={setTexto}
+          />
 
-        {/* chips de categoría */}
-        <View style={styles.catRow}>
-          {CATEGORIAS.map((cat) => (
-            <Pressable
-              key={cat}
-              onPress={() => setCategoria(cat)}
-              style={[
-                styles.chip,
-                categoria === cat && styles.chipActive,
-              ]}
-            >
-              <Text
+          {/* chips de categoría */}
+          <View style={styles.catRow}>
+            {CATEGORIAS.map((cat) => (
+              <Pressable
+                key={cat}
+                onPress={() => setCategoria(cat)}
                 style={[
-                  styles.chipText,
-                  categoria === cat && styles.chipTextActive,
+                  styles.chip,
+                  categoria === cat && styles.chipActive,
                 ]}
               >
-                {cat}
-              </Text>
-            </Pressable>
-          ))}
-        </View>
+                <Text
+                  style={[
+                    styles.chipText,
+                    categoria === cat && styles.chipTextActive,
+                  ]}
+                >
+                  {cat}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
 
-        {/* botón publicar */}
-        <Pressable
-          style={[styles.button, subiendo && { opacity: 0.6 }]}
-          onPress={subirPost}
-          disabled={subiendo}
-        >
-          <Text style={styles.buttonText}>
-            {subiendo ? "Subiendo..." : "Publicar"}
-          </Text>
-        </Pressable>
+          {/* botón publicar */}
+          <Pressable
+            style={[styles.button, subiendo && { opacity: 0.6 }]}
+            onPress={subirPost}
+            disabled={subiendo}
+          >
+            <Text style={styles.buttonText}>
+              {subiendo ? "Subiendo..." : "Publicar"}
+            </Text>
+          </Pressable>
+        </View>
       </View>
-    </View>
+    </FondoLayout>
   );
 }
 
@@ -160,7 +163,6 @@ export default function CreatePostScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
     paddingHorizontal: 20,
     justifyContent: "center",
   },

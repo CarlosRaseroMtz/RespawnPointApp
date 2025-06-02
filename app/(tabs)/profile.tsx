@@ -1,4 +1,5 @@
 /* -----------------  MI PERFIL (REDISEÑADO) ----------------- */
+import FondoLayout from "@/src/components/FondoLayout";
 import { useMiPerfil } from "@/src/hooks/useMiPerfil";
 import { useMisPublicaciones } from "@/src/hooks/useMisPublicaciones";
 import { Ionicons } from "@expo/vector-icons";
@@ -8,7 +9,6 @@ import {
   StyleSheet, Text, TouchableOpacity, View
 } from "react-native";
 import PostGridItem from "../../src/components/PostGridItem";
-import { useAuth } from "../../src/hooks/useAuth";
 
 /* helpers */
 const { width } = Dimensions.get("window");
@@ -21,9 +21,6 @@ const truncate = (t: string, n = 26) =>
 /* ——————— componente ——————— */
 export default function MyProfile() {
   const router = useRouter();
-  const { user } = useAuth();
-
-
   const info = useMiPerfil();
   const posts = useMisPublicaciones();
 
@@ -34,47 +31,49 @@ export default function MyProfile() {
   const sigo = info.siguiendo?.length ?? 0;
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* —— BOTÓN DE CONFIGURACIÓN —— */}
-      <TouchableOpacity onPress={() => router.push("/configuracion")} style={styles.btnGear}>
-        <Ionicons name="settings-outline" size={22} color="#fff" />
-      </TouchableOpacity>
-      {/* —— NOMBRE + PLATAFORMA —— */}
-      <View style={styles.header}>
-        <Text style={styles.username}>{truncate(info.username)}</Text>
-        {info.plataformaFav && <Text style={styles.platformTxt}>{info.plataformaFav}</Text>}
-      </View>
-
-      {/* —— FOTO + ESTADÍSTICAS + CONFIG —— */}
-      <View style={styles.topRow}>
-        <Image
-          source={{ uri: info.fotoPerfil || "https://i.pravatar.cc/150?u=" + info.username }}
-          style={styles.avatar}
-        />
-        <View style={styles.statsBox}>
-          <Counter n={posts.length} label="Publicaciones" />
-          <Counter n={seg} label="Seguidores" />
-          <Counter n={sigo} label="Siguiendo" />
+    <FondoLayout>
+      <SafeAreaView style={styles.container}>
+        {/* —— BOTÓN DE CONFIGURACIÓN —— */}
+        <TouchableOpacity onPress={() => router.push("/configuracion")} style={styles.btnGear}>
+          <Ionicons name="settings-outline" size={22} color="#fff" />
+        </TouchableOpacity>
+        {/* —— NOMBRE + PLATAFORMA —— */}
+        <View style={styles.header}>
+          <Text style={styles.username}>{truncate(info.username)}</Text>
+          {info.plataformaFav && <Text style={styles.platformTxt}>{info.plataformaFav}</Text>}
         </View>
-      </View>
 
-      {/* —— BIO Y GÉNERO FAVORITO —— */}
-      {info.generoFav && <Text style={styles.genre}>{info.generoFav}</Text>}
-      {info.descripcion && <Text style={styles.bio}>{info.descripcion}</Text>}
+        {/* —— FOTO + ESTADÍSTICAS + CONFIG —— */}
+        <View style={styles.topRow}>
+          <Image
+            source={{ uri: info.fotoPerfil || "https://i.pravatar.cc/150?u=" + info.username }}
+            style={styles.avatar}
+          />
+          <View style={styles.statsBox}>
+            <Counter n={posts.length} label="Publicaciones" />
+            <Counter n={seg} label="Seguidores" />
+            <Counter n={sigo} label="Siguiendo" />
+          </View>
+        </View>
 
-      {/* —— GRID DE PUBLICACIONES —— */}
-      <FlatList
-        data={posts}
-        numColumns={2}
-        keyExtractor={(p) => p.id}
-        columnWrapperStyle={{ gap: 6 }}
-        contentContainerStyle={{ paddingBottom: 100, gap: 6 }}
-        renderItem={({ item }) => (
-          <PostGridItem id={item.id} mediaUrl={item.mediaUrl} />
-        )}
+        {/* —— BIO Y GÉNERO FAVORITO —— */}
+        {info.generoFav && <Text style={styles.genre}>{info.generoFav}</Text>}
+        {info.descripcion && <Text style={styles.bio}>{info.descripcion}</Text>}
 
-      />
-    </SafeAreaView>
+        {/* —— GRID DE PUBLICACIONES —— */}
+        <FlatList
+          data={posts}
+          numColumns={2}
+          keyExtractor={(p) => p.id}
+          columnWrapperStyle={{ gap: 6 }}
+          contentContainerStyle={{ paddingBottom: 100, gap: 6 }}
+          renderItem={({ item }) => (
+            <PostGridItem id={item.id} mediaUrl={item.mediaUrl} />
+          )}
+
+        />
+      </SafeAreaView>
+    </FondoLayout>
   );
 }
 
@@ -89,7 +88,7 @@ function Counter({ n, label }: { n: number, label: string }) {
 
 /* ——— estilos actualizados ——— */
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", padding: 16 },
+  container: { flex: 1, padding: 16 },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
 
   header: { alignItems: "center", marginBottom: 6, paddingTop: 16 },

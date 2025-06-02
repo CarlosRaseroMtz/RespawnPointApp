@@ -1,3 +1,4 @@
+import FondoLayout from "@/src/components/FondoLayout";
 import { AntDesign } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
@@ -46,133 +47,134 @@ export default function LoginScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.background} />
+    <FondoLayout>
+      <View style={styles.container}>
+        <View style={styles.background} />
 
-      <View style={styles.inner}>
-        {/* 👈 Ruta del logo ajustada */}
-        <Image
-          source={require("../../assets/images/logo.png")}
-          style={styles.logo}
-        />
-
-        <Text style={styles.title}>Inicio de sesión</Text>
-
-        {/* ——— inputs ——— */}
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Correo electrónico"
-            placeholderTextColor="#888"
-            autoCapitalize="none"
-            keyboardType="email-address"
-            value={email}
-            onChangeText={setEmail}
+        <View style={styles.inner}>
+          {/* 👈 Ruta del logo ajustada */}
+          <Image
+            source={require("../../assets/images/logo.png")}
+            style={styles.logo}
           />
-        </View>
 
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Contraseña"
-            placeholderTextColor="#888"
-            secureTextEntry={!showPassword}
-            value={password}
-            onChangeText={setPassword}
-          />
-          <TouchableOpacity
-            style={styles.eyeIcon}
-            onPress={() => setShowPassword(!showPassword)}
-          >
-            <AntDesign
-              name={showPassword ? "eye" : "eyeo"}
-              size={20}
-              color="#888"
+          <Text style={styles.title}>Inicio de sesión</Text>
+
+          {/* ——— inputs ——— */}
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="Correo electrónico"
+              placeholderTextColor="#888"
+              autoCapitalize="none"
+              keyboardType="email-address"
+              value={email}
+              onChangeText={setEmail}
             />
+          </View>
+
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              placeholder="Contraseña"
+              placeholderTextColor="#888"
+              secureTextEntry={!showPassword}
+              value={password}
+              onChangeText={setPassword}
+            />
+            <TouchableOpacity
+              style={styles.eyeIcon}
+              onPress={() => setShowPassword(!showPassword)}
+            >
+              <AntDesign
+                name={showPassword ? "eye" : "eyeo"}
+                size={20}
+                color="#888"
+              />
+            </TouchableOpacity>
+          </View>
+
+          {/* ——— enlaces ——— */}
+          <Text style={styles.linkText}>
+            ¿Olvidaste la contraseña?{" "}
+            <Text
+              style={styles.pink}
+              onPress={() => router.push("/forgot-password")}
+            >
+              Pulsa aquí
+            </Text>
+          </Text>
+
+          {/* ——— botones ——— */}
+          <TouchableOpacity style={styles.primaryButton} onPress={handleLogin}>
+            <Text style={styles.primaryButtonText}>Continuar</Text>
           </TouchableOpacity>
+
+          <TouchableOpacity
+            style={[styles.googleButton, { opacity: 0.5 }]}
+            disabled
+          >
+            <AntDesign name="google" size={20} color="#999" />
+            <Text style={[styles.googleButtonText, { color: "#999" }]}>
+              Google (deshabilitado)
+            </Text>
+          </TouchableOpacity>
+
+          {/* ——— separador ——— */}
+          <View style={styles.separator}>
+            <View style={styles.line} />
+            <Text style={styles.separatorText}>o</Text>
+            <View style={styles.line} />
+          </View>
+
+          <Text style={styles.linkText}>
+            ¿Aún no tienes cuenta?{" "}
+            <Text
+              style={styles.pink}
+              onPress={() => router.push("/register")}
+            >
+              Regístrate aquí
+            </Text>
+          </Text>
+
+          <Text style={styles.terms}>
+            Al continuar aceptas nuestros{" "}
+            <Text
+              style={styles.linkBlue}
+              onPress={() => Linking.openURL("https://www.ejemplo.com/terminos")}
+            >
+              Términos de servicio
+            </Text>{" "}
+            y{" "}
+            <Text
+              style={styles.linkBlue}
+              onPress={() =>
+                Linking.openURL("https://www.ejemplo.com/privacidad")
+              }
+            >
+              Política de privacidad
+            </Text>
+            .
+          </Text>
         </View>
-
-        {/* ——— enlaces ——— */}
-        <Text style={styles.linkText}>
-          ¿Olvidaste la contraseña?{" "}
-          <Text
-            style={styles.pink}
-            onPress={() => router.push("/forgot-password")}
-          >
-            Pulsa aquí
-          </Text>
-        </Text>
-
-        {/* ——— botones ——— */}
-        <TouchableOpacity style={styles.primaryButton} onPress={handleLogin}>
-          <Text style={styles.primaryButtonText}>Continuar</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity
-          style={[styles.googleButton, { opacity: 0.5 }]}
-          disabled
-        >
-          <AntDesign name="google" size={20} color="#999" />
-          <Text style={[styles.googleButtonText, { color: "#999" }]}>
-            Google (deshabilitado)
-          </Text>
-        </TouchableOpacity>
-
-        {/* ——— separador ——— */}
-        <View style={styles.separator}>
-          <View style={styles.line} />
-          <Text style={styles.separatorText}>o</Text>
-          <View style={styles.line} />
-        </View>
-
-        <Text style={styles.linkText}>
-          ¿Aún no tienes cuenta?{" "}
-          <Text
-            style={styles.pink}
-            onPress={() => router.push("/register")}
-          >
-            Regístrate aquí
-          </Text>
-        </Text>
-
-        <Text style={styles.terms}>
-          Al continuar aceptas nuestros{" "}
-          <Text
-            style={styles.linkBlue}
-            onPress={() => Linking.openURL("https://www.ejemplo.com/terminos")}
-          >
-            Términos de servicio
-          </Text>{" "}
-          y{" "}
-          <Text
-            style={styles.linkBlue}
-            onPress={() =>
-              Linking.openURL("https://www.ejemplo.com/privacidad")
-            }
-          >
-            Política de privacidad
-          </Text>
-          .
-        </Text>
       </View>
-    </View>
+    </FondoLayout>
   );
 }
 
 /* ——— estilos idénticos ——— */
 const styles = StyleSheet.create({
-  container: { flex: 1, position: "relative", backgroundColor: "#fff" },
+  container: { flex: 1, position: "relative"},
   background: {
     position: "absolute",
     top: 0,
     bottom: 0,
     width: width,
-    backgroundColor: "#fff",
   },
   inner: { flex: 1, padding: 20, justifyContent: "center" },
   logo: {
-    width: 180,
-    height: 180,
+    width: 150,
+    height: 150,
     alignSelf: "center",
     resizeMode: "contain",
     marginBottom: 10,

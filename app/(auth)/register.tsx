@@ -1,3 +1,4 @@
+import FondoLayout from "@/src/components/FondoLayout";
 import { AntDesign } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { useRouter } from "expo-router";
@@ -94,7 +95,7 @@ export default function RegisterScreen() {
       );
       return;
     }
-    
+
     try {
       await registerUser({
         email: email.trim(),
@@ -124,152 +125,154 @@ export default function RegisterScreen() {
 
   /* —— UI —— */
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Image
-        source={require("../../assets/images/logo.png")}
-        style={styles.logo}
-      />
-      <Text style={styles.title}>Regístrate</Text>
+    <FondoLayout>
+      <ScrollView contentContainerStyle={styles.container}>
+        <Image
+          source={require("../../assets/images/logo.png")}
+          style={styles.logo}
+        />
+        <Text style={styles.title}>Regístrate</Text>
 
-      {/*  correo / contraseña */}
-      <TextInput
-        style={styles.input}
-        placeholder="Correo electrónico"
-        placeholderTextColor="#888"
-        autoCapitalize="none"
-        keyboardType="email-address"
-        value={email}
-        onChangeText={setEmail}
-      />
-
-      <View style={styles.passwordContainer}>
+        {/*  correo / contraseña */}
         <TextInput
           style={styles.input}
-          placeholder="Contraseña"
+          placeholder="Correo electrónico"
           placeholderTextColor="#888"
-          secureTextEntry={!showPass}
-          value={password}
-          onChangeText={setPassword}
-          onFocus={() => setPasswordFocused(true)}
-          onBlur={() => setPasswordFocused(false)}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail}
         />
-        <TouchableOpacity
-          style={styles.eyeIcon}
-          onPress={() => setShowPass(!showPass)}
-        >
-          <AntDesign name={showPass ? "eye" : "eyeo"} size={20} color="#888" />
-        </TouchableOpacity>
-      </View>
 
-      {passwordFocused && (
-        <View style={{ marginBottom: 10, marginTop: -10 }}>
-          <Text style={{ color: "#888", fontSize: 12, marginBottom: 5 }}>
-            Fuerza: {fuerza}
-          </Text>
-          <Text style={{ color: criterios.longitud ? "#0c0" : "#999" }}>
-            {criterios.longitud ? "✅" : "❌"} 8+ caracteres
-          </Text>
-          <Text style={{ color: criterios.mayuscula ? "#0c0" : "#999" }}>
-            {criterios.mayuscula ? "✅" : "❌"} Una mayúscula
-          </Text>
-          <Text style={{ color: criterios.minuscula ? "#0c0" : "#999" }}>
-            {criterios.minuscula ? "✅" : "❌"} Una minúscula
-          </Text>
-          <Text style={{ color: criterios.numero ? "#0c0" : "#999" }}>
-            {criterios.numero ? "✅" : "❌"} Un número
+        <View style={styles.passwordContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="Contraseña"
+            placeholderTextColor="#888"
+            secureTextEntry={!showPass}
+            value={password}
+            onChangeText={setPassword}
+            onFocus={() => setPasswordFocused(true)}
+            onBlur={() => setPasswordFocused(false)}
+          />
+          <TouchableOpacity
+            style={styles.eyeIcon}
+            onPress={() => setShowPass(!showPass)}
+          >
+            <AntDesign name={showPass ? "eye" : "eyeo"} size={20} color="#888" />
+          </TouchableOpacity>
+        </View>
+
+        {passwordFocused && (
+          <View style={{ marginBottom: 10, marginTop: -10 }}>
+            <Text style={{ color: "#888", fontSize: 12, marginBottom: 5 }}>
+              Fuerza: {fuerza}
+            </Text>
+            <Text style={{ color: criterios.longitud ? "#0c0" : "#999" }}>
+              {criterios.longitud ? "✅" : "❌"} 8+ caracteres
+            </Text>
+            <Text style={{ color: criterios.mayuscula ? "#0c0" : "#999" }}>
+              {criterios.mayuscula ? "✅" : "❌"} Una mayúscula
+            </Text>
+            <Text style={{ color: criterios.minuscula ? "#0c0" : "#999" }}>
+              {criterios.minuscula ? "✅" : "❌"} Una minúscula
+            </Text>
+            <Text style={{ color: criterios.numero ? "#0c0" : "#999" }}>
+              {criterios.numero ? "✅" : "❌"} Un número
+            </Text>
+          </View>
+        )}
+
+        {/*  nombre / user */}
+        <TextInput
+          style={styles.input}
+          placeholder="Nombre completo"
+          placeholderTextColor="#888"
+          value={fullName}
+          onChangeText={setFullName}
+        />
+        <TextInput
+          style={styles.input}
+          placeholder="Nombre de usuario"
+          placeholderTextColor="#888"
+          autoCapitalize="none"
+          value={username}
+          onChangeText={setUsername}
+        />
+
+        {/*  plataforma */}
+        <Text style={styles.label}>Plataforma favorita</Text>
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={platform}
+            onValueChange={setPlatform}
+            style={styles.picker}
+          >
+            {platforms.map((p) => (
+              <Picker.Item key={p} label={p} value={p} />
+            ))}
+          </Picker>
+        </View>
+
+        {/*  géneros */}
+        <Text style={styles.label}>Géneros favoritos (máx. 2)</Text>
+        <View style={styles.genreContainer}>
+          {genres.map((g) => (
+            <TouchableOpacity
+              key={g}
+              style={[
+                styles.genreTag,
+                selectedGenres.includes(g) && styles.genreTagSelected,
+              ]}
+              onPress={() => toggleGenre(g)}
+            >
+              <Text
+                style={[
+                  styles.genreText,
+                  selectedGenres.includes(g) && styles.genreTextSelected,
+                ]}
+              >
+                {g}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
+        <TouchableOpacity style={styles.primaryButton} onPress={handleRegister}>
+          <Text style={styles.primaryButtonText}>Registrarme</Text>
+        </TouchableOpacity>
+
+        {/* separador / login */}
+        <View style={styles.separator}>
+          <View style={styles.line} />
+          <Text style={styles.separatorText}>o</Text>
+          <View style={styles.line} />
+        </View>
+
+        <View style={[styles.googleButton, { opacity: 0.5 }]}>
+          <AntDesign name="google" size={20} color="#999" />
+          <Text style={[styles.googleButtonText, { color: "#999" }]}>
+            Próximamente
           </Text>
         </View>
-      )}
 
-      {/*  nombre / user */}
-      <TextInput
-        style={styles.input}
-        placeholder="Nombre completo"
-        placeholderTextColor="#888"
-        value={fullName}
-        onChangeText={setFullName}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Nombre de usuario"
-        placeholderTextColor="#888"
-        autoCapitalize="none"
-        value={username}
-        onChangeText={setUsername}
-      />
-
-      {/*  plataforma */}
-      <Text style={styles.label}>Plataforma favorita</Text>
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={platform}
-          onValueChange={setPlatform}
-          style={styles.picker}
-        >
-          {platforms.map((p) => (
-            <Picker.Item key={p} label={p} value={p} />
-          ))}
-        </Picker>
-      </View>
-
-      {/*  géneros */}
-      <Text style={styles.label}>Géneros favoritos (máx. 2)</Text>
-      <View style={styles.genreContainer}>
-        {genres.map((g) => (
-          <TouchableOpacity
-            key={g}
-            style={[
-              styles.genreTag,
-              selectedGenres.includes(g) && styles.genreTagSelected,
-            ]}
-            onPress={() => toggleGenre(g)}
-          >
-            <Text
-              style={[
-                styles.genreText,
-                selectedGenres.includes(g) && styles.genreTextSelected,
-              ]}
-            >
-              {g}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
-
-      <TouchableOpacity style={styles.primaryButton} onPress={handleRegister}>
-        <Text style={styles.primaryButtonText}>Registrarme</Text>
-      </TouchableOpacity>
-
-      {/* separador / login */}
-      <View style={styles.separator}>
-        <View style={styles.line} />
-        <Text style={styles.separatorText}>o</Text>
-        <View style={styles.line} />
-      </View>
-
-      <View style={[styles.googleButton, { opacity: 0.5 }]}>
-        <AntDesign name="google" size={20} color="#999" />
-        <Text style={[styles.googleButtonText, { color: "#999" }]}>
-          Próximamente
-        </Text>
-      </View>
-
-      <TouchableOpacity onPress={() => router.replace("/login")}>
-        <Text style={{ color: "#FF66C4", textAlign: "center" }}>
-          ¿Ya tienes cuenta? Inicia sesión
-        </Text>
-      </TouchableOpacity>
-    </ScrollView>
+        <TouchableOpacity onPress={() => router.replace("/login")}>
+          <Text style={{ color: "#FF66C4", textAlign: "center" }}>
+            ¿Ya tienes cuenta? Inicia sesión
+          </Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </FondoLayout>
   );
 }
 
 /* —— estilos idénticos … —— */
 const styles = StyleSheet.create({ /* ↓ mantenidos como los tuyos */
 
-  container: { padding: 20, paddingBottom: 40, backgroundColor: "#fff" },
+  container: { padding: 20, paddingBottom: 40},
   logo: {
-    width: 180,
-    height: 180,
+    width: 100,
+    height: 100,
     alignSelf: "center",
     resizeMode: "contain",
     marginBottom: 10,

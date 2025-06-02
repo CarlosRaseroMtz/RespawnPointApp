@@ -1,3 +1,4 @@
+import FondoLayout from "@/src/components/FondoLayout";
 import { useRouter } from "expo-router";
 import { useState } from "react";
 import {
@@ -50,38 +51,40 @@ export default function HomeScreen() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      {/* pestañas superior */}
-      <View style={styles.tabs}>
-        {tabs.map((t) => (
-          <TouchableOpacity key={t} onPress={() => setActiveTab(t)}>
-            <Text
-              style={[
-                styles.tabText,
-                activeTab === t && styles.tabActive,
-              ]}
-            >
-              {t}
-            </Text>
-            {activeTab === t && <View style={styles.underline} />}
-          </TouchableOpacity>
-        ))}
-      </View>
+    <FondoLayout>
+      <SafeAreaView style={styles.container}>
+        {/* pestañas superior */}
+        <View style={styles.tabs}>
+          {tabs.map((t) => (
+            <TouchableOpacity key={t} onPress={() => setActiveTab(t)}>
+              <Text
+                style={[
+                  styles.tabText,
+                  activeTab === t && styles.tabActive,
+                ]}
+              >
+                {t}
+              </Text>
+              {activeTab === t && <View style={styles.underline} />}
+            </TouchableOpacity>
+          ))}
+        </View>
 
-      {/* feed */}
-      <FlatList
-        data={posts}
-        keyExtractor={(i) => i.id}
-        renderItem={renderPost}
-        contentContainerStyle={{ padding: 16 }}
-        showsVerticalScrollIndicator={false}
-      />
-    </SafeAreaView>
+        {/* feed */}
+        <FlatList
+          data={posts}
+          keyExtractor={(i) => i.id}
+          renderItem={renderPost}
+          contentContainerStyle={{ padding: 16 }}
+          showsVerticalScrollIndicator={false}
+        />
+      </SafeAreaView>
+    </FondoLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", paddingTop: 16 },
+  container: { flex: 1, paddingTop: 16 },
   tabs: {
     flexDirection: "row",
     justifyContent: "space-around",
