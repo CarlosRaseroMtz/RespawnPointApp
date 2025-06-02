@@ -1,18 +1,16 @@
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-  addDoc,
   arrayRemove,
   arrayUnion,
   collection,
   doc,
   getDoc,
-  increment,
   onSnapshot,
   orderBy,
   query,
   Timestamp,
-  updateDoc,
+  updateDoc
 } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
 import {
@@ -30,6 +28,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import PostCard from "../../../src/components/post-card";
 import { firestore } from "../../../src/config/firebase-config";
 import { useAuth } from "../../../src/hooks/useAuth";
+import { comentarPublicacion } from "../../../src/utils/feed-actions";
 
 /* —— tipos —— */
 type Publicacion = {
@@ -123,19 +122,22 @@ export default function PublicacionDetalle() {
   };
 
   /* —— enviar comentario —— */
-  const enviarComentario = async () => {
-    if (!texto.trim() || !user || !id) return;
-    await addDoc(collection(firestore, "publicaciones", id, "comentarios"), {
-      userId: user.uid,
-      texto: texto.trim(),
-      timestamp: Timestamp.now(),
+const enviarComentario = async () => {
+  if (!user || !texto.trim()) return;
+
+  try {
+    await comentarPublicacion({
+      publicacionId: post?.id ?? "",
+      contenido: texto,
+      autorUid: user.uid,
     });
-    await updateDoc(doc(firestore, "publicaciones", id), {
-      commentsCount: increment(1),
-    });
-    setTexto("");
-    setTimeout(() => flatRef.current?.scrollToEnd({ animated: true }), 100);
-  };
+
+    setTexto(""); // limpia input
+  } catch (error) {
+    console.error("❌ Error al comentar:", error);
+  }
+};
+
 
   if (loading) return <ActivityIndicator style={{ flex: 1 }} />;
 

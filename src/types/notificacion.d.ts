@@ -7,6 +7,7 @@ export interface Notificacion {
   avatar: string;
   message: string;
   time: any; // puedes usar Timestamp de Firebase si lo importas
+  tipo: TipoNoti;
   leida: boolean;
   action?: string;
   categoria?: "Usuarios" | "Comunidades" | "Torneos";

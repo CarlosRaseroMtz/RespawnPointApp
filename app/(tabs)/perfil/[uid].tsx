@@ -2,12 +2,14 @@
 import { Feather } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-  arrayRemove, arrayUnion,
   collection, doc,
   onSnapshot,
-  orderBy, query, updateDoc, where
+  orderBy, query,
+  where
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
+import { toggleSeguir } from "../../../src/utils/feed-actions";
+
 import {
   Dimensions, FlatList, Image, SafeAreaView,
   StyleSheet, Text, TouchableOpacity, View
@@ -75,16 +77,14 @@ export default function OtherProfile() {
 
   /* seguir/dejar de seguir */
   const toggleFollow = async () => {
-    if (!user) return;
+    if (!user || !uid) return;
 
-    const miRef = doc(firestore, "usuarios", user.uid);
-
-    await updateDoc(miRef, {
-      siguiendo: yoSigo ? arrayRemove(uid) : arrayUnion(uid)
+    await toggleSeguir({
+      desdeUid: user.uid,
+      haciaUid: uid,
     });
-
-    // ⇨ nada sobre “suRef”
   };
+
 
 
   const seguidores = seguidoresCnt;

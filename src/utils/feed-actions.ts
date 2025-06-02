@@ -1,13 +1,17 @@
 import {
-    arrayRemove,
-    arrayUnion,
-    doc,
-    getDoc,
-    updateDoc,
+  arrayRemove,
+  arrayUnion,
+  doc,
+  getDoc,
+  runTransaction,
+  updateDoc
 } from "firebase/firestore";
 import { crearNotificacion } from "../../src/utils/crear-notificacion";
 import { firestore } from "../config/firebase-config";
 
+// ────────────────────────────────
+// 1. LIKE / UNLIKE PUBLICACIÓN
+// ────────────────────────────────
 export async function toggleLike({
   postId,
   userUid,
@@ -40,3 +44,89 @@ export async function toggleLike({
   }
 }
 
+// ────────────────────────────────
+// 2. COMENTAR PUBLICACIÓN
+// ────────────────────────────────
+export async function comentarPublicacion({
+  publicacionId,
+  contenido,
+  autorUid,
+}: {
+  publicacionId: string;
+  contenido: string;
+  autorUid: string;
+}) {
+  const pubRef = doc(firestore, "publicaciones", publicacionId);
+  const pubSnap = await getDoc(pubRef);
+
+  if (!pubSnap.exists()) return;
+
+  const { userId: autorOriginal } = pubSnap.data();
+
+  // ⬇️ Guardar el comentario como subcolección de la publicación
+  await runTransaction(firestore, async (tx) => {
+    const snap = await tx.get(pubRef);
+    if (!snap.exists()) return;
+
+    const current = snap.data().commentsCount || 0;
+    tx.update(pubRef, {
+      commentsCount: current + 1,
+    });
+  });
+
+
+
+  // ⬇️ Notificar al autor si no es el mismo
+  if (autorOriginal !== autorUid) {
+    await crearNotificacion({
+      paraUid: autorOriginal,
+      deUid: autorUid,
+      contenido: `comentó en tu publicación`,
+      tipo: "comentario",
+    });
+  }
+}
+
+
+// ────────────────────────────────
+// 3. SEGUIR / DEJAR DE SEGUIR
+// ────────────────────────────────
+export async function toggleSeguir({
+  desdeUid,
+  haciaUid,
+}: {
+  desdeUid: string;
+  haciaUid: string;
+}) {
+  if (desdeUid === haciaUid) return;
+
+  const desdeRef = doc(firestore, "usuarios", desdeUid);
+  const haciaRef = doc(firestore, "usuarios", haciaUid);
+
+  await runTransaction(firestore, async (tx) => {
+    const desdeSnap = await tx.get(desdeRef);
+    const haciaSnap = await tx.get(haciaRef);
+
+    if (!desdeSnap.exists() || !haciaSnap.exists()) return;
+
+    const seguidos = desdeSnap.data().seguidos || [];
+    const yaSigue = seguidos.includes(haciaUid);
+
+    tx.update(desdeRef, {
+      seguidos: yaSigue ? arrayRemove(haciaUid) : arrayUnion(haciaUid),
+    });
+
+    tx.update(haciaRef, {
+      seguidores: yaSigue ? arrayRemove(desdeUid) : arrayUnion(desdeUid),
+    });
+
+    if (!yaSigue) {
+      await crearNotificacion({
+        paraUid: haciaUid,
+        deUid: desdeUid,
+        contenido: `empezó a seguirte`,
+        tipo: "seguimiento",
+      });
+    }
+  });
+}

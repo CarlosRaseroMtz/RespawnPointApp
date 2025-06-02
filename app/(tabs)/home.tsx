@@ -1,11 +1,4 @@
 import { useRouter } from "expo-router";
-import {
-  arrayRemove,
-  arrayUnion,
-  doc,
-  getDoc,
-  updateDoc
-} from "firebase/firestore";
 import { useState } from "react";
 import {
   FlatList,
@@ -15,13 +8,10 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import { firestore } from "../../src/config/firebase-config";
+import PostCard from "../../src/components/post-card"; // ⬅️ nuevo
 import { useAuth } from "../../src/hooks/useAuth";
 import { usePublicacionesFeed } from "../../src/hooks/usePublicacionesFeed";
-import { crearNotificacion } from "../../src/utils/crear-notificacion";
 import * as FeedActions from "../../src/utils/feed-actions";
-
-import PostCard from "../../src/components/post-card"; // ⬅️ nuevo
 
 const tabs = ["Juegos", "Para ti", "Memes"];
 
@@ -32,32 +22,6 @@ export default function HomeScreen() {
 
   /* —— carga publicaciones + autor —— */
   const posts = usePublicacionesFeed();
-
-  /* —— like / unlike —— */
-  const toggleLike = async (postId: string, likes: string[]) => {
-    if (!user) return;
-    const ref = doc(firestore, "publicaciones", postId);
-    const yaLike = likes.includes(user.uid);
-
-    await updateDoc(ref, {
-      likes: yaLike ? arrayRemove(user.uid) : arrayUnion(user.uid),
-    });
-
-    if (!yaLike) {
-      const snap = await getDoc(ref);
-      if (snap.exists()) {
-        const { userId } = snap.data();
-        if (userId !== user.uid) {
-          await crearNotificacion({
-            paraUid: userId,
-            deUid: user.uid,
-            contenido: "le ha dado me gusta a tu publicación",
-            tipo: "like",
-          });
-        }
-      }
-    }
-  };
 
   /* —— render —— */
   const renderPost = ({ item }: any) => (

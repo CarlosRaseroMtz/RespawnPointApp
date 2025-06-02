@@ -84,7 +84,7 @@ export default function NotificacionesScreen() {
                 leida={item.leida}
                 action={item.action}
                 seguido={seguidos[item.id]}
-                onToggleSeguir={toggleSeguir} seconds={undefined} />
+                onToggleSeguir={toggleSeguir} seconds={undefined} tipo={"like"} />
             ))
 
           )}
