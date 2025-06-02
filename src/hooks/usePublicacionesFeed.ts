@@ -28,7 +28,9 @@ export function usePublicacionesFeed() {
       const arr = await Promise.all(
         snap.docs.map(async (d) => {
           const data = d.data();
+          console.log("📄 Post leído:", data);
           const usnap = await getDoc(doc(firestore, "usuarios", data.userId));
+          console.log("👤 Autor cargado:", usnap.data());
           const autor = usnap.exists() ? usnap.data() : {};
 
           return {

@@ -1,10 +1,10 @@
 import { AntDesign, Feather } from "@expo/vector-icons";
 import { Image } from "expo-image";
 import {
-    StyleSheet,
-    Text,
-    TouchableOpacity,
-    View,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
 
 /* —— tipos —— */
@@ -69,7 +69,7 @@ export default function PostCard({
 
       {/* —— media —— */}
       <TouchableOpacity activeOpacity={0.9} onPress={onPress}>
-        <Image source={{ uri: post.mediaUrl }} style={styles.media} />
+        <Image source={{ uri: post.mediaUrl || "https://via.placeholder.com/400x300" }} style={styles.media} />
       </TouchableOpacity>
 
       {/* —— meta (chip) —— */}

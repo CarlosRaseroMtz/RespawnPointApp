@@ -1,6 +1,6 @@
 import {
-    createUserWithEmailAndPassword,
-    updateProfile,
+  createUserWithEmailAndPassword,
+  updateProfile,
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { auth, firestore } from "../config/firebase-config";
