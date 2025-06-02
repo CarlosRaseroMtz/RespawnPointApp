@@ -16,16 +16,28 @@ import {
 import { firestore } from "../../../src/config/firebase-config";
 import { useAuth } from "../../../src/hooks/useAuth";
 
-const platforms = [
-  "Xbox 360", "Xbox One", "Xbox Series X/S",
-  "PlayStation 3", "PlayStation 4", "PlayStation 5",
-  "Wii", "Wii U", "Nintendo Switch", "Consola retro/antigua"
-];
+const platforms = ["Xbox 360",
+  "Xbox One",
+  "Xbox Series X/S",
+  "PlayStation 3",
+  "PlayStation 4",
+  "PlayStation 5",
+  "Wii",
+  "Wii U",
+  "Nintendo Switch",
+  "PC",
+  "Nintendo 3DS",
+  "Consola retro/antigua",
+  "Móviles",
+  "VRs",
+  "Otro",
+  "No tengo una plataforma favorita"];
 
-const genres = [
-  "Acción", "Aventura", "RPG", "Shooter", "Estrategia",
+const genres = ["Acción", "Aventura", "RPG", "Shooter", "Estrategia",
   "Deportes", "Simulación", "Lucha", "Plataformas", "Terror",
-];
+  "Carreras", "Puzzle", "Indie", "Multijugador", "Sandbox", "MOBA",
+  "Mundo abierto", "Narrativo", "Survival", "Battle Royale",
+  "Sigilo", "Construcción", "Educativo", "Otro"];
 
 export default function EditarPerfilScreen() {
   const router = useRouter();
@@ -33,6 +45,7 @@ export default function EditarPerfilScreen() {
 
   const [username, setUsername] = useState("");
   const [fotoPerfil, setFotoPerfil] = useState("");
+  const [bio, setBio] = useState("");
   const [plataforma, setPlataforma] = useState(platforms[0]);
   const [generos, setGeneros] = useState<string[]>([]);
 
@@ -47,6 +60,7 @@ export default function EditarPerfilScreen() {
         setFotoPerfil(data.fotoPerfil || "");
         setPlataforma(data.plataformaFav || platforms[0]);
         setGeneros(data.generoFav?.split(", ") || []);
+        setBio(data.descripcion || "");
       }
     };
     cargarDatos();
@@ -83,6 +97,7 @@ export default function EditarPerfilScreen() {
         fotoPerfil,
         plataformaFav: plataforma,
         generoFav: generos.join(", "),
+        descripcion: bio,
       });
       Alert.alert("Perfil actualizado", "Los cambios se guardaron correctamente.");
       router.back();
@@ -141,6 +156,17 @@ export default function EditarPerfilScreen() {
           </TouchableOpacity>
         ))}
       </View>
+
+      <Text style={styles.label}>Biografía</Text>
+      <TextInput
+        style={[styles.input, { height: 100, textAlignVertical: "top" }]}
+        placeholder="Cuéntanos algo sobre ti..."
+        multiline
+        numberOfLines={4}
+        maxLength={200}
+        value={bio}
+        onChangeText={setBio}
+      />
 
       <TouchableOpacity style={styles.button} onPress={guardarCambios}>
         <Text style={styles.buttonText}>Guardar cambios</Text>

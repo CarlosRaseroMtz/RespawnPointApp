@@ -1,6 +1,8 @@
 import {
+  addDoc,
   arrayRemove,
   arrayUnion,
+  collection,
   doc,
   getDoc,
   runTransaction,
@@ -47,6 +49,7 @@ export async function toggleLike({
 // ────────────────────────────────
 // 2. COMENTAR PUBLICACIÓN
 // ────────────────────────────────
+
 export async function comentarPublicacion({
   publicacionId,
   contenido,
@@ -63,7 +66,14 @@ export async function comentarPublicacion({
 
   const { userId: autorOriginal } = pubSnap.data();
 
-  // ⬇️ Guardar el comentario como subcolección de la publicación
+  // 1. Guardar el comentario en la subcolección correcta
+  await addDoc(collection(pubRef, "comentarios"), {
+    userId: autorUid,
+    contenido,
+    timestamp: new Date(),
+  });
+
+  // 2. Incrementar el contador de comentarios con seguridad
   await runTransaction(firestore, async (tx) => {
     const snap = await tx.get(pubRef);
     if (!snap.exists()) return;
@@ -74,9 +84,7 @@ export async function comentarPublicacion({
     });
   });
 
-
-
-  // ⬇️ Notificar al autor si no es el mismo
+  // 3. Notificar si el autor no es uno mismo
   if (autorOriginal !== autorUid) {
     await crearNotificacion({
       paraUid: autorOriginal,
@@ -86,6 +94,7 @@ export async function comentarPublicacion({
     });
   }
 }
+
 
 
 // ────────────────────────────────

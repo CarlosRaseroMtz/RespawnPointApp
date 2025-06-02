@@ -46,31 +46,31 @@ export default function ConfiguracionScreen() {
         <TouchableOpacity>
           <Text style={styles.item}>Accesibilidad e idiomas</Text>
         </TouchableOpacity>
-        <TouchableOpacity>
-          <Text style={styles.item}>Tu actividad</Text>
+        <TouchableOpacity disabled>
+          <Text style={[styles.item, { color: "#ccc" }]}>Tu actividad</Text>
         </TouchableOpacity>
 
         <View style={styles.divider} />
 
         {/* privacidad */}
         <Text style={styles.sectionTitle}>Privacidad</Text>
-        <TouchableOpacity>
-          <Text style={styles.item}>Suscripciones</Text>
+        <TouchableOpacity disabled>
+          <Text style={[styles.item, { color: "#ccc" }]}>Suscripciones</Text>
         </TouchableOpacity>
-        <TouchableOpacity>
-          <Text style={styles.item}>Usuarios bloqueados</Text>
+        <TouchableOpacity disabled>
+          <Text style={[styles.item, { color: "#ccc" }]}>Usuarios bloqueados</Text>
         </TouchableOpacity>
-        <TouchableOpacity>
-          <Text style={styles.item}>Notificaciones</Text>
+        <TouchableOpacity disabled>
+          <Text style={[styles.item, { color: "#ccc" }]}>Notificaciones</Text>
         </TouchableOpacity>
-        <TouchableOpacity>
-          <Text style={styles.item}>Ayuda</Text>
+        <TouchableOpacity disabled>
+          <Text style={[styles.item, { color: "#ccc" }]}>Ayuda</Text>
         </TouchableOpacity>
-        <TouchableOpacity>
-          <Text style={styles.item}>Centro de privacidad</Text>
+        <TouchableOpacity disabled>
+          <Text style={[styles.item, { color: "#ccc" }]}>Centro de privacidad</Text>
         </TouchableOpacity>
-        <TouchableOpacity>
-          <Text style={styles.item}>Estado de la cuenta</Text>
+        <TouchableOpacity disabled>
+          <Text style={[styles.item, { color: "#ccc" }]}>Estado de la cuenta</Text>
         </TouchableOpacity>
 
         <View style={styles.divider} />
