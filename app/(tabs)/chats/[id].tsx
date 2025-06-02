@@ -152,7 +152,7 @@ const styles = StyleSheet.create({
   hora: { fontSize: 10, color: "#666", marginTop: 4 },
   inputArea: {
     flexDirection: "row",
-    padding: 12,
+    padding: 8,
     borderTopWidth: 1,
     borderColor: "#ddd",
     backgroundColor: "rgba(255,255,255,0.9)",
