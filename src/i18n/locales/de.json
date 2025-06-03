@@ -197,5 +197,31 @@
   "postP": {
     "likes": "Gefällt mir",
     "comments": "Kommentare"
+  },
+  "adapt": {
+    "title": "Sprache und Barrierefreiheit",
+    "language": {
+      "sectionTitle": "APP-SPRACHE",
+      "label": "Bevorzugte Sprache"
+    },
+    "privacy": {
+      "sectionTitle": "KONTO",
+      "label": "Kontoprivatsphäre",
+      "public": "Jeder kann deine Beiträge sehen.",
+      "private": "Nur deine Follower können deine Beiträge sehen."
+    },
+    "theme": {
+      "sectionTitle": "EINSTELLUNGEN",
+      "label": "Hell-/Dunkelmodus",
+      "dark": "Dunkle Oberfläche zur Schonung der Augen.",
+      "light": "Helle Oberfläche für bessere Sichtbarkeit am Tag."
+    },
+    "languages": {
+      "en": "Englisch",
+      "es": "Spanisch",
+      "fr": "Französisch",
+      "it": "Italienisch",
+      "de": "Deutsch"
+    }
   }
 }

@@ -197,5 +197,31 @@
     "postP": {
         "likes": "likes",
         "comments": "Comments"
+    },
+    "adapt": {
+        "title": "Language and Accessibility",
+        "language": {
+            "sectionTitle": "APP LANGUAGE",
+            "label": "Preferred language"
+        },
+        "privacy": {
+            "sectionTitle": "ACCOUNT",
+            "label": "Account privacy",
+            "public": "Anyone can see your posts.",
+            "private": "Only your followers can see your posts."
+        },
+        "theme": {
+            "sectionTitle": "PREFERENCES",
+            "label": "Light / Dark mode",
+            "dark": "Dark interface for resting your eyes.",
+            "light": "Light interface for better daylight visibility."
+        },
+        "languages": {
+            "en": "English",
+            "es": "Spanish",
+            "fr": "French",
+            "it": "Italian",
+            "de": "German"
+        }
     }
 }

@@ -197,5 +197,33 @@
     "postP": {
         "likes": "me gusta",
         "comments": "Comentarios"
+    },
+    
+  "adapt": {
+    "title": "Idioma y accesibilidad",
+    "language": {
+      "sectionTitle": "IDIOMA DE LA APP",
+      "label": "Idioma preferido"
+    },
+    "privacy": {
+      "sectionTitle": "CUENTA",
+      "label": "Privacidad de cuenta",
+      "public": "Cualquiera podrá ver tus publicaciones.",
+      "private": "Solo tus seguidores podrán ver tus publicaciones."
+    },
+    "theme": {
+      "sectionTitle": "PREFERENCIAS",
+      "label": "Modo claro / oscuro",
+      "dark": "Interfaz con colores oscuros para descansar la vista.",
+      "light": "Interfaz clara con mejor visibilidad diurna."
+    },
+    "languages": {
+      "en": "Inglés",
+      "es": "Español",
+      "fr": "Francés",
+      "it": "Italiano",
+      "de": "Alemán"
     }
+  }
 }
+

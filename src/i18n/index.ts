@@ -32,7 +32,8 @@ i18n
     interpolation: {
       escapeValue: false,
     },
-  })
-  .then(() => console.log(`✅ i18n initialized with language: ${language}`));
+  }, () => {
+    console.log(`✅ i18n initialized with language: ${language}`);
+  });
 
 export default i18n;

@@ -197,5 +197,31 @@
   "postP": {
     "likes": "j'aime",
     "comments": "Commentaires"
+  },
+  "adapt": {
+    "title": "Langue et accessibilité",
+    "language": {
+      "sectionTitle": "LANGUE DE L'APPLICATION",
+      "label": "Langue préférée"
+    },
+    "privacy": {
+      "sectionTitle": "COMPTE",
+      "label": "Confidentialité du compte",
+      "public": "Tout le monde peut voir vos publications.",
+      "private": "Seuls vos abonnés peuvent voir vos publications."
+    },
+    "theme": {
+      "sectionTitle": "PRÉFÉRENCES",
+      "label": "Mode clair / sombre",
+      "dark": "Interface sombre pour reposer vos yeux.",
+      "light": "Interface claire pour une meilleure visibilité de jour."
+    },
+    "languages": {
+      "en": "Anglais",
+      "es": "Espagnol",
+      "fr": "Français",
+      "it": "Italien",
+      "de": "Allemand"
+    }
   }
 }
