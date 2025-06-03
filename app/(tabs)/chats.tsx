@@ -6,14 +6,15 @@ import {
   getDocs,
   query,
   setDoc,
+  Timestamp,
   where
 } from "firebase/firestore";
 import { useState } from "react";
 
 import { addDoc } from "firebase/firestore";
 
+import * as ImagePicker from "expo-image-picker";
 import {
-  GestureResponderEvent,
   Image,
   SafeAreaView,
   ScrollView,
@@ -21,7 +22,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  View,
+  View
 } from "react-native";
 import ChatItem from "../../src/components/ChatItem";
 import { firestore } from "../../src/config/firebase-config";
@@ -40,32 +41,14 @@ export default function ChatsScreen() {
   const [resultados, setResultados] = useState<any[]>([]);
   const [modoCrearGrupo, setModoCrearGrupo] = useState(false);
   const [participantesGrupo, setParticipantesGrupo] = useState<string[]>([]);
+  const [nombreGrupo, setNombreGrupo] = useState("");
+  const [avatarGrupo, setAvatarGrupo] = useState<string | null>(null);
+
 
   const toggleSeleccionUsuario = (id: string) => {
     setParticipantesGrupo(prev =>
       prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
     );
-
-    const crearGrupo = async () => {
-      if (!user || participantesGrupo.length < 1) return;
-
-      const nuevoChatRef = await addDoc(collection(firestore, "chats"), {
-        participantes: [user.uid, ...participantesGrupo],
-        tipo: "grupo",
-        timestamp: new Date(),
-        lastMessage: "",
-      });
-
-      setModoCrearGrupo(false);
-      setParticipantesGrupo([]);
-      router.push(`/chats/${nuevoChatRef.id}`);
-
-
-      setModoCrearGrupo(false);
-      setParticipantesGrupo([]);
-      router.push(`/chats/${nuevoChatRef.id}`);
-    };
-
   };
 
 
@@ -88,7 +71,9 @@ export default function ChatsScreen() {
   const iniciarChatCon = async (usuario: any) => {
     if (!user) return;
 
-    // ¿Existe ya un chat 1-a-1?
+    const usuarioId = usuario.uid || usuario.id;
+    if (!usuarioId) return;
+
     const q = query(
       collection(firestore, "chats"),
       where("participantes", "array-contains", user.uid)
@@ -96,25 +81,25 @@ export default function ChatsScreen() {
     const snap = await getDocs(q);
     const existente = snap.docs.find((d) => {
       const p = d.data().participantes;
-      return p.includes(usuario.id) && p.length === 2;
+      return p.includes(usuarioId) && p.length === 2;
     });
 
     if (existente) {
-      router.push(`/chats/${existente.id}`);         // ✅ ruta absoluta
+      router.push(`/chats/${existente.id}`);
       return;
     }
 
-    // Nuevo chat
-    const chatId = `${user.uid}_${usuario.id}`;
+    const chatId = `${user.uid}_${usuarioId}`;
     await setDoc(doc(firestore, "chats", chatId), {
-      participantes: [user.uid, usuario.id],
+      participantes: [user.uid, usuarioId],
       tipo: "usuario",
-      timestamp: new Date(),
+      timestamp: Timestamp.now(),
       lastMessage: "",
     });
 
-    router.push(`/chats/${chatId}`);                // ✅
+    router.push(`/chats/${chatId}`);
   };
+
 
   /* ---------- filtros de pestaña ---------- */
   const userChats = chats.filter((c: { tipo: string; }) => c.tipo === "usuario");
@@ -127,9 +112,34 @@ export default function ChatsScreen() {
         ? groupChats
         : [];
 
-  function crearGrupo(event: GestureResponderEvent): void {
-    throw new Error("Function not implemented.");
-  }
+  const crearGrupo = async () => {
+    if (!user || participantesGrupo.length < 1) return;
+
+    const nuevoChatRef = await addDoc(collection(firestore, "chats"), {
+      participantes: [user.uid, ...participantesGrupo],
+      tipo: "grupo",
+      timestamp: new Date(),
+      lastMessage: "",
+    });
+    setModoCrearGrupo(false);
+    setParticipantesGrupo([]);
+    router.push(`/chats/${nuevoChatRef.id}`);
+  };
+
+
+
+  const handleSeleccionarImagen = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      quality: 0.7,
+    });
+
+    if (!result.canceled && result.assets.length > 0) {
+      setAvatarGrupo(result.assets[0].uri);
+    }
+  };
+
 
   /* ---------- UI ---------- */
   return (
@@ -172,15 +182,28 @@ export default function ChatsScreen() {
         {/* Solo si estamos en "Comunidades" */}
         {activeTab === "Comunidades" && (
           <>
-            {!modoCrearGrupo ? (
-              <TouchableOpacity
-                style={{ backgroundColor: "#FF66C4", padding: 10, borderRadius: 8, marginBottom: 10 }}
-                onPress={() => setModoCrearGrupo(true)}
-              >
-                <Text style={{ color: "white", textAlign: "center" }}>➕ Crear grupo</Text>
-              </TouchableOpacity>
-            ) : (
+            {modoCrearGrupo ? (
               <>
+                <TextInput
+                  placeholder="Nombre del grupo"
+                  value={nombreGrupo}
+                  onChangeText={setNombreGrupo}
+                  style={styles.search}
+                />
+                <TouchableOpacity
+                  onPress={handleSeleccionarImagen}
+                  style={{ marginBottom: 10 }}
+                >
+                  <Text style={{ color: "#42BAFF", textAlign: "center" }}>
+                    📷 Seleccionar foto de grupo
+                  </Text>
+                </TouchableOpacity>
+                {avatarGrupo && (
+                  <Image
+                    source={{ uri: avatarGrupo }}
+                    style={{ width: 60, height: 60, borderRadius: 30, alignSelf: "center", marginBottom: 10 }}
+                  />
+                )}
                 <TouchableOpacity
                   style={{ backgroundColor: "#42BAFF", padding: 10, borderRadius: 8, marginBottom: 10 }}
                   onPress={crearGrupo}
@@ -196,6 +219,13 @@ export default function ChatsScreen() {
                   <Text style={{ color: "#888", marginBottom: 10 }}>❌ Cancelar</Text>
                 </TouchableOpacity>
               </>
+            ) : (
+              <TouchableOpacity
+                style={{ backgroundColor: "#FF66C4", padding: 10, borderRadius: 8, marginBottom: 10 }}
+                onPress={() => setModoCrearGrupo(true)}
+              >
+                <Text style={{ color: "white", textAlign: "center" }}>➕ Crear grupo</Text>
+              </TouchableOpacity>
             )}
           </>
         )}
