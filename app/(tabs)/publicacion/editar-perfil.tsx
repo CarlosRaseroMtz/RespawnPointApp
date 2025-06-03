@@ -1,3 +1,4 @@
+import FondoLayout from "@/src/components/FondoLayout";
 import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
@@ -17,7 +18,7 @@ import {
 import { useAuth } from "../../../src/hooks/useAuth";
 import { firestore } from "../../../src/services/config/firebase-config";
 
-const platforms = [ /* mantenemos como está */ 
+const platforms = [ /* mantenemos como está */
   "Xbox 360", "Xbox One", "Xbox Series X/S", "PlayStation 3", "PlayStation 4",
   "PlayStation 5", "Wii", "Wii U", "Nintendo Switch", "PC", "Nintendo 3DS",
   "Consola retro/antigua", "Móviles", "VRs", "Otro", "No tengo una plataforma favorita"
@@ -100,64 +101,66 @@ export default function EditarPerfilScreen() {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>{t("editProfile.title")}</Text>
+    <FondoLayout>
+      <ScrollView contentContainerStyle={styles.container}>
+        <Text style={styles.title}>{t("editProfile.title")}</Text>
 
-      <TouchableOpacity onPress={elegirImagen}>
-        <Image source={{ uri: fotoPerfil }} style={styles.avatar} />
-        <Text style={styles.changePhoto}>{t("editProfile.changePhoto")}</Text>
-      </TouchableOpacity>
+        <TouchableOpacity onPress={elegirImagen}>
+          <Image source={{ uri: fotoPerfil }} style={styles.avatar} />
+          <Text style={styles.changePhoto}>{t("editProfile.changePhoto")}</Text>
+        </TouchableOpacity>
 
-      <TextInput
-        style={styles.input}
-        placeholder={t("editProfile.usernamePlaceholder")}
-        value={username}
-        onChangeText={setUsername}
-      />
+        <TextInput
+          style={styles.input}
+          placeholder={t("editProfile.usernamePlaceholder")}
+          value={username}
+          onChangeText={setUsername}
+        />
 
-      <Text style={styles.label}>{t("editProfile.platformLabel")}</Text>
-      <View style={styles.pickerContainer}>
-        <Picker
-          selectedValue={plataforma}
-          onValueChange={setPlataforma}
-          style={styles.picker}
-        >
-          {platforms.map(p => (
-            <Picker.Item key={p} label={p} value={p} />
-          ))}
-        </Picker>
-      </View>
-
-      <Text style={styles.label}>{t("editProfile.genresLabel")}</Text>
-      <View style={styles.genreContainer}>
-        {genres.map(g => (
-          <TouchableOpacity
-            key={g}
-            style={[styles.genreTag, generos.includes(g) && styles.genreTagSelected]}
-            onPress={() => toggleGenero(g)}
+        <Text style={styles.label}>{t("editProfile.platformLabel")}</Text>
+        <View style={styles.pickerContainer}>
+          <Picker
+            selectedValue={plataforma}
+            onValueChange={setPlataforma}
+            style={styles.picker}
           >
-            <Text style={[styles.genreText, generos.includes(g) && styles.genreTextSelected]}>
-              {g}
-            </Text>
-          </TouchableOpacity>
-        ))}
-      </View>
+            {platforms.map(p => (
+              <Picker.Item key={p} label={p} value={p} />
+            ))}
+          </Picker>
+        </View>
 
-      <Text style={styles.label}>{t("editProfile.bioLabel")}</Text>
-      <TextInput
-        style={[styles.input, { height: 100, textAlignVertical: "top" }]}
-        placeholder={t("editProfile.bioPlaceholder")}
-        multiline
-        numberOfLines={4}
-        maxLength={200}
-        value={bio}
-        onChangeText={setBio}
-      />
+        <Text style={styles.label}>{t("editProfile.genresLabel")}</Text>
+        <View style={styles.genreContainer}>
+          {genres.map(g => (
+            <TouchableOpacity
+              key={g}
+              style={[styles.genreTag, generos.includes(g) && styles.genreTagSelected]}
+              onPress={() => toggleGenero(g)}
+            >
+              <Text style={[styles.genreText, generos.includes(g) && styles.genreTextSelected]}>
+                {g}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
 
-      <TouchableOpacity style={styles.button} onPress={guardarCambios}>
-        <Text style={styles.buttonText}>{t("editProfile.saveButton")}</Text>
-      </TouchableOpacity>
-    </ScrollView>
+        <Text style={styles.label}>{t("editProfile.bioLabel")}</Text>
+        <TextInput
+          style={[styles.input, { height: 100, textAlignVertical: "top" }]}
+          placeholder={t("editProfile.bioPlaceholder")}
+          multiline
+          numberOfLines={4}
+          maxLength={200}
+          value={bio}
+          onChangeText={setBio}
+        />
+
+        <TouchableOpacity style={styles.button} onPress={guardarCambios}>
+          <Text style={styles.buttonText}>{t("editProfile.saveButton")}</Text>
+        </TouchableOpacity>
+      </ScrollView>
+    </FondoLayout>
   );
 }
 
@@ -165,7 +168,6 @@ export default function EditarPerfilScreen() {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    backgroundColor: "#fff",
   },
   title: {
     fontSize: 22,

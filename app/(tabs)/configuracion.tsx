@@ -10,6 +10,7 @@ import {
 
 import { useTranslation } from "react-i18next";
 
+import FondoLayout from "@/src/components/FondoLayout";
 import UserHeader from "../../src/components/UserHeader";
 import { useAuth } from "../../src/hooks/useAuth";
 import { usePerfilUsuario } from "../../src/hooks/usePerfilUsuario";
@@ -22,80 +23,82 @@ export default function ConfiguracionScreen() {
   const perfil = usePerfilUsuario();
 
   return (
-    <SafeAreaView style={styles.container}>
-      <ScrollView>
-        <UserHeader
-          username={perfil?.username || t("settings.loading")}
-          plataforma={perfil?.plataformaFav}
-          avatarUrl={perfil?.fotoPerfil || "https://i.pravatar.cc/150?img=12"}
-        />
+    <FondoLayout>
+      <SafeAreaView style={styles.container}>
+        <ScrollView>
+          <UserHeader
+            username={perfil?.username || t("settings.loading")}
+            plataforma={perfil?.plataformaFav}
+            avatarUrl={perfil?.fotoPerfil || "https://i.pravatar.cc/150?img=12"}
+          />
 
-        {/* ajustes */}
-        <Text style={styles.sectionTitle}>{t("settings.general")}</Text>
+          {/* ajustes */}
+          <Text style={styles.sectionTitle}>{t("settings.general")}</Text>
 
-        <TouchableOpacity onPress={() => router.push("/publicacion/editar-perfil")}>
-          <Text style={styles.item}>{t("settings.editProfile")}</Text>
-        </TouchableOpacity>
+          <TouchableOpacity onPress={() => router.push("/publicacion/editar-perfil")}>
+            <Text style={styles.item}>{t("settings.editProfile")}</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity
-          onPress={() => router.push("/lenguaje")}
-          className="py-3 border-b border-gray-300"
-        >
-          <Text style={styles.item}>{t("settings.language")}</Text>
-        </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => router.push("/lenguaje")}
+            className="py-3 border-b border-gray-300"
+          >
+            <Text style={styles.item}>{t("settings.language")}</Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity disabled>
-          <Text style={[styles.item, { color: "#ccc" }]}>{t("settings.activity")}</Text>
-        </TouchableOpacity>
+          <TouchableOpacity disabled>
+            <Text style={[styles.item, { color: "#ccc" }]}>{t("settings.activity")}</Text>
+          </TouchableOpacity>
 
-        <View style={styles.divider} />
+          <View style={styles.divider} />
 
-        {/* privacidad */}
-        <Text style={styles.sectionTitle}>{t("settings.privacy")}</Text>
+          {/* privacidad */}
+          <Text style={styles.sectionTitle}>{t("settings.privacy")}</Text>
 
-        <TouchableOpacity disabled>
-          <Text style={[styles.item, { color: "#ccc" }]}>{t("settings.subscriptions")}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity disabled>
-          <Text style={[styles.item, { color: "#ccc" }]}>{t("settings.blocked")}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity disabled>
-          <Text style={[styles.item, { color: "#ccc" }]}>{t("settings.notifications")}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity disabled>
-          <Text style={[styles.item, { color: "#ccc" }]}>{t("settings.help")}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity disabled>
-          <Text style={[styles.item, { color: "#ccc" }]}>{t("settings.privacyCenter")}</Text>
-        </TouchableOpacity>
-        <TouchableOpacity disabled>
-          <Text style={[styles.item, { color: "#ccc" }]}>{t("settings.accountStatus")}</Text>
-        </TouchableOpacity>
+          <TouchableOpacity disabled>
+            <Text style={[styles.item, { color: "#ccc" }]}>{t("settings.subscriptions")}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity disabled>
+            <Text style={[styles.item, { color: "#ccc" }]}>{t("settings.blocked")}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity disabled>
+            <Text style={[styles.item, { color: "#ccc" }]}>{t("settings.notifications")}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity disabled>
+            <Text style={[styles.item, { color: "#ccc" }]}>{t("settings.help")}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity disabled>
+            <Text style={[styles.item, { color: "#ccc" }]}>{t("settings.privacyCenter")}</Text>
+          </TouchableOpacity>
+          <TouchableOpacity disabled>
+            <Text style={[styles.item, { color: "#ccc" }]}>{t("settings.accountStatus")}</Text>
+          </TouchableOpacity>
 
-        <View style={styles.divider} />
+          <View style={styles.divider} />
 
-        {/* sesión */}
-        <Text style={styles.sectionTitle}>{t("settings.session")}</Text>
+          {/* sesión */}
+          <Text style={styles.sectionTitle}>{t("settings.session")}</Text>
 
-        <TouchableOpacity disabled>
-          <Text style={[styles.item, { color: "#ccc" }]}>
-            {t("settings.addAccount")}
-          </Text>
-        </TouchableOpacity>
+          <TouchableOpacity disabled>
+            <Text style={[styles.item, { color: "#ccc" }]}>
+              {t("settings.addAccount")}
+            </Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => cerrarSesion(router)}>
-          <Text style={[styles.item, { color: "red" }]}>
-            {t("settings.logout")}
-          </Text>
-        </TouchableOpacity>
+          <TouchableOpacity onPress={() => cerrarSesion(router)}>
+            <Text style={[styles.item, { color: "red" }]}>
+              {t("settings.logout")}
+            </Text>
+          </TouchableOpacity>
 
-        <TouchableOpacity onPress={() => eliminarCuenta(user?.uid, router)}>
-          <Text style={[styles.item, { color: "#FF66C4" }]}>
-            {t("settings.deleteAccount")}
-          </Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </SafeAreaView>
+          <TouchableOpacity onPress={() => eliminarCuenta(user?.uid, router)}>
+            <Text style={[styles.item, { color: "#FF66C4" }]}>
+              {t("settings.deleteAccount")}
+            </Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </SafeAreaView>
+    </FondoLayout>
   );
 }
 

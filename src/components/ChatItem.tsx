@@ -16,6 +16,8 @@ interface ChatItemProps {
   lastMessage?: string;
   timestamp?: string;
   onPress?: () => void;
+  avatarC?: string;
+  nombreC?: string;
 }
 
 const ChatItem = ({

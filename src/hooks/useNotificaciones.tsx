@@ -1,23 +1,23 @@
 import { getAuth } from "firebase/auth";
 import {
-    collection,
-    getFirestore,
-    onSnapshot,
-    updateDoc,
+  collection,
+  getFirestore,
+  onSnapshot,
+  updateDoc,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { app } from "../services/config/firebase-config";
 import { Notificacion } from "../types/notificacion";
-
 
 export function useNotificaciones(categoriaActiva: string) {
   const [notifications, setNotifications] = useState<Notificacion[]>([]);
 
   const db = getFirestore(app);
   const auth = getAuth(app);
+  const user = auth.currentUser;
 
   useEffect(() => {
-    const user = auth.currentUser;
+    
     if (!user) return;
 
     const itemsRef = collection(db, "notificaciones", user.uid, "items");
@@ -32,7 +32,7 @@ export function useNotificaciones(categoriaActiva: string) {
               seconds: data.time?.seconds || 0,
           } as unknown as Notificacion;
         })
-        .filter((n) => n.user && n.message && n.time && n.categoria === categoriaActiva)
+        .filter((n) => n.message && n.categoria?.toLowerCase() === categoriaActiva)
         .sort((a, b) => b.seconds - a.seconds);
 
       setNotifications(notifList);

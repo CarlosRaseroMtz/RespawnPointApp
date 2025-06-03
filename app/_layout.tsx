@@ -1,11 +1,13 @@
-// app/_layout.tsx
-import { Stack } from 'expo-router';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { ThemeProvider } from "@/src/context/ThemeContext"; // 👈 ajusta si el path cambia
+import { Stack } from "expo-router";
+import { SafeAreaProvider } from "react-native-safe-area-context";
 
 export default function RootLayout() {
   return (
     <SafeAreaProvider>
-      <Stack screenOptions={{ headerShown: false }} />
+      <ThemeProvider>
+        <Stack screenOptions={{ headerShown: false }} />
+      </ThemeProvider>
     </SafeAreaProvider>
   );
 }

@@ -98,6 +98,8 @@ export default function ChatsScreen() {
       tipo: "grupo",
       timestamp: new Date(),
       lastMessage: "",
+      //nombreC: nombreGrupo || "Nuevo Grupo",
+      //avatarC: avatarGrupo || "https://i.pravatar.cc/150?img=1",
     });
 
     setModoCrearGrupo(false);
@@ -199,7 +201,7 @@ export default function ChatsScreen() {
               disabled={u.id === "no-results"}
             >
               <Image
-                source={{ uri: u.fotoPerfil ?? "https://i.pravatar.cc/150?img=1" }}
+                source={{ uri: u.fotoPerfil ?? "https://i.pravatar.https://cdn-icons-png.flaticon.com/512/5234/5234404.png/150?img=1" }}
                 style={styles.avatar}
               />
               <Text style={styles.name}>{u.username}</Text>
