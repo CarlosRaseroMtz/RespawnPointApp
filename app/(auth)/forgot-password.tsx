@@ -16,7 +16,6 @@ import { sendResetLink } from "../../src/utils/auth-reset-password";
 export default function ForgotPasswordScreen() {
   const router = useRouter();
   const { t } = useTranslation();
-  console.log("Traducido:", t("forgot.title"));
   const [email, setEmail] = useState("");
 
   const handleRecovery = async () => {

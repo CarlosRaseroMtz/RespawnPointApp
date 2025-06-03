@@ -37,7 +37,10 @@ export default function ConfiguracionScreen() {
           <Text style={styles.item}>{t("settings.editProfile")}</Text>
         </TouchableOpacity>
 
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => router.push("/lenguaje")}
+          className="py-3 border-b border-gray-300"
+        >
           <Text style={styles.item}>{t("settings.language")}</Text>
         </TouchableOpacity>
 
