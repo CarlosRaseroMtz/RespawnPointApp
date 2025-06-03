@@ -3,6 +3,7 @@ import { AntDesign } from "@expo/vector-icons";
 import { Picker } from "@react-native-picker/picker";
 import { useRouter } from "expo-router";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   Image,
@@ -14,8 +15,6 @@ import {
   View,
 } from "react-native";
 import { registerUser } from "../../src/utils/auth-register";
-
-/* ⬇️  ruta correcta: 2 niveles arriba desde (auth) */
 
 const platforms = ["Xbox 360",
   "Xbox One",
@@ -34,6 +33,7 @@ const platforms = ["Xbox 360",
   "Otro",
   "No tengo una plataforma favorita"];
 
+
 const genres = ["Acción", "Aventura", "RPG", "Shooter", "Estrategia",
   "Deportes", "Simulación", "Lucha", "Plataformas", "Terror",
   "Carreras", "Puzzle", "Indie", "Multijugador", "Sandbox", "MOBA",
@@ -42,6 +42,7 @@ const genres = ["Acción", "Aventura", "RPG", "Shooter", "Estrategia",
 
 export default function RegisterScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -52,13 +53,13 @@ export default function RegisterScreen() {
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [passwordFocused, setPasswordFocused] = useState(false);
 
-  /* —— validaciones auxiliares —— */
   const criterios = {
     longitud: password.length >= 8,
     mayuscula: /[A-Z]/.test(password),
     minuscula: /[a-z]/.test(password),
     numero: /\d/.test(password),
   };
+
   const evaluarFuerza = (pass: string) => {
     let f = 0;
     if (pass.length >= 8) f++;
@@ -66,8 +67,9 @@ export default function RegisterScreen() {
     if (/[a-z]/.test(pass)) f++;
     if (/\d/.test(pass)) f++;
     if (/[\W_]/.test(pass)) f++;
-    return ["Débil", "Débil", "Media", "Fuerte", "Muy fuerte"][f - 1] ?? "Débil";
+    return [t("register.strengths.weak"), t("register.strengths.weak"), t("register.strengths.medium"), t("register.strengths.strong"), t("register.strengths.veryStrong")][f - 1] ?? t("register.strengths.weak");
   };
+
   const fuerza = evaluarFuerza(password);
 
   const toggleGenre = (genre: string) => {
@@ -75,24 +77,17 @@ export default function RegisterScreen() {
       setSelectedGenres(selectedGenres.filter((g) => g !== genre));
     else if (selectedGenres.length < 2)
       setSelectedGenres([...selectedGenres, genre]);
-    else Alert.alert("Límite", "Solo puedes elegir 2 géneros");
+    else Alert.alert(t("register.limitTitle"), t("register.limitMsg"));
   };
 
-  /* —— registro —— */
   const handleRegister = async () => {
-    if (
-      !email || !password || !fullName || !username ||
-      selectedGenres.length === 0
-    ) {
-      Alert.alert("Campos incompletos", "Completa todos los datos.");
+    if (!email || !password || !fullName || !username || selectedGenres.length === 0) {
+      Alert.alert(t("register.incompleteTitle"), t("register.incompleteMsg"));
       return;
     }
-    if (!criterios.longitud || !criterios.mayuscula ||
-      !criterios.minuscula || !criterios.numero) {
-      Alert.alert(
-        "Contraseña insegura",
-        "Mínimo 8 caracteres, una mayúscula, una minúscula y un número."
-      );
+
+    if (!criterios.longitud || !criterios.mayuscula || !criterios.minuscula || !criterios.numero) {
+      Alert.alert(t("register.weakTitle"), t("register.weakMsg"));
       return;
     }
 
@@ -106,59 +101,33 @@ export default function RegisterScreen() {
         selectedGenres,
       });
 
-      Alert.alert("Registro exitoso", "¡Bienvenido!");
+      Alert.alert(t("register.successTitle"), t("register.successMsg"));
       router.replace("/login");
     } catch (e: any) {
       console.error("❌ Registro:", e);
       const msg =
         e.code === "auth/email-already-in-use"
-          ? "El correo ya está registrado."
+          ? t("register.errors.emailInUse")
           : e.code === "auth/invalid-email"
-            ? "Correo inválido."
-            : e.code === "auth/weak-password"
-              ? "Contraseña muy débil."
-              : "Ocurrió un error.";
-      Alert.alert("Error de registro", msg);
+          ? t("register.errors.invalidEmail")
+          : e.code === "auth/weak-password"
+          ? t("register.errors.weakPassword")
+          : t("register.errors.default");
+      Alert.alert(t("register.errors.title"), msg);
     }
-
   };
 
-  /* —— UI —— */
   return (
     <FondoLayout>
       <ScrollView contentContainerStyle={styles.container}>
-        <Image
-          source={require("../../assets/images/logo.png")}
-          style={styles.logo}
-        />
-        <Text style={styles.title}>Regístrate</Text>
+        <Image source={require("../../assets/images/logo.png")} style={styles.logo} />
+        <Text style={styles.title}>{t("register.title")}</Text>
 
-        {/*  correo / contraseña */}
-        <TextInput
-          style={styles.input}
-          placeholder="Correo electrónico"
-          placeholderTextColor="#888"
-          autoCapitalize="none"
-          keyboardType="email-address"
-          value={email}
-          onChangeText={setEmail}
-        />
+        <TextInput style={styles.input} placeholder={t("register.email")} placeholderTextColor="#888" autoCapitalize="none" keyboardType="email-address" value={email} onChangeText={setEmail} />
 
         <View style={styles.passwordContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Contraseña"
-            placeholderTextColor="#888"
-            secureTextEntry={!showPass}
-            value={password}
-            onChangeText={setPassword}
-            onFocus={() => setPasswordFocused(true)}
-            onBlur={() => setPasswordFocused(false)}
-          />
-          <TouchableOpacity
-            style={styles.eyeIcon}
-            onPress={() => setShowPass(!showPass)}
-          >
+          <TextInput style={styles.input} placeholder={t("register.password")} placeholderTextColor="#888" secureTextEntry={!showPass} value={password} onChangeText={setPassword} onFocus={() => setPasswordFocused(true)} onBlur={() => setPasswordFocused(false)} />
+          <TouchableOpacity style={styles.eyeIcon} onPress={() => setShowPass(!showPass)}>
             <AntDesign name={showPass ? "eye" : "eyeo"} size={20} color="#888" />
           </TouchableOpacity>
         </View>
@@ -166,72 +135,38 @@ export default function RegisterScreen() {
         {passwordFocused && (
           <View style={{ marginBottom: 10, marginTop: -10 }}>
             <Text style={{ color: "#888", fontSize: 12, marginBottom: 5 }}>
-              Fuerza: {fuerza}
+              {t("register.strength")} {fuerza}
             </Text>
             <Text style={{ color: criterios.longitud ? "#0c0" : "#999" }}>
-              {criterios.longitud ? "✅" : "❌"} 8+ caracteres
+              {criterios.longitud ? "✅" : "❌"} {t("register.rules.length")}
             </Text>
             <Text style={{ color: criterios.mayuscula ? "#0c0" : "#999" }}>
-              {criterios.mayuscula ? "✅" : "❌"} Una mayúscula
+              {criterios.mayuscula ? "✅" : "❌"} {t("register.rules.upper")}
             </Text>
             <Text style={{ color: criterios.minuscula ? "#0c0" : "#999" }}>
-              {criterios.minuscula ? "✅" : "❌"} Una minúscula
+              {criterios.minuscula ? "✅" : "❌"} {t("register.rules.lower")}
             </Text>
             <Text style={{ color: criterios.numero ? "#0c0" : "#999" }}>
-              {criterios.numero ? "✅" : "❌"} Un número
+              {criterios.numero ? "✅" : "❌"} {t("register.rules.number")}
             </Text>
           </View>
         )}
 
-        {/*  nombre / user */}
-        <TextInput
-          style={styles.input}
-          placeholder="Nombre completo"
-          placeholderTextColor="#888"
-          value={fullName}
-          onChangeText={setFullName}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Nombre de usuario"
-          placeholderTextColor="#888"
-          autoCapitalize="none"
-          value={username}
-          onChangeText={setUsername}
-        />
+        <TextInput style={styles.input} placeholder={t("register.fullName")} placeholderTextColor="#888" value={fullName} onChangeText={setFullName} />
+        <TextInput style={styles.input} placeholder={t("register.username")} placeholderTextColor="#888" autoCapitalize="none" value={username} onChangeText={setUsername} />
 
-        {/*  plataforma */}
-        <Text style={styles.label}>Plataforma favorita</Text>
+        <Text style={styles.label}>{t("register.platformLabel")}</Text>
         <View style={styles.pickerContainer}>
-          <Picker
-            selectedValue={platform}
-            onValueChange={setPlatform}
-            style={styles.picker}
-          >
-            {platforms.map((p) => (
-              <Picker.Item key={p} label={p} value={p} />
-            ))}
+          <Picker selectedValue={platform} onValueChange={setPlatform} style={styles.picker}>
+            {platforms.map((p) => <Picker.Item key={p} label={p} value={p} />)}
           </Picker>
         </View>
 
-        {/*  géneros */}
-        <Text style={styles.label}>Géneros favoritos (máx. 2)</Text>
+        <Text style={styles.label}>{t("register.genreLabel")}</Text>
         <View style={styles.genreContainer}>
           {genres.map((g) => (
-            <TouchableOpacity
-              key={g}
-              style={[
-                styles.genreTag,
-                selectedGenres.includes(g) && styles.genreTagSelected,
-              ]}
-              onPress={() => toggleGenre(g)}
-            >
-              <Text
-                style={[
-                  styles.genreText,
-                  selectedGenres.includes(g) && styles.genreTextSelected,
-                ]}
-              >
+            <TouchableOpacity key={g} style={[styles.genreTag, selectedGenres.includes(g) && styles.genreTagSelected]} onPress={() => toggleGenre(g)}>
+              <Text style={[styles.genreText, selectedGenres.includes(g) && styles.genreTextSelected]}>
                 {g}
               </Text>
             </TouchableOpacity>
@@ -239,32 +174,32 @@ export default function RegisterScreen() {
         </View>
 
         <TouchableOpacity style={styles.primaryButton} onPress={handleRegister}>
-          <Text style={styles.primaryButtonText}>Registrarme</Text>
+          <Text style={styles.primaryButtonText}>{t("register.submit")}</Text>
         </TouchableOpacity>
 
-        {/* separador / login */}
         <View style={styles.separator}>
           <View style={styles.line} />
-          <Text style={styles.separatorText}>o</Text>
+          <Text style={styles.separatorText}>{t("register.or")}</Text>
           <View style={styles.line} />
         </View>
 
         <View style={[styles.googleButton, { opacity: 0.5 }]}>
           <AntDesign name="google" size={20} color="#999" />
           <Text style={[styles.googleButtonText, { color: "#999" }]}>
-            Próximamente
+            {t("register.comingSoon")}
           </Text>
         </View>
 
         <TouchableOpacity onPress={() => router.replace("/login")}>
           <Text style={{ color: "#FF66C4", textAlign: "center" }}>
-            ¿Ya tienes cuenta? Inicia sesión
+            {t("register.hasAccount")}
           </Text>
         </TouchableOpacity>
       </ScrollView>
     </FondoLayout>
   );
 }
+
 
 /* —— estilos idénticos … —— */
 const styles = StyleSheet.create({ /* ↓ mantenidos como los tuyos */

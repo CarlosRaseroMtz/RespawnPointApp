@@ -14,5 +14,67 @@
     "successMsg": "Check your inbox.",
     "errorTitle": "Error",
     "errorMsg": "Could not send the email. Is it correct?"
+  },
+  "login": {
+    "title": "Login",
+    "email": "Email",
+    "password": "Password",
+    "continue": "Continue",
+    "forgotQuestion": "Forgot your password?",
+    "forgotLink": "Click here",
+    "googleDisabled": "Google (disabled)",
+    "or": "or",
+    "noAccount": "Don't have an account?",
+    "register": "Register here",
+    "terms1": "By continuing you accept our",
+    "termsLink": "Terms of Service",
+    "privacyLink": "Privacy Policy",
+    "and": "and",
+    "error": "Login failed.",
+    "userNotFound": "This user does not exist.",
+    "wrongPassword": "Incorrect password.",
+    "invalidEmail": "Invalid email address."
+  },
+  "register": {
+  "title": "Register",
+  "email": "Email",
+  "password": "Password",
+  "fullName": "Full name",
+  "username": "Username",
+  "strength": "Strength:",
+  "strengths": {
+    "weak": "Weak",
+    "medium": "Medium",
+    "strong": "Strong",
+    "veryStrong": "Very strong"
+  },
+  "rules": {
+    "length": "8+ characters",
+    "upper": "One uppercase",
+    "lower": "One lowercase",
+    "number": "One number"
+  },
+  "platformLabel": "Favorite platform",
+  "genreLabel": "Favorite genres (max. 2)",
+  "submit": "Sign up",
+  "or": "or",
+  "comingSoon": "Coming soon",
+  "hasAccount": "Already have an account? Log in",
+  "limitTitle": "Limit",
+  "limitMsg": "You can only select 2 genres",
+  "incompleteTitle": "Incomplete fields",
+  "incompleteMsg": "Please complete all fields.",
+  "weakTitle": "Weak password",
+  "weakMsg": "Minimum 8 characters, one uppercase, one lowercase, and one number.",
+  "successTitle": "Registration successful",
+  "successMsg": "Welcome!",
+  "errors": {
+    "title": "Registration error",
+    "emailInUse": "Email is already in use.",
+    "invalidEmail": "Invalid email.",
+    "weakPassword": "Password is too weak.",
+    "default": "An error occurred."
   }
+}
+
 }

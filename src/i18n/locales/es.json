@@ -14,5 +14,68 @@
     "successMsg": "Revisa tu bandeja de entrada.",
     "errorTitle": "Error",
     "errorMsg": "No se pudo enviar el correo. ¿Está bien escrito?"
+  },
+  "login": {
+    "title": "Inicio de sesión",
+    "email": "Correo electrónico",
+    "password": "Contraseña",
+    "continue": "Continuar",
+    "forgotQuestion": "¿Olvidaste la contraseña?",
+    "forgotLink": "Pulsa aquí",
+    "googleDisabled": "Google (deshabilitado)",
+    "or": "o",
+    "noAccount": "¿Aún no tienes cuenta?",
+    "register": "Regístrate aquí",
+    "terms1": "Al continuar aceptas nuestros",
+    "termsLink": "Términos de servicio",
+    "privacyLink": "Política de privacidad",
+    "and": "y",
+    "error": "Error al iniciar sesión.",
+    "userNotFound": "Este usuario no existe.",
+    "wrongPassword": "Contraseña incorrecta.",
+    "invalidEmail": "El correo electrónico no es válido."
+  },
+  "register": {
+  "title": "Regístrate",
+  "email": "Correo electrónico",
+  "password": "Contraseña",
+  "fullName": "Nombre completo",
+  "username": "Nombre de usuario",
+  "strength": "Fuerza:",
+  "strengths": {
+    "weak": "Débil",
+    "medium": "Media",
+    "strong": "Fuerte",
+    "veryStrong": "Muy fuerte"
+  },
+  "rules": {
+    "length": "8+ caracteres",
+    "upper": "Una mayúscula",
+    "lower": "Una minúscula",
+    "number": "Un número"
+  },
+  "platformLabel": "Plataforma favorita",
+  "genreLabel": "Géneros favoritos (máx. 2)",
+  "submit": "Registrarme",
+  "or": "o",
+  "comingSoon": "Próximamente",
+  "hasAccount": "¿Ya tienes cuenta? Inicia sesión",
+  "limitTitle": "Límite",
+  "limitMsg": "Solo puedes elegir 2 géneros",
+  "incompleteTitle": "Campos incompletos",
+  "incompleteMsg": "Completa todos los datos.",
+  "weakTitle": "Contraseña insegura",
+  "weakMsg": "Mínimo 8 caracteres, una mayúscula, una minúscula y un número.",
+  "successTitle": "Registro exitoso",
+  "successMsg": "¡Bienvenido!",
+  "errors": {
+    "title": "Error de registro",
+    "emailInUse": "El correo ya está registrado.",
+    "invalidEmail": "Correo inválido.",
+    "weakPassword": "Contraseña muy débil.",
+    "default": "Ocurrió un error."
   }
 }
+
+}
+

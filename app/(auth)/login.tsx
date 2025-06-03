@@ -2,6 +2,7 @@ import FondoLayout from "@/src/components/FondoLayout";
 import { AntDesign } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Dimensions,
   Image,
@@ -14,12 +15,11 @@ import {
 } from "react-native";
 import { loginWithEmail } from "../../src/utils/auth-login";
 
-/* 👈 Ruta actualizada (estás un nivel más profundo) */
-
 const { width } = Dimensions.get("window");
 
 export default function LoginScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -28,18 +28,18 @@ export default function LoginScreen() {
   const handleLogin = async () => {
     try {
       await loginWithEmail(email, password);
-      router.replace("/home");           // 👈 ruta nueva
+      router.replace("/home");
     } catch (err: any) {
-      let message = "Error al iniciar sesión.";
+      let message = t("login.error");
       switch (err.code) {
         case "auth/user-not-found":
-          message = "Este usuario no existe.";
+          message = t("login.userNotFound");
           break;
         case "auth/wrong-password":
-          message = "Contraseña incorrecta.";
+          message = t("login.wrongPassword");
           break;
         case "auth/invalid-email":
-          message = "El correo electrónico no es válido.";
+          message = t("login.invalidEmail");
           break;
       }
       alert(message);
@@ -50,21 +50,19 @@ export default function LoginScreen() {
     <FondoLayout>
       <View style={styles.container}>
         <View style={styles.background} />
-
         <View style={styles.inner}>
-          {/* 👈 Ruta del logo ajustada */}
           <Image
             source={require("../../assets/images/logo.png")}
             style={styles.logo}
           />
 
-          <Text style={styles.title}>Inicio de sesión</Text>
+          <Text style={styles.title}>{t("login.title")}</Text>
 
-          {/* ——— inputs ——— */}
+          {/* —— Inputs —— */}
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
-              placeholder="Correo electrónico"
+              placeholder={t("login.email")}
               placeholderTextColor="#888"
               autoCapitalize="none"
               keyboardType="email-address"
@@ -76,7 +74,7 @@ export default function LoginScreen() {
           <View style={styles.inputContainer}>
             <TextInput
               style={styles.input}
-              placeholder="Contraseña"
+              placeholder={t("login.password")}
               placeholderTextColor="#888"
               secureTextEntry={!showPassword}
               value={password}
@@ -94,20 +92,17 @@ export default function LoginScreen() {
             </TouchableOpacity>
           </View>
 
-          {/* ——— enlaces ——— */}
+          {/* —— Enlaces —— */}
           <Text style={styles.linkText}>
-            ¿Olvidaste la contraseña?{" "}
-            <Text
-              style={styles.pink}
-              onPress={() => router.push("/forgot-password")}
-            >
-              Pulsa aquí
+            {t("login.forgotQuestion")}{" "}
+            <Text style={styles.pink} onPress={() => router.push("/forgot-password")}>
+              {t("login.forgotLink")}
             </Text>
           </Text>
 
-          {/* ——— botones ——— */}
+          {/* —— Botones —— */}
           <TouchableOpacity style={styles.primaryButton} onPress={handleLogin}>
-            <Text style={styles.primaryButtonText}>Continuar</Text>
+            <Text style={styles.primaryButtonText}>{t("login.continue")}</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -116,43 +111,39 @@ export default function LoginScreen() {
           >
             <AntDesign name="google" size={20} color="#999" />
             <Text style={[styles.googleButtonText, { color: "#999" }]}>
-              Google (deshabilitado)
+              {t("login.googleDisabled")}
             </Text>
           </TouchableOpacity>
 
-          {/* ——— separador ——— */}
           <View style={styles.separator}>
             <View style={styles.line} />
-            <Text style={styles.separatorText}>o</Text>
+            <Text style={styles.separatorText}>{t("login.or")}</Text>
             <View style={styles.line} />
           </View>
 
           <Text style={styles.linkText}>
-            ¿Aún no tienes cuenta?{" "}
-            <Text
-              style={styles.pink}
-              onPress={() => router.push("/register")}
-            >
-              Regístrate aquí
+            {t("login.noAccount")}{" "}
+            <Text style={styles.pink} onPress={() => router.push("/register")}>
+              {t("login.register")}
             </Text>
           </Text>
 
           <Text style={styles.terms}>
-            Al continuar aceptas nuestros{" "}
+            {t("login.terms1")}{" "}
             <Text
               style={styles.linkBlue}
               onPress={() => Linking.openURL("https://www.ejemplo.com/terminos")}
             >
-              Términos de servicio
+              {t("login.termsLink")}
             </Text>{" "}
-            y{" "}
+            {t("login.and")}{" "}
             <Text
               style={styles.linkBlue}
               onPress={() =>
                 Linking.openURL("https://www.ejemplo.com/privacidad")
               }
             >
-              Política de privacidad
+              {t("login.privacyLink")}
             </Text>
             .
           </Text>
@@ -161,6 +152,7 @@ export default function LoginScreen() {
     </FondoLayout>
   );
 }
+
 
 /* ——— estilos idénticos ——— */
 const styles = StyleSheet.create({
