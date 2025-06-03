@@ -1,22 +1,21 @@
-/* -------------  PERFIL AJENO  ------------- */
 import { Feather } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-    collection, doc,
-    onSnapshot,
-    orderBy, query,
-    where
+  collection, doc,
+  onSnapshot,
+  orderBy, query,
+  where
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { toggleSeguir } from "../../../src/utils/feed-actions";
-
+import { useTranslation } from "react-i18next";
 import {
-    Dimensions, FlatList, Image, SafeAreaView,
-    StyleSheet, Text, TouchableOpacity, View
+  Dimensions, FlatList, Image, SafeAreaView,
+  StyleSheet, Text, TouchableOpacity, View
 } from "react-native";
 import { useAuth } from "../../../src/hooks/useAuth";
 import { firestore } from "../../../src/services/config/firebase-config";
-import { stylesCommon as C } from "../profile"; // reutilizamos tamaños
+import { toggleSeguir } from "../../../src/utils/feed-actions";
+import { stylesCommon as C } from "../profile";
 
 const { width } = Dimensions.get("window");
 const IMG = C.IMG;
@@ -24,6 +23,7 @@ const IMG = C.IMG;
 export default function OtherProfile() {
   const { uid } = useLocalSearchParams<{ uid: string }>();
   const { user } = useAuth();
+  const { t } = useTranslation();
   const router = useRouter();
 
   const [info, setInfo] = useState<any>();
@@ -31,7 +31,6 @@ export default function OtherProfile() {
   const [yoSigo, setYoSigo] = useState(false);
   const [seguidoresCnt, setSeguidoresCnt] = useState(0);
 
-  /* datos del usuario */
   useEffect(() => {
     if (!uid) return;
     const ref = doc(firestore, "usuarios", uid);
@@ -43,24 +42,18 @@ export default function OtherProfile() {
     return unsub;
   }, [uid, user?.uid]);
 
-  /*  ➜  NUEVO  */
   useEffect(() => {
     if (!uid) return;
-
     const q = query(
       collection(firestore, "usuarios"),
-      where("siguiendo", "array-contains", uid)   // todos los que siguen a uid
+      where("siguiendo", "array-contains", uid)
     );
-
     const unsub = onSnapshot(q, (snap) => {
-      setSeguidoresCnt(snap.size);                // número en tiempo real
+      setSeguidoresCnt(snap.size);
     });
-
     return unsub;
   }, [uid]);
 
-
-  /* sus publicaciones */
   useEffect(() => {
     if (!uid) return;
     const q = query(
@@ -73,56 +66,48 @@ export default function OtherProfile() {
     );
   }, [uid]);
 
-  if (!info) return <SafeAreaView style={s.center}><Text>Cargando…</Text></SafeAreaView>;
+  if (!info)
+    return (
+      <SafeAreaView style={s.center}>
+        <Text>{t("profile.loading")}</Text>
+      </SafeAreaView>
+    );
 
-  /* seguir/dejar de seguir */
   const toggleFollow = async () => {
     if (!user || !uid) return;
-
-    await toggleSeguir({
-      desdeUid: user.uid,
-      haciaUid: uid,
-    });
+    await toggleSeguir({ desdeUid: user.uid, haciaUid: uid });
   };
-
-
 
   const seguidores = seguidoresCnt;
   const siguiendo = info.siguiendo?.length ?? 0;
 
   return (
     <SafeAreaView style={s.container}>
-      {/* ───────────  CABECERA  ─────────── */}
       <View style={s.topPadding} />
-
-      {/* nombre + plataforma, totalmente centrados */}
       <Text style={s.nameTxt}>{info.username}</Text>
       {info.plataformaFav && (
         <Text style={s.platform}>{info.plataformaFav}</Text>
       )}
 
-      {/* avatar + contadores en UNA SOLA FILA */}
       <View style={s.rowCentered}>
         <Image source={{ uri: info.fotoPerfil }} style={s.avatar} />
         <View style={s.statsRow}>
-          <Counter n={posts.length} label="Contenido" />
-          <Counter n={seguidores} label="Seguidores" />
-          <Counter n={siguiendo} label="Seguidos" />
+          <Counter n={posts.length} label={t("profile.content")} />
+          <Counter n={seguidores} label={t("profile.followers")} />
+          <Counter n={siguiendo} label={t("profile.following")} />
         </View>
       </View>
 
-      {/* géneros y bio */}
       {info.generoFav && <Text style={s.genres}>{info.generoFav}</Text>}
       {info.descripcion && <Text style={s.bio}>{info.descripcion}</Text>}
 
-      {/* BOTONES centrados – mismos anchos */}
       <View style={s.btnRow}>
         <TouchableOpacity
           style={[s.followBtn, yoSigo && s.followed]}
           onPress={toggleFollow}
         >
           <Text style={[s.followTxt, yoSigo && { color: "#fff" }]}>
-            {yoSigo ? "Dejar de seguir" : "Seguir"}
+            {yoSigo ? t("profile.unfollow") : t("profile.follow")}
           </Text>
         </TouchableOpacity>
 
@@ -133,10 +118,10 @@ export default function OtherProfile() {
           }
         >
           <Feather name="message-circle" size={18} color="#000" />
-          <Text style={s.msgTxt}>Mensaje</Text>
+          <Text style={s.msgTxt}>{t("profile.message")}</Text>
         </TouchableOpacity>
       </View>
-      {/* grid 2×n */}
+
       <FlatList
         data={posts}
         numColumns={2}
@@ -144,8 +129,11 @@ export default function OtherProfile() {
         columnWrapperStyle={{ gap: 4 }}
         contentContainerStyle={{ gap: 4, paddingBottom: 80 }}
         renderItem={({ item }) => (
-          <TouchableOpacity activeOpacity={0.9}
-            onPress={() => router.push({ pathname: "/publicacion/[id]", params: { id: item.id } })}
+          <TouchableOpacity
+            activeOpacity={0.9}
+            onPress={() =>
+              router.push({ pathname: "/publicacion/[id]", params: { id: item.id } })
+            }
           >
             <Image source={{ uri: item.mediaUrl }} style={s.gridImg} />
           </TouchableOpacity>
@@ -155,7 +143,7 @@ export default function OtherProfile() {
   );
 }
 
-function Counter({ n, label }: { n: number, label: string }) {
+function Counter({ n, label }: { n: number; label: string }) {
   return (
     <View style={{ alignItems: "center" }}>
       <Text style={{ fontWeight: "700" }}>{n}</Text>

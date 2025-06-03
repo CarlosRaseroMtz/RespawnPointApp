@@ -1,19 +1,9 @@
 import FondoLayout from "@/src/components/FondoLayout";
-import { useRouter } from "expo-router";
-import {
-  collection,
-  doc,
-  getDocs,
-  query,
-  setDoc,
-  Timestamp,
-  where
-} from "firebase/firestore";
-import { useState } from "react";
-
-import { addDoc } from "firebase/firestore";
-
 import * as ImagePicker from "expo-image-picker";
+import { useRouter } from "expo-router";
+import { addDoc, collection, doc, getDocs, query, setDoc, Timestamp, where } from "firebase/firestore";
+import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Image,
   SafeAreaView,
@@ -34,6 +24,7 @@ const tabs = ["Usuarios", "Comunidades", "Torneos"];
 
 export default function ChatsScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
   const { user } = useAuth();
 
   const [activeTab, setActiveTab] = useState("Usuarios");
@@ -44,18 +35,14 @@ export default function ChatsScreen() {
   const [nombreGrupo, setNombreGrupo] = useState("");
   const [avatarGrupo, setAvatarGrupo] = useState<string | null>(null);
 
-
   const toggleSeleccionUsuario = (id: string) => {
     setParticipantesGrupo(prev =>
       prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
     );
   };
 
-
-  /* ---------- listener de todos mis chats ---------- */
   const chats = useChats();
 
-  /* ---------- búsqueda de usuarios ---------- */
   const handleBuscarUsuarios = async (text: string) => {
     setBusqueda(text);
     if (text.length >= 2 && user?.uid) {
@@ -66,18 +53,13 @@ export default function ChatsScreen() {
     }
   };
 
-
-  /* ---------- iniciar chat ---------- */
   const iniciarChatCon = async (usuario: any) => {
     if (!user) return;
 
     const usuarioId = usuario.uid || usuario.id;
     if (!usuarioId) return;
 
-    const q = query(
-      collection(firestore, "chats"),
-      where("participantes", "array-contains", user.uid)
-    );
+    const q = query(collection(firestore, "chats"), where("participantes", "array-contains", user.uid));
     const snap = await getDocs(q);
     const existente = snap.docs.find((d) => {
       const p = d.data().participantes;
@@ -100,17 +82,13 @@ export default function ChatsScreen() {
     router.push(`/chats/${chatId}`);
   };
 
-
-  /* ---------- filtros de pestaña ---------- */
-  const userChats = chats.filter((c: { tipo: string; }) => c.tipo === "usuario");
-  const groupChats = chats.filter((c: { tipo: string; }) => c.tipo === "grupo");
+  const userChats = chats.filter((c: { tipo: string }) => c.tipo === "usuario");
+  const groupChats = chats.filter((c: { tipo: string }) => c.tipo === "grupo");
 
   const chatsToShow =
-    activeTab === "Usuarios"
-      ? userChats
-      : activeTab === "Comunidades"
-        ? groupChats
-        : [];
+    activeTab === "Usuarios" ? userChats :
+    activeTab === "Comunidades" ? groupChats :
+    [];
 
   const crearGrupo = async () => {
     if (!user || participantesGrupo.length < 1) return;
@@ -121,12 +99,11 @@ export default function ChatsScreen() {
       timestamp: new Date(),
       lastMessage: "",
     });
+
     setModoCrearGrupo(false);
     setParticipantesGrupo([]);
     router.push(`/chats/${nuevoChatRef.id}`);
   };
-
-
 
   const handleSeleccionarImagen = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -140,14 +117,11 @@ export default function ChatsScreen() {
     }
   };
 
-
-  /* ---------- UI ---------- */
   return (
     <FondoLayout>
       <SafeAreaView style={styles.container}>
-        <Text style={styles.title}>Chats</Text>
+        <Text style={styles.title}>{t("chats.title")}</Text>
 
-        {/* pestañas */}
         <View style={styles.tabs}>
           {tabs.map((tab) => (
             <TouchableOpacity
@@ -160,42 +134,33 @@ export default function ChatsScreen() {
                 tab === "Torneos" && { opacity: 0.5 },
               ]}
             >
-              <Text
-                style={[
-                  styles.tabText,
-                  activeTab === tab && styles.activeTabText,
-                ]}
-              >
-                {tab}
+              <Text style={[styles.tabText, activeTab === tab && styles.activeTabText]}>
+                {t(`chats.tabs.${tab.toLowerCase()}`)}
               </Text>
             </TouchableOpacity>
           ))}
         </View>
 
-        {/* búsqueda */}
         <TextInput
-          placeholder="Buscar usuarios..."
+          placeholder={t("chats.search")}
           style={styles.search}
           value={busqueda}
           onChangeText={handleBuscarUsuarios}
         />
-        {/* Solo si estamos en "Comunidades" */}
+
         {activeTab === "Comunidades" && (
           <>
             {modoCrearGrupo ? (
               <>
                 <TextInput
-                  placeholder="Nombre del grupo"
+                  placeholder={t("chats.groupName")}
                   value={nombreGrupo}
                   onChangeText={setNombreGrupo}
                   style={styles.search}
                 />
-                <TouchableOpacity
-                  onPress={handleSeleccionarImagen}
-                  style={{ marginBottom: 10 }}
-                >
+                <TouchableOpacity onPress={handleSeleccionarImagen} style={{ marginBottom: 10 }}>
                   <Text style={{ color: "#42BAFF", textAlign: "center" }}>
-                    📷 Seleccionar foto de grupo
+                    {t("chats.selectPhoto")}
                   </Text>
                 </TouchableOpacity>
                 {avatarGrupo && (
@@ -204,34 +169,26 @@ export default function ChatsScreen() {
                     style={{ width: 60, height: 60, borderRadius: 30, alignSelf: "center", marginBottom: 10 }}
                   />
                 )}
-                <TouchableOpacity
-                  style={{ backgroundColor: "#42BAFF", padding: 10, borderRadius: 8, marginBottom: 10 }}
-                  onPress={crearGrupo}
-                >
-                  <Text style={{ color: "white", textAlign: "center" }}>✅ Confirmar grupo ({participantesGrupo.length})</Text>
+                <TouchableOpacity style={{ backgroundColor: "#42BAFF", padding: 10, borderRadius: 8, marginBottom: 10 }} onPress={crearGrupo}>
+                  <Text style={{ color: "white", textAlign: "center" }}>
+                    {t("chats.confirmGroup", { count: participantesGrupo.length })}
+                  </Text>
                 </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => {
-                    setModoCrearGrupo(false);
-                    setParticipantesGrupo([]);
-                  }}
-                >
-                  <Text style={{ color: "#888", marginBottom: 10 }}>❌ Cancelar</Text>
+                <TouchableOpacity onPress={() => {
+                  setModoCrearGrupo(false);
+                  setParticipantesGrupo([]);
+                }}>
+                  <Text style={{ color: "#888", marginBottom: 10 }}>{t("chats.cancel")}</Text>
                 </TouchableOpacity>
               </>
             ) : (
-              <TouchableOpacity
-                style={{ backgroundColor: "#FF66C4", padding: 10, borderRadius: 8, marginBottom: 10 }}
-                onPress={() => setModoCrearGrupo(true)}
-              >
-                <Text style={{ color: "white", textAlign: "center" }}>➕ Crear grupo</Text>
+              <TouchableOpacity style={{ backgroundColor: "#FF66C4", padding: 10, borderRadius: 8, marginBottom: 10 }} onPress={() => setModoCrearGrupo(true)}>
+                <Text style={{ color: "white", textAlign: "center" }}>{t("chats.createGroup")}</Text>
               </TouchableOpacity>
             )}
           </>
         )}
 
-
-        {/* resultados de búsqueda */}
         {resultados.map((u) => {
           const seleccionado = participantesGrupo.includes(u.id);
           return (
@@ -255,8 +212,6 @@ export default function ChatsScreen() {
           );
         })}
 
-
-        {/* lista de chats */}
         <ScrollView>
           {chatsToShow.map((chat) => (
             <ChatItem
@@ -274,6 +229,7 @@ export default function ChatsScreen() {
     </FondoLayout>
   );
 }
+
 /* ---------- estilos ---------- */
 const styles = StyleSheet.create({
   container: { flex: 1, paddingHorizontal: 16, paddingTop: 16 },

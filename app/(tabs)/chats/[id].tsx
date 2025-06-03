@@ -14,6 +14,7 @@ import {
   updateDoc,
 } from "firebase/firestore";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   FlatList,
   KeyboardAvoidingView,
@@ -27,23 +28,24 @@ import {
 import FondoLayout from "../../../src/components/FondoLayout";
 import { firestore } from "../../../src/services/config/firebase-config";
 
-
 export default function ChatScreen() {
+  const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
+  const { chatId } = useLocalSearchParams(); // si usas expo-router
   const { user } = useAuth();
   const { marcarMensajesComoLeidos } = useMarcarMensajesLeidos();
+
   const [mensajes, setMensajes] = useState<any[]>([]);
   const [texto, setTexto] = useState("");
   const flatListRef = useRef<FlatList>(null);
-  const { chatId } = useLocalSearchParams(); // si usas expo-router
 
   useFocusEffect(
-  useCallback(() => {
-    if (user?.uid && typeof chatId === "string") {
-      marcarMensajesComoLeidos(chatId, user.uid);
-    }
-  }, [chatId, user?.uid])
-);
+    useCallback(() => {
+      if (user?.uid && typeof chatId === "string") {
+        marcarMensajesComoLeidos(chatId, user.uid);
+      }
+    }, [chatId, user?.uid])
+  );
 
   useEffect(() => {
     if (!id || !user?.uid) return;
@@ -83,7 +85,7 @@ export default function ChatScreen() {
 
     await addDoc(collection(chatRef, "mensajes"), {
       userId: user.uid,
-      contenido: texto.trim(), // 👈 importante: lo llamaste "contenido"
+      contenido: texto.trim(),
       timestamp: serverTimestamp(),
       leidoPor: [user.uid],
     });
@@ -101,7 +103,7 @@ export default function ChatScreen() {
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === "ios" ? "padding" : undefined}
-        keyboardVerticalOffset={90} // ajusta según tu UI
+        keyboardVerticalOffset={90}
       >
         <FlatList
           ref={flatListRef}
@@ -116,7 +118,7 @@ export default function ChatScreen() {
               ]}
             >
               <Text style={styles.texto}>
-                {item.contenido || item.texto || "(sin contenido)"}
+                {item.contenido || item.texto || t("chat.noContent")}
               </Text>
               <Text style={styles.hora}>
                 {item.timestamp?.toDate().toLocaleTimeString("es-ES", {
@@ -131,13 +133,13 @@ export default function ChatScreen() {
         <View style={styles.inputArea}>
           <TextInput
             style={styles.input}
-            placeholder="Escribe un mensaje..."
+            placeholder={t("chat.placeholder")}
             value={texto}
             onChangeText={setTexto}
             placeholderTextColor="#666"
           />
           <TouchableOpacity style={styles.btn} onPress={enviar}>
-            <Text style={{ color: "#fff" }}>Enviar</Text>
+            <Text style={{ color: "#fff" }}>{t("chat.send")}</Text>
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>

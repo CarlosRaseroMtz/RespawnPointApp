@@ -1,81 +1,205 @@
 {
-  "forgot": {
-    "title": "Recuperar contraseña",
-    "placeholder": "Correo electrónico",
-    "button": "Enviar recuperación",
-    "or": "o",
-    "noAccount": "¿Aún no tienes cuenta?",
-    "register": "Regístrate aquí",
-    "terms1": "Al continuar aceptas nuestros",
-    "termsLink": "Términos de servicio",
-    "privacyLink": "Política de privacidad",
-    "and": "y",
-    "successTitle": "Recuperación enviada",
-    "successMsg": "Revisa tu bandeja de entrada.",
-    "errorTitle": "Error",
-    "errorMsg": "No se pudo enviar el correo. ¿Está bien escrito?"
-  },
-  "login": {
-    "title": "Inicio de sesión",
-    "email": "Correo electrónico",
-    "password": "Contraseña",
-    "continue": "Continuar",
-    "forgotQuestion": "¿Olvidaste la contraseña?",
-    "forgotLink": "Pulsa aquí",
-    "googleDisabled": "Google (deshabilitado)",
-    "or": "o",
-    "noAccount": "¿Aún no tienes cuenta?",
-    "register": "Regístrate aquí",
-    "terms1": "Al continuar aceptas nuestros",
-    "termsLink": "Términos de servicio",
-    "privacyLink": "Política de privacidad",
-    "and": "y",
-    "error": "Error al iniciar sesión.",
-    "userNotFound": "Este usuario no existe.",
-    "wrongPassword": "Contraseña incorrecta.",
-    "invalidEmail": "El correo electrónico no es válido."
-  },
-  "register": {
-  "title": "Regístrate",
-  "email": "Correo electrónico",
-  "password": "Contraseña",
-  "fullName": "Nombre completo",
-  "username": "Nombre de usuario",
-  "strength": "Fuerza:",
-  "strengths": {
-    "weak": "Débil",
-    "medium": "Media",
-    "strong": "Fuerte",
-    "veryStrong": "Muy fuerte"
-  },
-  "rules": {
-    "length": "8+ caracteres",
-    "upper": "Una mayúscula",
-    "lower": "Una minúscula",
-    "number": "Un número"
-  },
-  "platformLabel": "Plataforma favorita",
-  "genreLabel": "Géneros favoritos (máx. 2)",
-  "submit": "Registrarme",
-  "or": "o",
-  "comingSoon": "Próximamente",
-  "hasAccount": "¿Ya tienes cuenta? Inicia sesión",
-  "limitTitle": "Límite",
-  "limitMsg": "Solo puedes elegir 2 géneros",
-  "incompleteTitle": "Campos incompletos",
-  "incompleteMsg": "Completa todos los datos.",
-  "weakTitle": "Contraseña insegura",
-  "weakMsg": "Mínimo 8 caracteres, una mayúscula, una minúscula y un número.",
-  "successTitle": "Registro exitoso",
-  "successMsg": "¡Bienvenido!",
-  "errors": {
-    "title": "Error de registro",
-    "emailInUse": "El correo ya está registrado.",
-    "invalidEmail": "Correo inválido.",
-    "weakPassword": "Contraseña muy débil.",
-    "default": "Ocurrió un error."
-  }
+    "forgot": {
+        "title": "Recuperar contraseña",
+        "placeholder": "Correo electrónico",
+        "button": "Enviar recuperación",
+        "or": "o",
+        "noAccount": "¿Aún no tienes cuenta?",
+        "register": "Regístrate aquí",
+        "terms1": "Al continuar aceptas nuestros",
+        "termsLink": "Términos de servicio",
+        "privacyLink": "Política de privacidad",
+        "and": "y",
+        "successTitle": "Recuperación enviada",
+        "successMsg": "Revisa tu bandeja de entrada.",
+        "errorTitle": "Error",
+        "errorMsg": "No se pudo enviar el correo. ¿Está bien escrito?"
+    },
+    "login": {
+        "title": "Inicio de sesión",
+        "email": "Correo electrónico",
+        "password": "Contraseña",
+        "continue": "Continuar",
+        "forgotQuestion": "¿Olvidaste la contraseña?",
+        "forgotLink": "Pulsa aquí",
+        "googleDisabled": "Google (deshabilitado)",
+        "or": "o",
+        "noAccount": "¿Aún no tienes cuenta?",
+        "register": "Regístrate aquí",
+        "terms1": "Al continuar aceptas nuestros",
+        "termsLink": "Términos de servicio",
+        "privacyLink": "Política de privacidad",
+        "and": "y",
+        "error": "Error al iniciar sesión.",
+        "userNotFound": "Este usuario no existe.",
+        "wrongPassword": "Contraseña incorrecta.",
+        "invalidEmail": "El correo electrónico no es válido."
+    },
+    "register": {
+        "title": "Regístrate",
+        "email": "Correo electrónico",
+        "password": "Contraseña",
+        "fullName": "Nombre completo",
+        "username": "Nombre de usuario",
+        "strength": "Fuerza:",
+        "strengths": {
+            "weak": "Débil",
+            "medium": "Media",
+            "strong": "Fuerte",
+            "veryStrong": "Muy fuerte"
+        },
+        "rules": {
+            "length": "8+ caracteres",
+            "upper": "Una mayúscula",
+            "lower": "Una minúscula",
+            "number": "Un número"
+        },
+        "platformLabel": "Plataforma favorita",
+        "genreLabel": "Géneros favoritos (máx. 2)",
+        "submit": "Registrarme",
+        "or": "o",
+        "comingSoon": "Próximamente",
+        "hasAccount": "¿Ya tienes cuenta? Inicia sesión",
+        "limitTitle": "Límite",
+        "limitMsg": "Solo puedes elegir 2 géneros",
+        "incompleteTitle": "Campos incompletos",
+        "incompleteMsg": "Completa todos los datos.",
+        "weakTitle": "Contraseña insegura",
+        "weakMsg": "Mínimo 8 caracteres, una mayúscula, una minúscula y un número.",
+        "successTitle": "Registro exitoso",
+        "successMsg": "¡Bienvenido!",
+        "errors": {
+            "title": "Error de registro",
+            "emailInUse": "El correo ya está registrado.",
+            "invalidEmail": "Correo inválido.",
+            "weakPassword": "Contraseña muy débil.",
+            "default": "Ocurrió un error."
+        }
+    },
+    "chats": {
+        "title": "Chats",
+        "tabs": {
+            "usuarios": "Usuarios",
+            "comunidades": "Comunidades",
+            "torneos": "Torneos"
+        },
+        "search": "Buscar usuarios...",
+        "groupName": "Nombre del grupo",
+        "selectPhoto": "📷 Seleccionar foto de grupo",
+        "confirmGroup": "✅ Confirmar grupo ({{count}})",
+        "cancel": "❌ Cancelar",
+        "createGroup": "➕ Crear grupo"
+    },
+    "chat": {
+        "placeholder": "Escribe un mensaje...",
+        "send": "Enviar",
+        "noContent": "(sin contenido)"
+    },
+    "settings": {
+        "loading": "Cargando...",
+        "general": "Configuración",
+        "editProfile": "Editar perfil",
+        "language": "Accesibilidad e idiomas",
+        "activity": "Tu actividad",
+        "privacy": "Privacidad",
+        "subscriptions": "Suscripciones",
+        "blocked": "Usuarios bloqueados",
+        "notifications": "Notificaciones",
+        "help": "Ayuda",
+        "privacyCenter": "Centro de privacidad",
+        "accountStatus": "Estado de la cuenta",
+        "session": "Inicio de sesión",
+        "addAccount": "Añadir cuenta (próximamente)",
+        "logout": "Cerrar sesión",
+        "deleteAccount": "Eliminar cuenta para siempre"
+    },
+    "home": {
+        "tabs": {
+            "games": "Juegos",
+            "foryou": "Para ti",
+            "memes": "Memes"
+        }
+    },
+    "notifications": {
+        "title": "Últimas notificaciones de",
+        "tabs": {
+            "usuarios": "Usuarios",
+            "comunidades": "Comunidades",
+            "torneos": "Torneos"
+        },
+        "empty": "No hay notificaciones en esta categoría."
+    },
+    "mi-profile": {
+        "loading": "Cargando…",
+        "posts": "Publicaciones",
+        "followers": "Seguidores",
+        "following": "Siguiendo"
+    },
+    "profile": {
+        "loading": "Cargando…",
+        "content": "Contenido",
+        "followers": "Seguidores",
+        "following": "Seguidos",
+        "follow": "Seguir",
+        "unfollow": "Dejar de seguir",
+        "message": "Mensaje"
+    },
+    "post": {
+        "writeComment": "Escribe un comentario…",
+        "send": "Enviar"
+    },
+    "create": {
+        "tapToUpload": "Pulsa para elegir imagen",
+        "placeholder": "Escribe algo...",
+        "uploading": "Subiendo...",
+        "publish": "Publicar",
+        "sessionErrorTitle": "Sesión no lista",
+        "sessionErrorMsg": "Inicia sesión primero",
+        "incompleteTitle": "Campos incompletos",
+        "incompleteMsg": "Añade mensaje e imagen.",
+        "success": "¡Publicación creada!",
+        "error": "Error",
+        "errorFallback": "Fallo al subir."
+    },
+    "editProfile": {
+        "title": "Editar Perfil",
+        "changePhoto": "Cambiar foto",
+        "usernamePlaceholder": "Nombre de usuario",
+        "platformLabel": "Plataforma favorita",
+        "genresLabel": "Géneros favoritos (máx. 2)",
+        "bioLabel": "Biografía",
+        "bioPlaceholder": "Cuéntanos algo sobre ti...",
+        "saveButton": "Guardar cambios",
+        "savedTitle": "Perfil actualizado",
+        "savedMsg": "Los cambios se guardaron correctamente.",
+        "errorTitle": "Error",
+        "errorMsg": "No se pudieron guardar los cambios.",
+        "limitTitle": "Límite",
+        "limitMsg": "Solo puedes elegir 2 géneros favoritos."
+    },
+    "imageScreen": {
+  "permissionTitle": "Permiso denegado",
+  "permissionMsg": "No se puede guardar la imagen sin permiso.",
+  "successTitle": "Guardado",
+  "successMsg": "Imagen descargada a tu galería.",
+  "errorTitle": "Error",
+  "errorMsg": "No se pudo guardar la imagen."
+},
+"chatItem": {
+  "noName": "Grupo sin nombre",
+  "noMessages": "No hay mensajes aún"
+},
+"notification": {
+  "follow": "Seguir",
+  "followed": "Seguido",
+  "noDate": "sin fecha"
+},
+"postP": {
+  "likes": "me gusta",
+  "comments": "Comentarios"
 }
 
-}
 
+
+
+}

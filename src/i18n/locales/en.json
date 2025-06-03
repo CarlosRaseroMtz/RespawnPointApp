@@ -1,80 +1,205 @@
 {
-  "forgot": {
-    "title": "Reset Password",
-    "placeholder": "Email address",
-    "button": "Send Reset Link",
-    "or": "or",
-    "noAccount": "Don't have an account?",
-    "register": "Register here",
-    "terms1": "By continuing you accept our",
-    "termsLink": "Terms of Service",
-    "privacyLink": "Privacy Policy",
-    "and": "and",
-    "successTitle": "Recovery sent",
-    "successMsg": "Check your inbox.",
-    "errorTitle": "Error",
-    "errorMsg": "Could not send the email. Is it correct?"
-  },
-  "login": {
-    "title": "Login",
-    "email": "Email",
-    "password": "Password",
-    "continue": "Continue",
-    "forgotQuestion": "Forgot your password?",
-    "forgotLink": "Click here",
-    "googleDisabled": "Google (disabled)",
-    "or": "or",
-    "noAccount": "Don't have an account?",
-    "register": "Register here",
-    "terms1": "By continuing you accept our",
-    "termsLink": "Terms of Service",
-    "privacyLink": "Privacy Policy",
-    "and": "and",
-    "error": "Login failed.",
-    "userNotFound": "This user does not exist.",
-    "wrongPassword": "Incorrect password.",
-    "invalidEmail": "Invalid email address."
-  },
-  "register": {
-  "title": "Register",
-  "email": "Email",
-  "password": "Password",
-  "fullName": "Full name",
-  "username": "Username",
-  "strength": "Strength:",
-  "strengths": {
-    "weak": "Weak",
-    "medium": "Medium",
-    "strong": "Strong",
-    "veryStrong": "Very strong"
-  },
-  "rules": {
-    "length": "8+ characters",
-    "upper": "One uppercase",
-    "lower": "One lowercase",
-    "number": "One number"
-  },
-  "platformLabel": "Favorite platform",
-  "genreLabel": "Favorite genres (max. 2)",
-  "submit": "Sign up",
-  "or": "or",
-  "comingSoon": "Coming soon",
-  "hasAccount": "Already have an account? Log in",
-  "limitTitle": "Limit",
-  "limitMsg": "You can only select 2 genres",
-  "incompleteTitle": "Incomplete fields",
-  "incompleteMsg": "Please complete all fields.",
-  "weakTitle": "Weak password",
-  "weakMsg": "Minimum 8 characters, one uppercase, one lowercase, and one number.",
-  "successTitle": "Registration successful",
-  "successMsg": "Welcome!",
-  "errors": {
-    "title": "Registration error",
-    "emailInUse": "Email is already in use.",
-    "invalidEmail": "Invalid email.",
-    "weakPassword": "Password is too weak.",
-    "default": "An error occurred."
-  }
+    "forgot": {
+        "title": "Reset Password",
+        "placeholder": "Email address",
+        "button": "Send Reset Link",
+        "or": "or",
+        "noAccount": "Don't have an account?",
+        "register": "Register here",
+        "terms1": "By continuing you accept our",
+        "termsLink": "Terms of Service",
+        "privacyLink": "Privacy Policy",
+        "and": "and",
+        "successTitle": "Recovery sent",
+        "successMsg": "Check your inbox.",
+        "errorTitle": "Error",
+        "errorMsg": "Could not send the email. Is it correct?"
+    },
+    "login": {
+        "title": "Login",
+        "email": "Email",
+        "password": "Password",
+        "continue": "Continue",
+        "forgotQuestion": "Forgot your password?",
+        "forgotLink": "Click here",
+        "googleDisabled": "Google (disabled)",
+        "or": "or",
+        "noAccount": "Don't have an account?",
+        "register": "Register here",
+        "terms1": "By continuing you accept our",
+        "termsLink": "Terms of Service",
+        "privacyLink": "Privacy Policy",
+        "and": "and",
+        "error": "Login failed.",
+        "userNotFound": "This user does not exist.",
+        "wrongPassword": "Incorrect password.",
+        "invalidEmail": "Invalid email address."
+    },
+    "register": {
+        "title": "Register",
+        "email": "Email",
+        "password": "Password",
+        "fullName": "Full name",
+        "username": "Username",
+        "strength": "Strength:",
+        "strengths": {
+            "weak": "Weak",
+            "medium": "Medium",
+            "strong": "Strong",
+            "veryStrong": "Very strong"
+        },
+        "rules": {
+            "length": "8+ characters",
+            "upper": "One uppercase",
+            "lower": "One lowercase",
+            "number": "One number"
+        },
+        "platformLabel": "Favorite platform",
+        "genreLabel": "Favorite genres (max. 2)",
+        "submit": "Sign up",
+        "or": "or",
+        "comingSoon": "Coming soon",
+        "hasAccount": "Already have an account? Log in",
+        "limitTitle": "Limit",
+        "limitMsg": "You can only select 2 genres",
+        "incompleteTitle": "Incomplete fields",
+        "incompleteMsg": "Please complete all fields.",
+        "weakTitle": "Weak password",
+        "weakMsg": "Minimum 8 characters, one uppercase, one lowercase, and one number.",
+        "successTitle": "Registration successful",
+        "successMsg": "Welcome!",
+        "errors": {
+            "title": "Registration error",
+            "emailInUse": "Email is already in use.",
+            "invalidEmail": "Invalid email.",
+            "weakPassword": "Password is too weak.",
+            "default": "An error occurred."
+        }
+    },
+    "chats": {
+        "title": "Chats",
+        "tabs": {
+            "usuarios": "Users",
+            "comunidades": "Communities",
+            "torneos": "Tournaments"
+        },
+        "search": "Search users...",
+        "groupName": "Group name",
+        "selectPhoto": "📷 Select group photo",
+        "confirmGroup": "✅ Confirm group ({{count}})",
+        "cancel": "❌ Cancel",
+        "createGroup": "➕ Create group"
+    },
+    "chat": {
+        "placeholder": "Type a message...",
+        "send": "Send",
+        "noContent": "(no content)"
+    },
+    "settings": {
+        "loading": "Loading...",
+        "general": "Settings",
+        "editProfile": "Edit profile",
+        "language": "Accessibility & languages",
+        "activity": "Your activity",
+        "privacy": "Privacy",
+        "subscriptions": "Subscriptions",
+        "blocked": "Blocked users",
+        "notifications": "Notifications",
+        "help": "Help",
+        "privacyCenter": "Privacy center",
+        "accountStatus": "Account status",
+        "session": "Login",
+        "addAccount": "Add account (coming soon)",
+        "logout": "Log out",
+        "deleteAccount": "Delete account permanently"
+    },
+    "home": {
+        "tabs": {
+            "games": "Games",
+            "foryou": "For you",
+            "memes": "Memes"
+        }
+    },
+    "notifications": {
+        "title": "Latest notifications from",
+        "tabs": {
+            "usuarios": "Users",
+            "comunidades": "Communities",
+            "torneos": "Tournaments"
+        },
+        "empty": "No notifications in this category."
+    },
+    "mi-profile": {
+        "loading": "Loading…",
+        "posts": "Posts",
+        "followers": "Followers",
+        "following": "Following"
+    },
+    "profile": {
+        "loading": "Loading…",
+        "content": "Content",
+        "followers": "Followers",
+        "following": "Following",
+        "follow": "Follow",
+        "unfollow": "Unfollow",
+        "message": "Message"
+    },
+    "post": {
+        "writeComment": "Write a comment…",
+        "send": "Send"
+    },
+    "create": {
+        "tapToUpload": "Tap to choose image",
+        "placeholder": "Write something...",
+        "uploading": "Uploading...",
+        "publish": "Publish",
+        "sessionErrorTitle": "Session not ready",
+        "sessionErrorMsg": "Please sign in first.",
+        "incompleteTitle": "Incomplete fields",
+        "incompleteMsg": "Please add message and image.",
+        "success": "Post created!",
+        "error": "Error",
+        "errorFallback": "Failed to upload."
+    },
+    "editProfile": {
+        "title": "Edit Profile",
+        "changePhoto": "Change photo",
+        "usernamePlaceholder": "Username",
+        "platformLabel": "Favorite platform",
+        "genresLabel": "Favorite genres (max. 2)",
+        "bioLabel": "Biography",
+        "bioPlaceholder": "Tell us something about you...",
+        "saveButton": "Save changes",
+        "savedTitle": "Profile updated",
+        "savedMsg": "Changes saved successfully.",
+        "errorTitle": "Error",
+        "errorMsg": "Changes could not be saved.",
+        "limitTitle": "Limit",
+        "limitMsg": "You can only choose 2 favorite genres."
+    },
+    "imageScreen": {
+  "permissionTitle": "Permission denied",
+  "permissionMsg": "Cannot save the image without permission.",
+  "successTitle": "Saved",
+  "successMsg": "Image downloaded to your gallery.",
+  "errorTitle": "Error",
+  "errorMsg": "Image could not be saved."
+},
+"chatItem": {
+  "noName": "Unnamed group",
+  "noMessages": "No messages yet"
+},
+"notification": {
+  "follow": "Follow",
+  "followed": "Following",
+  "noDate": "no date"
+},
+"postP": {
+  "likes": "likes",
+  "comments": "Comments"
 }
+
+
+
 
 }

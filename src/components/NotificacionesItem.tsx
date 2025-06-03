@@ -1,6 +1,7 @@
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import {
   Image,
   StyleSheet,
@@ -26,6 +27,8 @@ const NotificationItem = ({
   seguido,
   onToggleSeguir,
 }: NotificationItemProps) => {
+  const { t } = useTranslation();
+
   return (
     <View style={[styles.notification, { position: "relative" }]}>
       {!leida && <View style={styles.unreadDot} />}
@@ -37,10 +40,10 @@ const NotificationItem = ({
           <Text style={styles.time}>
             {time?.toDate
               ? formatDistanceToNow(time.toDate(), {
-                locale: es,
-                addSuffix: true,
-              })
-              : "sin fecha"}
+                  locale: es,
+                  addSuffix: true,
+                })
+              : t("notification.noDate")}
           </Text>
         </Text>
 
@@ -56,7 +59,7 @@ const NotificationItem = ({
           onPress={() => onToggleSeguir?.(id)}
         >
           <Text style={styles.followText}>
-            {seguido ? "Seguido" : "Seguir"}
+            {seguido ? t("notification.followed") : t("notification.follow")}
           </Text>
         </TouchableOpacity>
       )}

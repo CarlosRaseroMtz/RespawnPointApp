@@ -2,35 +2,35 @@ import FondoLayout from "@/src/components/FondoLayout";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-    arrayRemove,
-    arrayUnion,
-    collection,
-    doc,
-    getDoc,
-    onSnapshot,
-    orderBy,
-    query,
-    Timestamp,
-    updateDoc
+  arrayRemove,
+  arrayUnion,
+  collection,
+  doc,
+  getDoc,
+  onSnapshot,
+  orderBy,
+  query,
+  Timestamp,
+  updateDoc
 } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
-    ActivityIndicator,
-    FlatList,
-    KeyboardAvoidingView,
-    Platform,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  ActivityIndicator,
+  FlatList,
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import PostCard from "../../../src/components/post-card";
 import { useAuth } from "../../../src/hooks/useAuth";
 import { firestore } from "../../../src/services/config/firebase-config";
 import { comentarPublicacion } from "../../../src/utils/feed-actions";
 
-/* —— tipos —— */
 type Publicacion = {
   id: string;
   userId: string;
@@ -41,6 +41,7 @@ type Publicacion = {
   commentsCount?: number;
   timestamp: Timestamp;
 };
+
 type Comentario = {
   id: string;
   userId: string;
@@ -53,6 +54,7 @@ export default function PublicacionDetalle() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const router = useRouter();
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   const [post, setPost] = useState<Publicacion>();
   const [autor, setAutor] = useState<any>();
@@ -62,7 +64,6 @@ export default function PublicacionDetalle() {
 
   const flatRef = useRef<FlatList>(null);
 
-  /* —— snapshot publicación + autor —— */
   useEffect(() => {
     if (!id) return;
     const ref = doc(firestore, "publicaciones", id);
@@ -80,7 +81,6 @@ export default function PublicacionDetalle() {
     return unsub;
   }, [id]);
 
-  /* —— snapshot comentarios con avatar —— */
   useEffect(() => {
     if (!id) return;
     const q = query(
@@ -96,9 +96,9 @@ export default function PublicacionDetalle() {
           const usnap = await getDoc(doc(firestore, "usuarios", c.userId));
           const autor = usnap.exists()
             ? {
-              username: usnap.data().username,
-              fotoPerfil: usnap.data().fotoPerfil,
-            }
+                username: usnap.data().username,
+                fotoPerfil: usnap.data().fotoPerfil,
+              }
             : { username: "Player" };
 
           return { id: d.id, ...c, texto: textoReal, autor } as Comentario;
@@ -111,7 +111,6 @@ export default function PublicacionDetalle() {
     return unsub;
   }, [id]);
 
-  /* —— like / unlike —— */
   const toggleLike = async () => {
     if (!post || !user) return;
     const ref = doc(firestore, "publicaciones", post.id);
@@ -121,7 +120,6 @@ export default function PublicacionDetalle() {
     });
   };
 
-  /* —— enviar comentario —— */
   const enviarComentario = async () => {
     if (!user || !texto.trim()) return;
 
@@ -132,98 +130,94 @@ export default function PublicacionDetalle() {
         autorUid: user.uid,
       });
 
-      setTexto(""); // limpia input
+      setTexto("");
     } catch (error) {
       console.error("❌ Error al comentar:", error);
     }
   };
 
-
   if (loading) return <ActivityIndicator style={{ flex: 1 }} />;
 
   return (
-    <>
-      {/* —— lista + cabecera —— */}
-      <FondoLayout>
-        <FlatList
-          ref={flatRef}
-          data={comentarios}
-          keyExtractor={(c) => c.id}
-          contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
-          ListHeaderComponent={
-            post &&
-            autor && (
-              <PostCard
-                post={post}
-                autor={autor}
-                inDetail
-                likes={post.likes}
-                commentsCount={post.commentsCount ?? 0}
-                isLiked={post.likes.includes(user?.uid ?? "")}
-                onLike={toggleLike}
-                onComment={() =>
-                  flatRef.current?.scrollToEnd({ animated: true })
-                }
-                onPress={() => { }}
-                onAuthorPress={() =>
-                  router.push({
-                    pathname: "/perfil/[uid]",
-                    params: { uid: post.userId },
-                  })
-                }
-              />
-            )
-          }
-          renderItem={({ item }) => (
-            <View style={styles.coment}>
-              <Image
-                source={{
-                  uri:
-                    item.autor.fotoPerfil ??
-                    "https://i.pravatar.cc/100?u=" + item.autor.username,
-                }}
-                style={styles.comAvatar}
-              />
-              <View style={{ flex: 1 }}>
-                <Text style={styles.comAutor}>{item.autor.username}</Text>
-                <Text style={styles.comTexto}>{item.texto}</Text>
-                <Text style={styles.comFecha}>
-                  {item.timestamp.toDate().toLocaleDateString("es-ES", {
-                    day: "2-digit",
-                    month: "short",
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })}
-                </Text>
-              </View>
+    <FondoLayout>
+      <FlatList
+        ref={flatRef}
+        data={comentarios}
+        keyExtractor={(c) => c.id}
+        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
+        ListHeaderComponent={
+          post &&
+          autor && (
+            <PostCard
+              post={post}
+              autor={autor}
+              inDetail
+              likes={post.likes}
+              commentsCount={post.commentsCount ?? 0}
+              isLiked={post.likes.includes(user?.uid ?? "")}
+              onLike={toggleLike}
+              onComment={() =>
+                flatRef.current?.scrollToEnd({ animated: true })
+              }
+              onPress={() => {}}
+              onAuthorPress={() =>
+                router.push({
+                  pathname: "/perfil/[uid]",
+                  params: { uid: post.userId },
+                })
+              }
+            />
+          )
+        }
+        renderItem={({ item }) => (
+          <View style={styles.coment}>
+            <Image
+              source={{
+                uri:
+                  item.autor.fotoPerfil ??
+                  "https://i.pravatar.cc/100?u=" + item.autor.username,
+              }}
+              style={styles.comAvatar}
+            />
+            <View style={{ flex: 1 }}>
+              <Text style={styles.comAutor}>{item.autor.username}</Text>
+              <Text style={styles.comTexto}>{item.texto}</Text>
+              <Text style={styles.comFecha}>
+                {item.timestamp.toDate().toLocaleDateString("es-ES", {
+                  day: "2-digit",
+                  month: "short",
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })}
+              </Text>
             </View>
-          )}
-        />
-
-        {/* —— barra de entrada protegida —— */}
-        {user && (
-          <KeyboardAvoidingView
-            behavior={Platform.OS === "ios" ? "padding" : "height"}
-            keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 80}
-          >
-            <View style={styles.inputRow}>
-              <TextInput
-                style={styles.input}
-                placeholder="Escribe un comentario…"
-                value={texto}
-                onChangeText={setTexto}
-              />
-              <TouchableOpacity onPress={enviarComentario}>
-                <Text style={styles.enviar}>Enviar</Text>
-              </TouchableOpacity>
-            </View>
-          </KeyboardAvoidingView>
+          </View>
         )}
-      </FondoLayout></>
+      />
+
+      {user && (
+        <KeyboardAvoidingView
+          behavior={Platform.OS === "ios" ? "padding" : "height"}
+          keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 80}
+        >
+          <View style={styles.inputRow}>
+            <TextInput
+              style={styles.input}
+              placeholder={t("post.writeComment")}
+              value={texto}
+              onChangeText={setTexto}
+              placeholderTextColor="#666"
+            />
+            <TouchableOpacity onPress={enviarComentario}>
+              <Text style={styles.enviar}>{t("post.send")}</Text>
+            </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
+      )}
+    </FondoLayout>
   );
 }
 
-/* —— estilos —— */
 const styles = StyleSheet.create({
   coment: {
     maxWidth: "75%",
@@ -231,11 +225,16 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     marginBottom: 10,
   },
-  comAvatar: { width: 32, height: 32, borderRadius: 16, borderWidth: 1, borderColor: "#FF66C4", },
+  comAvatar: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: "#FF66C4",
+  },
   comTexto: { color: "#000", marginTop: 2 },
   comAutor: { fontWeight: "600" },
   comFecha: { fontSize: 10, color: "#888", marginTop: 2 },
-
   inputRow: {
     flexDirection: "row",
     padding: 8,

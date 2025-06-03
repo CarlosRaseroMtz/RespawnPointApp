@@ -1,6 +1,7 @@
 import FondoLayout from "@/src/components/FondoLayout";
 import { useRouter } from "expo-router";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   FlatList,
   SafeAreaView,
@@ -9,32 +10,27 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
-import PostCard from "../../src/components/post-card"; // ⬅️ nuevo
+import PostCard from "../../src/components/post-card";
 import { useAuth } from "../../src/hooks/useAuth";
 import { usePublicacionesFeed } from "../../src/hooks/usePublicacionesFeed";
 import * as FeedActions from "../../src/utils/feed-actions";
 
-const tabs = ["Juegos", "Para ti", "Memes"];
-
 export default function HomeScreen() {
-  const [activeTab, setActiveTab] = useState("Para ti");
+  const { t } = useTranslation();
+  const [activeTab, setActiveTab] = useState("foryou");
   const router = useRouter();
   const { user } = useAuth();
 
-  /* —— carga publicaciones + autor —— */
-const allPosts = usePublicacionesFeed();
+  const allPosts = usePublicacionesFeed();
 
-const posts = allPosts.filter((post) => {
-  const categoria = post.categoria?.toLowerCase?.() || "";
-  if (activeTab === "Para ti") return true;
-  if (activeTab === "Juegos") return categoria === "videojuego";
-  if (activeTab === "Memes") return categoria === "meme";
-  return true;
-});
+  const posts = allPosts.filter((post) => {
+    const categoria = post.categoria?.toLowerCase?.() || "";
+    if (activeTab === "foryou") return true;
+    if (activeTab === "games") return categoria === "videojuego";
+    if (activeTab === "memes") return categoria === "meme";
+    return true;
+  });
 
-
-
-  /* —— render —— */
   const renderPost = ({ item }: any) => (
     <View style={{ marginBottom: 20 }}>
       <PostCard
@@ -43,10 +39,10 @@ const posts = allPosts.filter((post) => {
         likes={item.likes || []}
         isLiked={item.likes?.includes(user?.uid)}
         onLike={() => {
-          if (!user) return;                     // no llames sin uid
+          if (!user) return;
           FeedActions.toggleLike({
             postId: item.id,
-            userUid: user.uid,                   // ✅ uid real, sin fallback ""
+            userUid: user.uid,
             likes: item.likes || [],
           });
         }}
@@ -63,24 +59,23 @@ const posts = allPosts.filter((post) => {
   return (
     <FondoLayout>
       <SafeAreaView style={styles.container}>
-        {/* pestañas superior */}
+        {/* pestañas */}
         <View style={styles.tabs}>
-          {tabs.map((t) => (
-            <TouchableOpacity key={t} onPress={() => setActiveTab(t)}>
+          {["games", "foryou", "memes"].map((key) => (
+            <TouchableOpacity key={key} onPress={() => setActiveTab(key)}>
               <Text
                 style={[
                   styles.tabText,
-                  activeTab === t && styles.tabActive,
+                  activeTab === key && styles.tabActive,
                 ]}
               >
-                {t}
+                {t(`home.tabs.${key}`)}
               </Text>
-              {activeTab === t && <View style={styles.underline} />}
+              {activeTab === key && <View style={styles.underline} />}
             </TouchableOpacity>
           ))}
         </View>
 
-        {/* feed */}
         <FlatList
           data={posts}
           keyExtractor={(i) => i.id}
@@ -105,7 +100,4 @@ const styles = StyleSheet.create({
   tabText: { fontSize: 16, color: "#888" },
   tabActive: { color: "#000", fontWeight: "bold" },
   underline: { height: 2, backgroundColor: "#000", marginTop: 4 },
-  row: { flexDirection: "row", gap: 20, paddingHorizontal: 4 },
-  action: { flexDirection: "row", alignItems: "center", gap: 6 },
-  actionText: { color: "#555", fontSize: 13 },
 });

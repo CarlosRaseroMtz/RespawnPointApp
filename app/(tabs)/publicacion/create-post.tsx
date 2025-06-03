@@ -2,35 +2,37 @@ import FondoLayout from "@/src/components/FondoLayout";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import {
-    addDoc,
-    collection,
-    Timestamp,
+  addDoc,
+  collection,
+  Timestamp,
 } from "firebase/firestore";
 import {
-    getDownloadURL,
-    getStorage,
-    ref,
-    uploadBytes,
+  getDownloadURL,
+  getStorage,
+  ref,
+  uploadBytes,
 } from "firebase/storage";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
-    Alert,
-    Dimensions,
-    Image,
-    Pressable,
-    StyleSheet,
-    Text,
-    TextInput,
-    View,
+  Alert,
+  Dimensions,
+  Image,
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
 } from "react-native";
 import { useAuth } from "../../../src/hooks/useAuth";
 import { firestore } from "../../../src/services/config/firebase-config";
 import { normalizarNombreArchivo } from "../../../src/utils/normalizar-nombre-archivo";
 
 const { width } = Dimensions.get("window");
-const CATEGORIAS = ["Videojuego", "Meme"]; // puedes ampliar
+const CATEGORIAS = ["Videojuego", "Meme"];
 
 export default function CreatePostScreen() {
+  const { t } = useTranslation();
   const { user, loading } = useAuth();
 
   const [texto, setTexto] = useState("");
@@ -38,7 +40,6 @@ export default function CreatePostScreen() {
   const [categoria, setCategoria] = useState(CATEGORIAS[0]);
   const [subiendo, setSubiendo] = useState(false);
 
-  /* ---------- elegir imagen ---------- */
   const pickImage = async () => {
     const res = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
@@ -49,21 +50,19 @@ export default function CreatePostScreen() {
     }
   };
 
-  /* ---------- publicar ---------- */
   const subirPost = async () => {
     if (loading || !user) {
-      Alert.alert("Sesión no lista", "Inicia sesión primero");
+      Alert.alert(t("create.sessionErrorTitle"), t("create.sessionErrorMsg"));
       return;
     }
     if (!texto.trim() || !imagen) {
-      Alert.alert("Campos incompletos", "Añade mensaje e imagen.");
+      Alert.alert(t("create.incompleteTitle"), t("create.incompleteMsg"));
       return;
     }
 
     try {
       setSubiendo(true);
 
-      /* 1. Subir imagen a Storage */
       const ts = Date.now();
       const nombreBase = imagen.split("/").pop() || `img_${ts}.jpg`;
       const nombreLimpio = normalizarNombreArchivo(nombreBase);
@@ -74,7 +73,6 @@ export default function CreatePostScreen() {
       await uploadBytes(storageRef, blob);
       const mediaUrl = await getDownloadURL(storageRef);
 
-      /* 2. Crear documento en Firestore */
       await addDoc(collection(firestore, "publicaciones"), {
         userId: user.uid,
         contenido: texto.trim(),
@@ -86,50 +84,43 @@ export default function CreatePostScreen() {
         comunidadId: "GENERAL",
       });
 
-      Alert.alert("✅ ¡Publicación creada!");
-      router.back(); // ← vuelve a la pantalla anterior
+      Alert.alert("✅ " + t("create.success"));
+      router.back();
     } catch (e: any) {
       console.error("❌ Error al subir publicación:", e);
-      Alert.alert("Error", e.message || "Fallo al subir.");
+      Alert.alert(t("create.error"), e.message || t("create.errorFallback"));
     } finally {
       setSubiendo(false);
     }
   };
 
-  /* ---------- UI ---------- */
   return (
     <FondoLayout>
       <View style={styles.container}>
         <View style={styles.box}>
-          {/* selector de imagen */}
           <Pressable style={styles.uploadArea} onPress={pickImage}>
             {imagen ? (
               <Image source={{ uri: imagen }} style={styles.preview} />
             ) : (
-              <Text style={styles.uploadText}>Pulsa para elegir imagen</Text>
+              <Text style={styles.uploadText}>{t("create.tapToUpload")}</Text>
             )}
           </Pressable>
 
-          {/* mensaje */}
           <TextInput
             style={styles.input}
-            placeholder="Escribe algo..."
+            placeholder={t("create.placeholder")}
             placeholderTextColor="#888"
             multiline
             value={texto}
             onChangeText={setTexto}
           />
 
-          {/* chips de categoría */}
           <View style={styles.catRow}>
             {CATEGORIAS.map((cat) => (
               <Pressable
                 key={cat}
                 onPress={() => setCategoria(cat)}
-                style={[
-                  styles.chip,
-                  categoria === cat && styles.chipActive,
-                ]}
+                style={[styles.chip, categoria === cat && styles.chipActive]}
               >
                 <Text
                   style={[
@@ -143,14 +134,13 @@ export default function CreatePostScreen() {
             ))}
           </View>
 
-          {/* botón publicar */}
           <Pressable
             style={[styles.button, subiendo && { opacity: 0.6 }]}
             onPress={subirPost}
             disabled={subiendo}
           >
             <Text style={styles.buttonText}>
-              {subiendo ? "Subiendo..." : "Publicar"}
+              {subiendo ? t("create.uploading") : t("create.publish")}
             </Text>
           </Pressable>
         </View>
@@ -159,7 +149,6 @@ export default function CreatePostScreen() {
   );
 }
 
-/* ---------- estilos ---------- */
 const styles = StyleSheet.create({
   container: {
     flex: 1,

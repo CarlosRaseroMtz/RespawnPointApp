@@ -1,31 +1,35 @@
-/* -----------------  MI PERFIL (REDISEÑADO) ----------------- */
 import FondoLayout from "@/src/components/FondoLayout";
 import { useMiPerfil } from "@/src/hooks/useMiPerfil";
 import { useMisPublicaciones } from "@/src/hooks/useMisPublicaciones";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { useTranslation } from "react-i18next";
 import {
   Dimensions, FlatList, Image, SafeAreaView,
   StyleSheet, Text, TouchableOpacity, View
 } from "react-native";
 import PostGridItem from "../../src/components/PostGridItem";
 
-/* helpers */
 const { width } = Dimensions.get("window");
 const PHOTO = 80;
 const GAP = 18;
 const IMG = (width - 36) / 2;
+
 const truncate = (t: string, n = 26) =>
   t.length > n ? t.slice(0, n - 1) + "…" : t;
 
-/* ——————— componente ——————— */
 export default function MyProfile() {
   const router = useRouter();
+  const { t } = useTranslation();
   const info = useMiPerfil();
   const posts = useMisPublicaciones();
 
   if (!info)
-    return <SafeAreaView style={styles.center}><Text>Cargando…</Text></SafeAreaView>;
+    return (
+      <SafeAreaView style={styles.center}>
+        <Text>{t("mi-profile.loading")}</Text>
+      </SafeAreaView>
+    );
 
   const seg = info.seguidores?.length ?? 0;
   const sigo = info.siguiendo?.length ?? 0;
@@ -33,34 +37,35 @@ export default function MyProfile() {
   return (
     <FondoLayout>
       <SafeAreaView style={styles.container}>
-        {/* —— BOTÓN DE CONFIGURACIÓN —— */}
-        <TouchableOpacity onPress={() => router.push("/configuracion")} style={styles.btnGear}>
+        <TouchableOpacity
+          onPress={() => router.push("/configuracion")}
+          style={styles.btnGear}
+        >
           <Ionicons name="settings-outline" size={22} color="#fff" />
         </TouchableOpacity>
-        {/* —— NOMBRE + PLATAFORMA —— */}
+
         <View style={styles.header}>
           <Text style={styles.username}>{truncate(info.username)}</Text>
-          {info.plataformaFav && <Text style={styles.platformTxt}>{info.plataformaFav}</Text>}
+          {info.plataformaFav && (
+            <Text style={styles.platformTxt}>{info.plataformaFav}</Text>
+          )}
         </View>
 
-        {/* —— FOTO + ESTADÍSTICAS + CONFIG —— */}
         <View style={styles.topRow}>
           <Image
             source={{ uri: info.fotoPerfil || "https://i.pravatar.cc/150?u=" + info.username }}
             style={styles.avatar}
           />
           <View style={styles.statsBox}>
-            <Counter n={posts.length} label="Publicaciones" />
-            <Counter n={seg} label="Seguidores" />
-            <Counter n={sigo} label="Siguiendo" />
+            <Counter n={posts.length} label={t("mi-profile.posts")} />
+            <Counter n={seg} label={t("mi-profile.followers")} />
+            <Counter n={sigo} label={t("mi-profile.following")} />
           </View>
         </View>
 
-        {/* —— BIO Y GÉNERO FAVORITO —— */}
         {info.generoFav && <Text style={styles.genre}>{info.generoFav}</Text>}
         {info.descripcion && <Text style={styles.bio}>{info.descripcion}</Text>}
 
-        {/* —— GRID DE PUBLICACIONES —— */}
         <FlatList
           data={posts}
           numColumns={2}
@@ -70,14 +75,13 @@ export default function MyProfile() {
           renderItem={({ item }) => (
             <PostGridItem id={item.id} mediaUrl={item.mediaUrl} />
           )}
-
         />
       </SafeAreaView>
     </FondoLayout>
   );
 }
 
-function Counter({ n, label }: { n: number, label: string }) {
+function Counter({ n, label }: { n: number; label: string }) {
   return (
     <View style={{ alignItems: "center" }}>
       <Text style={{ fontWeight: "700" }}>{n}</Text>
@@ -86,7 +90,6 @@ function Counter({ n, label }: { n: number, label: string }) {
   );
 }
 
-/* ——— estilos actualizados ——— */
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },
@@ -101,7 +104,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     justifyContent: "space-between",
   },
-  avatar: { width: PHOTO, height: PHOTO, borderRadius: PHOTO / 2, borderColor: "#FF66C4", },
+  avatar: { width: PHOTO, height: PHOTO, borderRadius: PHOTO / 2, borderColor: "#FF66C4" },
   statsBox: {
     flex: 1,
     flexDirection: "row",

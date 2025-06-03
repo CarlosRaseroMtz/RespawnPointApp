@@ -1,5 +1,6 @@
 import { router } from "expo-router";
 import React from "react";
+import { useTranslation } from "react-i18next";
 import {
   Image,
   StyleSheet,
@@ -25,10 +26,12 @@ const ChatItem = ({
   timestamp,
   onPress,
 }: ChatItemProps) => {
+  const { t } = useTranslation();
+
   const defaultAvatar = "https://i.pravatar.cc/150?img=12";
-  const displayName = nombre?.trim() || "Grupo sin nombre";
+  const displayName = nombre?.trim() || t("chatItem.noName");
   const displayAvatar = avatar?.trim() || defaultAvatar;
-  const displayMessage = lastMessage?.trim() || "No hay mensajes aún";
+  const displayMessage = lastMessage?.trim() || t("chatItem.noMessages");
 
   return (
     <TouchableOpacity

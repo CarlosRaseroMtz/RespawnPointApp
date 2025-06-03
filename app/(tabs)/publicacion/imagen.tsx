@@ -3,6 +3,7 @@ import * as FileSystem from "expo-file-system";
 import * as MediaLibrary from "expo-media-library";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import React, { useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   Animated,
@@ -17,6 +18,7 @@ const { width, height } = Dimensions.get("window");
 export default function ImagenScreen() {
   const { url } = useLocalSearchParams();
   const router = useRouter();
+  const { t } = useTranslation();
 
   const imageUrl = Array.isArray(url) ? url[0] : url;
 
@@ -42,7 +44,7 @@ export default function ImagenScreen() {
     try {
       const { status } = await MediaLibrary.requestPermissionsAsync();
       if (status !== "granted") {
-        Alert.alert("Permiso denegado", "No se puede guardar la imagen sin permiso.");
+        Alert.alert(t("imageScreen.permissionTitle"), t("imageScreen.permissionMsg"));
         return;
       }
 
@@ -53,15 +55,13 @@ export default function ImagenScreen() {
       );
 
       const downloadResult = await downloadResumable.downloadAsync();
-      if (!downloadResult) {
-        throw new Error("No se pudo descargar la imagen.");
-      }
-      await MediaLibrary.saveToLibraryAsync(downloadResult.uri);
+      if (!downloadResult) throw new Error("Descarga fallida");
 
-      Alert.alert("Guardado", "Imagen descargada a tu galería.");
+      await MediaLibrary.saveToLibraryAsync(downloadResult.uri);
+      Alert.alert(t("imageScreen.successTitle"), t("imageScreen.successMsg"));
     } catch (error) {
       console.error("❌ Error al guardar imagen:", error);
-      Alert.alert("Error", "No se pudo guardar la imagen.");
+      Alert.alert(t("imageScreen.errorTitle"), t("imageScreen.errorMsg"));
     }
   };
 
@@ -80,16 +80,11 @@ export default function ImagenScreen() {
           source={{ uri: imageUrl as string }}
           style={[
             styles.image,
-            {
-              opacity,
-              transform: [{ scale }],
-            },
+            { opacity, transform: [{ scale }] },
           ]}
           resizeMode="contain"
         />
-      ) : (
-        <></>
-      )}
+      ) : null}
     </SafeAreaView>
   );
 }
@@ -101,10 +96,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  image: {
-    width,
-    height,
-  },
+  image: { width, height },
   backButton: {
     position: "absolute",
     top: 40,

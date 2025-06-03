@@ -3,45 +3,37 @@ import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
-    Alert,
-    Image,
-    ScrollView,
-    StyleSheet,
-    Text,
-    TextInput,
-    TouchableOpacity,
-    View,
+  Alert,
+  Image,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from "react-native";
 import { useAuth } from "../../../src/hooks/useAuth";
 import { firestore } from "../../../src/services/config/firebase-config";
 
-const platforms = ["Xbox 360",
-  "Xbox One",
-  "Xbox Series X/S",
-  "PlayStation 3",
-  "PlayStation 4",
-  "PlayStation 5",
-  "Wii",
-  "Wii U",
-  "Nintendo Switch",
-  "PC",
-  "Nintendo 3DS",
-  "Consola retro/antigua",
-  "Móviles",
-  "VRs",
-  "Otro",
-  "No tengo una plataforma favorita"];
+const platforms = [ /* mantenemos como está */ 
+  "Xbox 360", "Xbox One", "Xbox Series X/S", "PlayStation 3", "PlayStation 4",
+  "PlayStation 5", "Wii", "Wii U", "Nintendo Switch", "PC", "Nintendo 3DS",
+  "Consola retro/antigua", "Móviles", "VRs", "Otro", "No tengo una plataforma favorita"
+];
 
-const genres = ["Acción", "Aventura", "RPG", "Shooter", "Estrategia",
-  "Deportes", "Simulación", "Lucha", "Plataformas", "Terror",
-  "Carreras", "Puzzle", "Indie", "Multijugador", "Sandbox", "MOBA",
-  "Mundo abierto", "Narrativo", "Survival", "Battle Royale",
-  "Sigilo", "Construcción", "Educativo", "Otro"];
+const genres = [
+  "Acción", "Aventura", "RPG", "Shooter", "Estrategia", "Deportes",
+  "Simulación", "Lucha", "Plataformas", "Terror", "Carreras", "Puzzle",
+  "Indie", "Multijugador", "Sandbox", "MOBA", "Mundo abierto", "Narrativo",
+  "Survival", "Battle Royale", "Sigilo", "Construcción", "Educativo", "Otro"
+];
 
 export default function EditarPerfilScreen() {
   const router = useRouter();
   const { user } = useAuth();
+  const { t } = useTranslation();
 
   const [username, setUsername] = useState("");
   const [fotoPerfil, setFotoPerfil] = useState("");
@@ -84,7 +76,7 @@ export default function EditarPerfilScreen() {
     } else if (generos.length < 2) {
       setGeneros([...generos, g]);
     } else {
-      Alert.alert("Límite", "Solo puedes elegir 2 géneros favoritos.");
+      Alert.alert(t("editProfile.limitTitle"), t("editProfile.limitMsg"));
     }
   };
 
@@ -99,31 +91,31 @@ export default function EditarPerfilScreen() {
         generoFav: generos.join(", "),
         descripcion: bio,
       });
-      Alert.alert("Perfil actualizado", "Los cambios se guardaron correctamente.");
+      Alert.alert(t("editProfile.savedTitle"), t("editProfile.savedMsg"));
       router.back();
     } catch (error) {
       console.error("❌ Error al guardar perfil:", error);
-      Alert.alert("Error", "No se pudieron guardar los cambios.");
+      Alert.alert(t("editProfile.errorTitle"), t("editProfile.errorMsg"));
     }
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Editar Perfil</Text>
+      <Text style={styles.title}>{t("editProfile.title")}</Text>
 
       <TouchableOpacity onPress={elegirImagen}>
         <Image source={{ uri: fotoPerfil }} style={styles.avatar} />
-        <Text style={styles.changePhoto}>Cambiar foto</Text>
+        <Text style={styles.changePhoto}>{t("editProfile.changePhoto")}</Text>
       </TouchableOpacity>
 
       <TextInput
         style={styles.input}
-        placeholder="Nombre de usuario"
+        placeholder={t("editProfile.usernamePlaceholder")}
         value={username}
         onChangeText={setUsername}
       />
 
-      <Text style={styles.label}>Plataforma favorita</Text>
+      <Text style={styles.label}>{t("editProfile.platformLabel")}</Text>
       <View style={styles.pickerContainer}>
         <Picker
           selectedValue={plataforma}
@@ -136,31 +128,25 @@ export default function EditarPerfilScreen() {
         </Picker>
       </View>
 
-      <Text style={styles.label}>Géneros favoritos (máx. 2)</Text>
+      <Text style={styles.label}>{t("editProfile.genresLabel")}</Text>
       <View style={styles.genreContainer}>
         {genres.map(g => (
           <TouchableOpacity
             key={g}
-            style={[
-              styles.genreTag,
-              generos.includes(g) && styles.genreTagSelected,
-            ]}
+            style={[styles.genreTag, generos.includes(g) && styles.genreTagSelected]}
             onPress={() => toggleGenero(g)}
           >
-            <Text style={[
-              styles.genreText,
-              generos.includes(g) && styles.genreTextSelected,
-            ]}>
+            <Text style={[styles.genreText, generos.includes(g) && styles.genreTextSelected]}>
               {g}
             </Text>
           </TouchableOpacity>
         ))}
       </View>
 
-      <Text style={styles.label}>Biografía</Text>
+      <Text style={styles.label}>{t("editProfile.bioLabel")}</Text>
       <TextInput
         style={[styles.input, { height: 100, textAlignVertical: "top" }]}
-        placeholder="Cuéntanos algo sobre ti..."
+        placeholder={t("editProfile.bioPlaceholder")}
         multiline
         numberOfLines={4}
         maxLength={200}
@@ -169,11 +155,12 @@ export default function EditarPerfilScreen() {
       />
 
       <TouchableOpacity style={styles.button} onPress={guardarCambios}>
-        <Text style={styles.buttonText}>Guardar cambios</Text>
+        <Text style={styles.buttonText}>{t("editProfile.saveButton")}</Text>
       </TouchableOpacity>
     </ScrollView>
   );
 }
+
 
 const styles = StyleSheet.create({
   container: {
