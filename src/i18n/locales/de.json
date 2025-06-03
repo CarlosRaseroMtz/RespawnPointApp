@@ -1,0 +1,201 @@
+{
+  "forgot": {
+    "title": "Passwort wiederherstellen",
+    "placeholder": "E-Mail-Adresse",
+    "button": "Wiederherstellung senden",
+    "or": "oder",
+    "noAccount": "Noch kein Konto?",
+    "register": "Hier registrieren",
+    "terms1": "Mit dem Fortfahren akzeptierst du unsere",
+    "termsLink": "Nutzungsbedingungen",
+    "privacyLink": "Datenschutzrichtlinie",
+    "and": "und",
+    "successTitle": "Wiederherstellung gesendet",
+    "successMsg": "Überprüfe deinen Posteingang.",
+    "errorTitle": "Fehler",
+    "errorMsg": "E-Mail konnte nicht gesendet werden. Ist sie korrekt geschrieben?"
+  },
+  "login": {
+    "title": "Anmeldung",
+    "email": "E-Mail-Adresse",
+    "password": "Passwort",
+    "continue": "Weiter",
+    "forgotQuestion": "Passwort vergessen?",
+    "forgotLink": "Hier klicken",
+    "googleDisabled": "Google (deaktiviert)",
+    "or": "oder",
+    "noAccount": "Noch kein Konto?",
+    "register": "Hier registrieren",
+    "terms1": "Mit dem Fortfahren akzeptierst du unsere",
+    "termsLink": "Nutzungsbedingungen",
+    "privacyLink": "Datenschutzrichtlinie",
+    "and": "und",
+    "error": "Fehler beim Anmelden.",
+    "userNotFound": "Dieser Benutzer existiert nicht.",
+    "wrongPassword": "Falsches Passwort.",
+    "invalidEmail": "Die E-Mail-Adresse ist ungültig."
+  },
+  "register": {
+    "title": "Registrieren",
+    "email": "E-Mail-Adresse",
+    "password": "Passwort",
+    "fullName": "Vollständiger Name",
+    "username": "Benutzername",
+    "strength": "Stärke:",
+    "strengths": {
+      "weak": "Schwach",
+      "medium": "Mittel",
+      "strong": "Stark",
+      "veryStrong": "Sehr stark"
+    },
+    "rules": {
+      "length": "8+ Zeichen",
+      "upper": "Ein Großbuchstabe",
+      "lower": "Ein Kleinbuchstabe",
+      "number": "Eine Zahl"
+    },
+    "platformLabel": "Lieblingsplattform",
+    "genreLabel": "Lieblingsgenres (max. 2)",
+    "submit": "Registrieren",
+    "or": "oder",
+    "comingSoon": "Demnächst verfügbar",
+    "hasAccount": "Bereits ein Konto? Anmelden",
+    "limitTitle": "Limit",
+    "limitMsg": "Du kannst nur 2 Genres auswählen",
+    "incompleteTitle": "Unvollständige Felder",
+    "incompleteMsg": "Bitte fülle alle Felder aus.",
+    "weakTitle": "Unsicheres Passwort",
+    "weakMsg": "Mindestens 8 Zeichen, ein Großbuchstabe, ein Kleinbuchstabe und eine Zahl.",
+    "successTitle": "Registrierung erfolgreich",
+    "successMsg": "Willkommen!",
+    "errors": {
+      "title": "Registrierungsfehler",
+      "emailInUse": "Die E-Mail-Adresse ist bereits registriert.",
+      "invalidEmail": "Ungültige E-Mail-Adresse.",
+      "weakPassword": "Sehr schwaches Passwort.",
+      "default": "Ein Fehler ist aufgetreten."
+    }
+  },
+  "chats": {
+    "title": "Chats",
+    "tabs": {
+      "usuarios": "Benutzer",
+      "comunidades": "Gemeinschaften",
+      "torneos": "Turniere"
+    },
+    "search": "Benutzer suchen...",
+    "groupName": "Gruppenname",
+    "selectPhoto": "📷 Gruppenfoto auswählen",
+    "confirmGroup": "✅ Gruppe bestätigen ({{count}})",
+    "cancel": "❌ Abbrechen",
+    "createGroup": "➕ Gruppe erstellen"
+  },
+  "chat": {
+    "placeholder": "Nachricht schreiben...",
+    "send": "Senden",
+    "noContent": "(kein Inhalt)"
+  },
+  "settings": {
+    "loading": "Lädt...",
+    "general": "Einstellungen",
+    "editProfile": "Profil bearbeiten",
+    "language": "Barrierefreiheit und Sprachen",
+    "activity": "Deine Aktivität",
+    "privacy": "Datenschutz",
+    "subscriptions": "Abonnements",
+    "blocked": "Blockierte Benutzer",
+    "notifications": "Benachrichtigungen",
+    "help": "Hilfe",
+    "privacyCenter": "Datenschutzzentrum",
+    "accountStatus": "Kontostatus",
+    "session": "Anmeldung",
+    "addAccount": "Konto hinzufügen (demnächst verfügbar)",
+    "logout": "Abmelden",
+    "deleteAccount": "Konto dauerhaft löschen"
+  },
+  "home": {
+    "tabs": {
+      "games": "Spiele",
+      "foryou": "Für dich",
+      "memes": "Memes"
+    }
+  },
+  "notifications": {
+    "title": "Neueste Benachrichtigungen von",
+    "tabs": {
+      "usuarios": "Benutzer",
+      "comunidades": "Gemeinschaften",
+      "torneos": "Turniere"
+    },
+    "empty": "Keine Benachrichtigungen in dieser Kategorie."
+  },
+  "mi-profile": {
+    "loading": "Lädt…",
+    "posts": "Beiträge",
+    "followers": "Follower",
+    "following": "Folgt"
+  },
+  "profile": {
+    "loading": "Lädt…",
+    "content": "Inhalt",
+    "followers": "Follower",
+    "following": "Folgt",
+    "follow": "Folgen",
+    "unfollow": "Nicht mehr folgen",
+    "message": "Nachricht"
+  },
+  "post": {
+    "writeComment": "Einen Kommentar schreiben…",
+    "send": "Senden"
+  },
+  "create": {
+    "tapToUpload": "Zum Hochladen tippen",
+    "placeholder": "Schreibe etwas...",
+    "uploading": "Wird hochgeladen...",
+    "publish": "Veröffentlichen",
+    "sessionErrorTitle": "Sitzung nicht bereit",
+    "sessionErrorMsg": "Bitte zuerst anmelden",
+    "incompleteTitle": "Unvollständige Felder",
+    "incompleteMsg": "Bitte Nachricht und Bild hinzufügen.",
+    "success": "Beitrag erstellt!",
+    "error": "Fehler",
+    "errorFallback": "Fehler beim Hochladen."
+  },
+  "editProfile": {
+    "title": "Profil bearbeiten",
+    "changePhoto": "Foto ändern",
+    "usernamePlaceholder": "Benutzername",
+    "platformLabel": "Lieblingsplattform",
+    "genresLabel": "Lieblingsgenres (max. 2)",
+    "bioLabel": "Biografie",
+    "bioPlaceholder": "Erzähle uns etwas über dich...",
+    "saveButton": "Änderungen speichern",
+    "savedTitle": "Profil aktualisiert",
+    "savedMsg": "Änderungen wurden erfolgreich gespeichert.",
+    "errorTitle": "Fehler",
+    "errorMsg": "Änderungen konnten nicht gespeichert werden.",
+    "limitTitle": "Limit",
+    "limitMsg": "Du kannst nur 2 Lieblingsgenres auswählen."
+  },
+  "imageScreen": {
+    "permissionTitle": "Berechtigung verweigert",
+    "permissionMsg": "Bild kann ohne Berechtigung nicht gespeichert werden.",
+    "successTitle": "Gespeichert",
+    "successMsg": "Bild wurde in deiner Galerie gespeichert.",
+    "errorTitle": "Fehler",
+    "errorMsg": "Bild konnte nicht gespeichert werden."
+  },
+  "chatItem": {
+    "noName": "Gruppe ohne Namen",
+    "noMessages": "Noch keine Nachrichten"
+  },
+  "notification": {
+    "follow": "Folgen",
+    "followed": "Gefolgt",
+    "noDate": "kein Datum"
+  },
+  "postP": {
+    "likes": "Gefällt mir",
+    "comments": "Kommentare"
+  }
+}

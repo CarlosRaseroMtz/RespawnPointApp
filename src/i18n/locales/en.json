@@ -178,28 +178,24 @@
         "limitMsg": "You can only choose 2 favorite genres."
     },
     "imageScreen": {
-  "permissionTitle": "Permission denied",
-  "permissionMsg": "Cannot save the image without permission.",
-  "successTitle": "Saved",
-  "successMsg": "Image downloaded to your gallery.",
-  "errorTitle": "Error",
-  "errorMsg": "Image could not be saved."
-},
-"chatItem": {
-  "noName": "Unnamed group",
-  "noMessages": "No messages yet"
-},
-"notification": {
-  "follow": "Follow",
-  "followed": "Following",
-  "noDate": "no date"
-},
-"postP": {
-  "likes": "likes",
-  "comments": "Comments"
-}
-
-
-
-
+        "permissionTitle": "Permission denied",
+        "permissionMsg": "Cannot save the image without permission.",
+        "successTitle": "Saved",
+        "successMsg": "Image downloaded to your gallery.",
+        "errorTitle": "Error",
+        "errorMsg": "Image could not be saved."
+    },
+    "chatItem": {
+        "noName": "Unnamed group",
+        "noMessages": "No messages yet"
+    },
+    "notification": {
+        "follow": "Follow",
+        "followed": "Following",
+        "noDate": "no date"
+    },
+    "postP": {
+        "likes": "likes",
+        "comments": "Comments"
+    }
 }

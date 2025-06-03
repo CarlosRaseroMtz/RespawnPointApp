@@ -1,0 +1,201 @@
+{
+  "forgot": {
+    "title": "Réinitialiser le mot de passe",
+    "placeholder": "Adresse e-mail",
+    "button": "Envoyer le lien de réinitialisation",
+    "or": "ou",
+    "noAccount": "Vous n'avez pas de compte ?",
+    "register": "Inscrivez-vous ici",
+    "terms1": "En continuant, vous acceptez nos",
+    "termsLink": "Conditions d'utilisation",
+    "privacyLink": "Politique de confidentialité",
+    "and": "et",
+    "successTitle": "Lien envoyé",
+    "successMsg": "Vérifiez votre boîte de réception.",
+    "errorTitle": "Erreur",
+    "errorMsg": "Impossible d'envoyer l'e-mail. Est-il correct ?"
+  },
+  "login": {
+    "title": "Connexion",
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "continue": "Continuer",
+    "forgotQuestion": "Mot de passe oublié ?",
+    "forgotLink": "Cliquez ici",
+    "googleDisabled": "Google (désactivé)",
+    "or": "ou",
+    "noAccount": "Vous n'avez pas de compte ?",
+    "register": "Inscrivez-vous ici",
+    "terms1": "En continuant, vous acceptez nos",
+    "termsLink": "Conditions d'utilisation",
+    "privacyLink": "Politique de confidentialité",
+    "and": "et",
+    "error": "Échec de la connexion.",
+    "userNotFound": "Cet utilisateur n'existe pas.",
+    "wrongPassword": "Mot de passe incorrect.",
+    "invalidEmail": "Adresse e-mail invalide."
+  },
+  "register": {
+    "title": "Inscription",
+    "email": "E-mail",
+    "password": "Mot de passe",
+    "fullName": "Nom complet",
+    "username": "Nom d'utilisateur",
+    "strength": "Solidité :",
+    "strengths": {
+      "weak": "Faible",
+      "medium": "Moyenne",
+      "strong": "Forte",
+      "veryStrong": "Très forte"
+    },
+    "rules": {
+      "length": "8+ caractères",
+      "upper": "Une majuscule",
+      "lower": "Une minuscule",
+      "number": "Un chiffre"
+    },
+    "platformLabel": "Plateforme préférée",
+    "genreLabel": "Genres préférés (max. 2)",
+    "submit": "S'inscrire",
+    "or": "ou",
+    "comingSoon": "Bientôt disponible",
+    "hasAccount": "Vous avez déjà un compte ? Connectez-vous",
+    "limitTitle": "Limite",
+    "limitMsg": "Vous ne pouvez sélectionner que 2 genres",
+    "incompleteTitle": "Champs incomplets",
+    "incompleteMsg": "Veuillez compléter tous les champs.",
+    "weakTitle": "Mot de passe faible",
+    "weakMsg": "Minimum 8 caractères, une majuscule, une minuscule et un chiffre.",
+    "successTitle": "Inscription réussie",
+    "successMsg": "Bienvenue !",
+    "errors": {
+      "title": "Erreur d'inscription",
+      "emailInUse": "E-mail déjà utilisé.",
+      "invalidEmail": "E-mail invalide.",
+      "weakPassword": "Mot de passe trop faible.",
+      "default": "Une erreur est survenue."
+    }
+  },
+  "chats": {
+    "title": "Discussions",
+    "tabs": {
+      "usuarios": "Utilisateurs",
+      "comunidades": "Communautés",
+      "torneos": "Tournois"
+    },
+    "search": "Rechercher des utilisateurs...",
+    "groupName": "Nom du groupe",
+    "selectPhoto": "📷 Sélectionner une photo de groupe",
+    "confirmGroup": "✅ Confirmer le groupe ({{count}})",
+    "cancel": "❌ Annuler",
+    "createGroup": "➕ Créer un groupe"
+  },
+  "chat": {
+    "placeholder": "Tapez un message...",
+    "send": "Envoyer",
+    "noContent": "(aucun contenu)"
+  },
+  "settings": {
+    "loading": "Chargement...",
+    "general": "Paramètres",
+    "editProfile": "Modifier le profil",
+    "language": "Accessibilité et langues",
+    "activity": "Votre activité",
+    "privacy": "Confidentialité",
+    "subscriptions": "Abonnements",
+    "blocked": "Utilisateurs bloqués",
+    "notifications": "Notifications",
+    "help": "Aide",
+    "privacyCenter": "Centre de confidentialité",
+    "accountStatus": "Statut du compte",
+    "session": "Connexion",
+    "addAccount": "Ajouter un compte (bientôt disponible)",
+    "logout": "Se déconnecter",
+    "deleteAccount": "Supprimer le compte définitivement"
+  },
+  "home": {
+    "tabs": {
+      "games": "Jeux",
+      "foryou": "Pour vous",
+      "memes": "Mèmes"
+    }
+  },
+  "notifications": {
+    "title": "Dernières notifications de",
+    "tabs": {
+      "usuarios": "Utilisateurs",
+      "comunidades": "Communautés",
+      "torneos": "Tournois"
+    },
+    "empty": "Aucune notification dans cette catégorie."
+  },
+  "mi-profile": {
+    "loading": "Chargement...",
+    "posts": "Publications",
+    "followers": "Abonnés",
+    "following": "Abonnements"
+  },
+  "profile": {
+    "loading": "Chargement...",
+    "content": "Contenu",
+    "followers": "Abonnés",
+    "following": "Abonnements",
+    "follow": "Suivre",
+    "unfollow": "Ne plus suivre",
+    "message": "Message"
+  },
+  "post": {
+    "writeComment": "Écrire un commentaire...",
+    "send": "Envoyer"
+  },
+  "create": {
+    "tapToUpload": "Appuyez pour choisir une image",
+    "placeholder": "Écrivez quelque chose...",
+    "uploading": "Téléchargement...",
+    "publish": "Publier",
+    "sessionErrorTitle": "Session non prête",
+    "sessionErrorMsg": "Veuillez vous connecter d'abord.",
+    "incompleteTitle": "Champs incomplets",
+    "incompleteMsg": "Veuillez ajouter un message et une image.",
+    "success": "Publication créée !",
+    "error": "Erreur",
+    "errorFallback": "Échec du téléchargement."
+  },
+  "editProfile": {
+    "title": "Modifier le profil",
+    "changePhoto": "Changer la photo",
+    "usernamePlaceholder": "Nom d'utilisateur",
+    "platformLabel": "Plateforme préférée",
+    "genresLabel": "Genres préférés (max. 2)",
+    "bioLabel": "Biographie",
+    "bioPlaceholder": "Parlez-nous un peu de vous...",
+    "saveButton": "Enregistrer les modifications",
+    "savedTitle": "Profil mis à jour",
+    "savedMsg": "Modifications enregistrées avec succès.",
+    "errorTitle": "Erreur",
+    "errorMsg": "Les modifications n'ont pas pu être enregistrées.",
+    "limitTitle": "Limite",
+    "limitMsg": "Vous ne pouvez choisir que 2 genres préférés."
+  },
+  "imageScreen": {
+    "permissionTitle": "Permission refusée",
+    "permissionMsg": "Impossible d'enregistrer l'image sans autorisation.",
+    "successTitle": "Enregistré",
+    "successMsg": "Image téléchargée dans votre galerie.",
+    "errorTitle": "Erreur",
+    "errorMsg": "L'image n'a pas pu être enregistrée."
+  },
+  "chatItem": {
+    "noName": "Groupe sans nom",
+    "noMessages": "Aucun message pour le moment"
+  },
+  "notification": {
+    "follow": "Suivre",
+    "followed": "Suivi",
+    "noDate": "pas de date"
+  },
+  "postP": {
+    "likes": "j'aime",
+    "comments": "Commentaires"
+  }
+}

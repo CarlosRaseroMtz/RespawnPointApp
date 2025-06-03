@@ -178,28 +178,24 @@
         "limitMsg": "Solo puedes elegir 2 géneros favoritos."
     },
     "imageScreen": {
-  "permissionTitle": "Permiso denegado",
-  "permissionMsg": "No se puede guardar la imagen sin permiso.",
-  "successTitle": "Guardado",
-  "successMsg": "Imagen descargada a tu galería.",
-  "errorTitle": "Error",
-  "errorMsg": "No se pudo guardar la imagen."
-},
-"chatItem": {
-  "noName": "Grupo sin nombre",
-  "noMessages": "No hay mensajes aún"
-},
-"notification": {
-  "follow": "Seguir",
-  "followed": "Seguido",
-  "noDate": "sin fecha"
-},
-"postP": {
-  "likes": "me gusta",
-  "comments": "Comentarios"
-}
-
-
-
-
+        "permissionTitle": "Permiso denegado",
+        "permissionMsg": "No se puede guardar la imagen sin permiso.",
+        "successTitle": "Guardado",
+        "successMsg": "Imagen descargada a tu galería.",
+        "errorTitle": "Error",
+        "errorMsg": "No se pudo guardar la imagen."
+    },
+    "chatItem": {
+        "noName": "Grupo sin nombre",
+        "noMessages": "No hay mensajes aún"
+    },
+    "notification": {
+        "follow": "Seguir",
+        "followed": "Seguido",
+        "noDate": "sin fecha"
+    },
+    "postP": {
+        "likes": "me gusta",
+        "comments": "Comentarios"
+    }
 }

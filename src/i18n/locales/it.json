@@ -1,0 +1,201 @@
+{
+  "forgot": {
+    "title": "Reimposta la password",
+    "placeholder": "Indirizzo email",
+    "button": "Invia link di reimpostazione",
+    "or": "oppure",
+    "noAccount": "Non hai un account?",
+    "register": "Registrati qui",
+    "terms1": "Continuando accetti i nostri",
+    "termsLink": "Termini di servizio",
+    "privacyLink": "Informativa sulla privacy",
+    "and": "e",
+    "successTitle": "Link inviato",
+    "successMsg": "Controlla la tua casella di posta.",
+    "errorTitle": "Errore",
+    "errorMsg": "Impossibile inviare l'e-mail. È corretta?"
+  },
+  "login": {
+    "title": "Accesso",
+    "email": "Email",
+    "password": "Password",
+    "continue": "Continua",
+    "forgotQuestion": "Hai dimenticato la password?",
+    "forgotLink": "Clicca qui",
+    "googleDisabled": "Google (disabilitato)",
+    "or": "oppure",
+    "noAccount": "Non hai un account?",
+    "register": "Registrati qui",
+    "terms1": "Continuando accetti i nostri",
+    "termsLink": "Termini di servizio",
+    "privacyLink": "Informativa sulla privacy",
+    "and": "e",
+    "error": "Accesso fallito.",
+    "userNotFound": "Utente non trovato.",
+    "wrongPassword": "Password errata.",
+    "invalidEmail": "Indirizzo email non valido."
+  },
+  "register": {
+    "title": "Registrazione",
+    "email": "Email",
+    "password": "Password",
+    "fullName": "Nome completo",
+    "username": "Nome utente",
+    "strength": "Forza:",
+    "strengths": {
+      "weak": "Debole",
+      "medium": "Media",
+      "strong": "Forte",
+      "veryStrong": "Molto forte"
+    },
+    "rules": {
+      "length": "8+ caratteri",
+      "upper": "Una maiuscola",
+      "lower": "Una minuscola",
+      "number": "Un numero"
+    },
+    "platformLabel": "Piattaforma preferita",
+    "genreLabel": "Generi preferiti (max. 2)",
+    "submit": "Iscriviti",
+    "or": "oppure",
+    "comingSoon": "Prossimamente",
+    "hasAccount": "Hai già un account? Accedi",
+    "limitTitle": "Limite",
+    "limitMsg": "Puoi selezionare solo 2 generi",
+    "incompleteTitle": "Campi incompleti",
+    "incompleteMsg": "Compila tutti i campi.",
+    "weakTitle": "Password debole",
+    "weakMsg": "Minimo 8 caratteri, una maiuscola, una minuscola e un numero.",
+    "successTitle": "Registrazione riuscita",
+    "successMsg": "Benvenuto!",
+    "errors": {
+      "title": "Errore di registrazione",
+      "emailInUse": "Email già in uso.",
+      "invalidEmail": "Email non valida.",
+      "weakPassword": "Password troppo debole.",
+      "default": "Si è verificato un errore."
+    }
+  },
+  "chats": {
+    "title": "Chat",
+    "tabs": {
+      "usuarios": "Utenti",
+      "comunidades": "Comunità",
+      "torneos": "Tornei"
+    },
+    "search": "Cerca utenti...",
+    "groupName": "Nome del gruppo",
+    "selectPhoto": "📷 Seleziona la foto del gruppo",
+    "confirmGroup": "✅ Conferma gruppo ({{count}})",
+    "cancel": "❌ Annulla",
+    "createGroup": "➕ Crea gruppo"
+  },
+  "chat": {
+    "placeholder": "Scrivi un messaggio...",
+    "send": "Invia",
+    "noContent": "(nessun contenuto)"
+  },
+  "settings": {
+    "loading": "Caricamento...",
+    "general": "Impostazioni",
+    "editProfile": "Modifica profilo",
+    "language": "Accessibilità e lingue",
+    "activity": "La tua attività",
+    "privacy": "Privacy",
+    "subscriptions": "Abbonamenti",
+    "blocked": "Utenti bloccati",
+    "notifications": "Notifiche",
+    "help": "Aiuto",
+    "privacyCenter": "Centro privacy",
+    "accountStatus": "Stato dell'account",
+    "session": "Login",
+    "addAccount": "Aggiungi account (prossimamente)",
+    "logout": "Disconnetti",
+    "deleteAccount": "Elimina account definitivamente"
+  },
+  "home": {
+    "tabs": {
+      "games": "Giochi",
+      "foryou": "Per te",
+      "memes": "Meme"
+    }
+  },
+  "notifications": {
+    "title": "Ultime notifiche da",
+    "tabs": {
+      "usuarios": "Utenti",
+      "comunidades": "Comunità",
+      "torneos": "Tornei"
+    },
+    "empty": "Nessuna notifica in questa categoria."
+  },
+  "mi-profile": {
+    "loading": "Caricamento...",
+    "posts": "Post",
+    "followers": "Follower",
+    "following": "Seguiti"
+  },
+  "profile": {
+    "loading": "Caricamento...",
+    "content": "Contenuti",
+    "followers": "Follower",
+    "following": "Seguiti",
+    "follow": "Segui",
+    "unfollow": "Non seguire più",
+    "message": "Messaggio"
+  },
+  "post": {
+    "writeComment": "Scrivi un commento...",
+    "send": "Invia"
+  },
+  "create": {
+    "tapToUpload": "Tocca per scegliere un'immagine",
+    "placeholder": "Scrivi qualcosa...",
+    "uploading": "Caricamento...",
+    "publish": "Pubblica",
+    "sessionErrorTitle": "Sessione non pronta",
+    "sessionErrorMsg": "Effettua il login prima.",
+    "incompleteTitle": "Campi incompleti",
+    "incompleteMsg": "Aggiungi messaggio e immagine.",
+    "success": "Post creato!",
+    "error": "Errore",
+    "errorFallback": "Caricamento fallito."
+  },
+  "editProfile": {
+    "title": "Modifica profilo",
+    "changePhoto": "Cambia foto",
+    "usernamePlaceholder": "Nome utente",
+    "platformLabel": "Piattaforma preferita",
+    "genresLabel": "Generi preferiti (max. 2)",
+    "bioLabel": "Biografia",
+    "bioPlaceholder": "Dicci qualcosa su di te...",
+    "saveButton": "Salva modifiche",
+    "savedTitle": "Profilo aggiornato",
+    "savedMsg": "Modifiche salvate correttamente.",
+    "errorTitle": "Errore",
+    "errorMsg": "Impossibile salvare le modifiche.",
+    "limitTitle": "Limite",
+    "limitMsg": "Puoi scegliere solo 2 generi preferiti."
+  },
+  "imageScreen": {
+    "permissionTitle": "Permesso negato",
+    "permissionMsg": "Impossibile salvare l'immagine senza permesso.",
+    "successTitle": "Salvato",
+    "successMsg": "Immagine scaricata nella tua galleria.",
+    "errorTitle": "Errore",
+    "errorMsg": "Impossibile salvare l'immagine."
+  },
+  "chatItem": {
+    "noName": "Gruppo senza nome",
+    "noMessages": "Nessun messaggio ancora"
+  },
+  "notification": {
+    "follow": "Segui",
+    "followed": "Seguito",
+    "noDate": "nessuna data"
+  },
+  "postP": {
+    "likes": "mi piace",
+    "comments": "Commenti"
+  }
+}
