@@ -1,5 +1,5 @@
 import { sendPasswordResetEmail } from "firebase/auth";
-import { auth } from "../config/firebase-config";
+import { auth } from "../services/config/firebase-config";
 
 export async function sendResetLink(email: string): Promise<void> {
   if (!email) throw new Error("Falta el correo");

@@ -1,6 +1,6 @@
 // src/utils/verificarMensajesAntiguos.ts
 import { collectionGroup, getDocs } from "firebase/firestore";
-import { firestore } from "../config/firebase-config";
+import { firestore } from "../services/config/firebase-config";
 
 export const verificarMensajesAntiguos = async () => {
   console.log("🔍 Verificando mensajes antiguos...");

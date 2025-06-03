@@ -1,7 +1,7 @@
 import { deleteUser, signOut } from "firebase/auth";
 import { deleteDoc, doc } from "firebase/firestore";
 import { Alert } from "react-native";
-import { auth, firestore } from "../config/firebase-config";
+import { auth, firestore } from "../services/config/firebase-config";
 
 export async function cerrarSesion(router: any) {
   try {

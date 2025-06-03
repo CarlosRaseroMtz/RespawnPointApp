@@ -2,20 +2,20 @@
 import { Feather } from "@expo/vector-icons";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-  collection, doc,
-  onSnapshot,
-  orderBy, query,
-  where
+    collection, doc,
+    onSnapshot,
+    orderBy, query,
+    where
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { toggleSeguir } from "../../../src/utils/feed-actions";
 
 import {
-  Dimensions, FlatList, Image, SafeAreaView,
-  StyleSheet, Text, TouchableOpacity, View
+    Dimensions, FlatList, Image, SafeAreaView,
+    StyleSheet, Text, TouchableOpacity, View
 } from "react-native";
-import { firestore } from "../../../src/config/firebase-config";
 import { useAuth } from "../../../src/hooks/useAuth";
+import { firestore } from "../../../src/services/config/firebase-config";
 import { stylesCommon as C } from "../profile"; // reutilizamos tamaños
 
 const { width } = Dimensions.get("window");

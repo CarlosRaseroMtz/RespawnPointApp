@@ -4,17 +4,17 @@ import { useRouter } from "expo-router";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import React, { useEffect, useState } from "react";
 import {
-  Alert,
-  Image,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    Alert,
+    Image,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
-import { firestore } from "../../../src/config/firebase-config";
 import { useAuth } from "../../../src/hooks/useAuth";
+import { firestore } from "../../../src/services/config/firebase-config";
 
 const platforms = ["Xbox 360",
   "Xbox One",

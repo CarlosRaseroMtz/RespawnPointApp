@@ -2,32 +2,32 @@ import FondoLayout from "@/src/components/FondoLayout";
 import { Image } from "expo-image";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
-  arrayRemove,
-  arrayUnion,
-  collection,
-  doc,
-  getDoc,
-  onSnapshot,
-  orderBy,
-  query,
-  Timestamp,
-  updateDoc
+    arrayRemove,
+    arrayUnion,
+    collection,
+    doc,
+    getDoc,
+    onSnapshot,
+    orderBy,
+    query,
+    Timestamp,
+    updateDoc
 } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
 import {
-  ActivityIndicator,
-  FlatList,
-  KeyboardAvoidingView,
-  Platform,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
+    ActivityIndicator,
+    FlatList,
+    KeyboardAvoidingView,
+    Platform,
+    StyleSheet,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    View,
 } from "react-native";
 import PostCard from "../../../src/components/post-card";
-import { firestore } from "../../../src/config/firebase-config";
 import { useAuth } from "../../../src/hooks/useAuth";
+import { firestore } from "../../../src/services/config/firebase-config";
 import { comentarPublicacion } from "../../../src/utils/feed-actions";
 
 /* —— tipos —— */

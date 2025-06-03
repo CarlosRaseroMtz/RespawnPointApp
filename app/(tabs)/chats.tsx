@@ -25,9 +25,9 @@ import {
   View
 } from "react-native";
 import ChatItem from "../../src/components/ChatItem";
-import { firestore } from "../../src/config/firebase-config";
 import { useAuth } from "../../src/hooks/useAuth";
 import { useChats } from "../../src/hooks/useChats";
+import { firestore } from "../../src/services/config/firebase-config";
 import { buscarUsuarios } from "../../src/utils/buscar-usuarios";
 
 const tabs = ["Usuarios", "Comunidades", "Torneos"];

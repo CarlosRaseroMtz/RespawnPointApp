@@ -25,7 +25,7 @@ import {
   View,
 } from "react-native";
 import FondoLayout from "../../../src/components/FondoLayout";
-import { firestore } from "../../../src/config/firebase-config";
+import { firestore } from "../../../src/services/config/firebase-config";
 
 
 export default function ChatScreen() {

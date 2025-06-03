@@ -1,6 +1,6 @@
 import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { firestore } from "../config/firebase-config";
+import { firestore } from "../services/config/firebase-config";
 
 export const usePerfil = (uid: string | undefined) => {
   const [perfil, setPerfil] = useState<any>(null);

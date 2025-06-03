@@ -6,7 +6,7 @@ import {
     where,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { firestore } from "../config/firebase-config";
+import { firestore } from "../services/config/firebase-config";
 import { Publicacion } from "../types/publicacion"; // Lo creamos en el siguiente paso
 import { useAuth } from "./useAuth";
 

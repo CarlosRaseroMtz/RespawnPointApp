@@ -1,15 +1,15 @@
 import {
-  addDoc,
-  arrayRemove,
-  arrayUnion,
-  collection,
-  doc,
-  getDoc,
-  runTransaction,
-  updateDoc
+    addDoc,
+    arrayRemove,
+    arrayUnion,
+    collection,
+    doc,
+    getDoc,
+    runTransaction,
+    updateDoc
 } from "firebase/firestore";
 import { crearNotificacion } from "../../src/utils/crear-notificacion";
-import { firestore } from "../config/firebase-config";
+import { firestore } from "../services/config/firebase-config";
 
 // ────────────────────────────────
 // 1. LIKE / UNLIKE PUBLICACIÓN

@@ -2,29 +2,29 @@ import FondoLayout from "@/src/components/FondoLayout";
 import * as ImagePicker from "expo-image-picker";
 import { router } from "expo-router";
 import {
-  addDoc,
-  collection,
-  Timestamp,
+    addDoc,
+    collection,
+    Timestamp,
 } from "firebase/firestore";
 import {
-  getDownloadURL,
-  getStorage,
-  ref,
-  uploadBytes,
+    getDownloadURL,
+    getStorage,
+    ref,
+    uploadBytes,
 } from "firebase/storage";
 import { useState } from "react";
 import {
-  Alert,
-  Dimensions,
-  Image,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
+    Alert,
+    Dimensions,
+    Image,
+    Pressable,
+    StyleSheet,
+    Text,
+    TextInput,
+    View,
 } from "react-native";
-import { firestore } from "../../../src/config/firebase-config";
 import { useAuth } from "../../../src/hooks/useAuth";
+import { firestore } from "../../../src/services/config/firebase-config";
 import { normalizarNombreArchivo } from "../../../src/utils/normalizar-nombre-archivo";
 
 const { width } = Dimensions.get("window");

@@ -1,13 +1,13 @@
 import {
-  collection,
-  doc,
-  getDoc,
-  onSnapshot,
-  orderBy,
-  query,
+    collection,
+    doc,
+    getDoc,
+    onSnapshot,
+    orderBy,
+    query,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { firestore } from "../config/firebase-config";
+import { firestore } from "../services/config/firebase-config";
 import { Autor } from "../types/autor";
 import { Publicacion } from "../types/publicacion";
 

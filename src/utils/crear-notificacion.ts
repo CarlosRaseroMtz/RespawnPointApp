@@ -1,5 +1,5 @@
 import { addDoc, collection, doc, getDoc, serverTimestamp } from "firebase/firestore";
-import { firestore } from "../../src/config/firebase-config";
+import { firestore } from "../services/config/firebase-config";
 
 export type TipoNoti = "like" | "comentario" | "seguimiento" | "mensaje";
 

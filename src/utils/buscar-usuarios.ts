@@ -1,5 +1,5 @@
 import { collection, getDocs } from "firebase/firestore";
-import { firestore } from "../config/firebase-config";
+import { firestore } from "../services/config/firebase-config";
 import { UsuarioPreview } from "../types/usuario";
 
 export async function buscarUsuarios(nombre: string, actualUid: string): Promise<UsuarioPreview[]> {

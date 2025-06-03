@@ -1,6 +1,6 @@
 import { doc, onSnapshot } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { firestore } from "../config/firebase-config";
+import { firestore } from "../services/config/firebase-config";
 import { Usuario } from "../types/usuario"; // Lo crearemos en el siguiente paso
 import { useAuth } from "./useAuth";
 

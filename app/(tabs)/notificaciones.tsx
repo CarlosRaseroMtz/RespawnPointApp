@@ -4,15 +4,15 @@ import { getAuth } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 import React, { useState } from "react";
 import {
-  SafeAreaView,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View
+    SafeAreaView,
+    ScrollView,
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View
 } from "react-native";
 import NotificationItem from "../../src/components/NotificacionesItem"; // ajusta el path según tu estructura
-import { app } from "../../src/config/firebase-config";
+import { app } from "../../src/services/config/firebase-config";
 
 const tabs = ["Usuarios", "Comunidades", "Torneos"];
 

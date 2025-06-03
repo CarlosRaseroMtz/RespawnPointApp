@@ -6,7 +6,7 @@ import {
     updateDoc,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { app } from "../config/firebase-config";
+import { app } from "../services/config/firebase-config";
 import { Notificacion } from "../types/notificacion";
 
 

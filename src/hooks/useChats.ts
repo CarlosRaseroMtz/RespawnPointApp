@@ -8,7 +8,7 @@ import {
     where,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { firestore } from "../config/firebase-config";
+import { firestore } from "../services/config/firebase-config";
 import { ChatPreview } from "../types/chats";
 import { useAuth } from "./useAuth";
 

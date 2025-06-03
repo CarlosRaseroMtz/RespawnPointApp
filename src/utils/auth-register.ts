@@ -1,9 +1,9 @@
 import {
-  createUserWithEmailAndPassword,
-  updateProfile,
+    createUserWithEmailAndPassword,
+    updateProfile,
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
-import { auth, firestore } from "../config/firebase-config";
+import { auth, firestore } from "../services/config/firebase-config";
 
 export async function registerUser({
   email,
