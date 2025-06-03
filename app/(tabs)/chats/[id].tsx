@@ -1,3 +1,6 @@
+import { useAuth } from "@/src/hooks/useAuth";
+import { useMarcarMensajesLeidos } from "@/src/hooks/useMarcarMensajesLeidos";
+import { useFocusEffect } from "@react-navigation/native";
 import { useLocalSearchParams } from "expo-router";
 import {
   addDoc,
@@ -10,7 +13,7 @@ import {
   Timestamp,
   updateDoc,
 } from "firebase/firestore";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   FlatList,
   KeyboardAvoidingView,
@@ -23,15 +26,24 @@ import {
 } from "react-native";
 import FondoLayout from "../../../src/components/FondoLayout";
 import { firestore } from "../../../src/config/firebase-config";
-import { useAuth } from "../../../src/hooks/useAuth";
+
 
 export default function ChatScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { user } = useAuth();
-
+  const { marcarMensajesComoLeidos } = useMarcarMensajesLeidos();
   const [mensajes, setMensajes] = useState<any[]>([]);
   const [texto, setTexto] = useState("");
   const flatListRef = useRef<FlatList>(null);
+  const { chatId } = useLocalSearchParams(); // si usas expo-router
+
+  useFocusEffect(
+  useCallback(() => {
+    if (user?.uid && typeof chatId === "string") {
+      marcarMensajesComoLeidos(chatId, user.uid);
+    }
+  }, [chatId, user?.uid])
+);
 
   useEffect(() => {
     if (!id || !user?.uid) return;

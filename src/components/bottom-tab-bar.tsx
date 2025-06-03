@@ -23,7 +23,7 @@ export default function BottomTabBar() {
 
       <TouchableOpacity onPress={() => router.push("../chats")}>
         <View style={{ position: "relative" }}>
-          <AntDesign name="clockcircleo" size={24} color={isActive("/chats") ? "#000" : "#999"} />
+          <Ionicons name="chatbubble-ellipses-outline" size={24} color={isActive("/chats") ? "#000" : "#999"} />
           {unreadChats > 0 && (
             <View style={styles.badge}>
               <Text style={styles.badgeText}>{unreadChats}</Text>
