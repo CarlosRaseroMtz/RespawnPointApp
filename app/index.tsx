@@ -1,3 +1,5 @@
+import "@/src/i18n";
+
 import { useRouter } from "expo-router";
 import React, { useEffect, useRef } from "react";
 import {

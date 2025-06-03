@@ -1,0 +1,18 @@
+{
+  "forgot": {
+    "title": "Recuperar contraseña",
+    "placeholder": "Correo electrónico",
+    "button": "Enviar recuperación",
+    "or": "o",
+    "noAccount": "¿Aún no tienes cuenta?",
+    "register": "Regístrate aquí",
+    "terms1": "Al continuar aceptas nuestros",
+    "termsLink": "Términos de servicio",
+    "privacyLink": "Política de privacidad",
+    "and": "y",
+    "successTitle": "Recuperación enviada",
+    "successMsg": "Revisa tu bandeja de entrada.",
+    "errorTitle": "Error",
+    "errorMsg": "No se pudo enviar el correo. ¿Está bien escrito?"
+  }
+}

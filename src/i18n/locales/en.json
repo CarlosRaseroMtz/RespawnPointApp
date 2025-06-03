@@ -1,0 +1,18 @@
+{
+  "forgot": {
+    "title": "Reset Password",
+    "placeholder": "Email address",
+    "button": "Send Reset Link",
+    "or": "or",
+    "noAccount": "Don't have an account?",
+    "register": "Register here",
+    "terms1": "By continuing you accept our",
+    "termsLink": "Terms of Service",
+    "privacyLink": "Privacy Policy",
+    "and": "and",
+    "successTitle": "Recovery sent",
+    "successMsg": "Check your inbox.",
+    "errorTitle": "Error",
+    "errorMsg": "Could not send the email. Is it correct?"
+  }
+}

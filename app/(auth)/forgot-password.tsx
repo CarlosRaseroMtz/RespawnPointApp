@@ -1,6 +1,7 @@
 import FondoLayout from "@/src/components/FondoLayout";
 import { useRouter } from "expo-router";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import {
   Alert,
   Image,
@@ -14,16 +15,18 @@ import { sendResetLink } from "../../src/utils/auth-reset-password";
 
 export default function ForgotPasswordScreen() {
   const router = useRouter();
+  const { t } = useTranslation();
+  console.log("Traducido:", t("forgot.title"));
   const [email, setEmail] = useState("");
 
   const handleRecovery = async () => {
     try {
       await sendResetLink(email);
-      Alert.alert("Recuperación enviada", "Revisa tu bandeja de entrada.");
+      Alert.alert(t("forgot.successTitle"), t("forgot.successMsg"));
       router.replace("/login");
     } catch (e) {
       console.error("❌ Recuperación:", e);
-      Alert.alert("Error", "No se pudo enviar el correo. ¿Está bien escrito?");
+      Alert.alert(t("forgot.errorTitle"), t("forgot.errorMsg"));
     }
   };
 
@@ -35,11 +38,11 @@ export default function ForgotPasswordScreen() {
           style={styles.logo}
         />
 
-        <Text style={styles.title}>Recuperar contraseña</Text>
+        <Text style={styles.title}>{t("forgot.title")}</Text>
 
         <TextInput
           style={styles.input}
-          placeholder="Correo electrónico"
+          placeholder={t("forgot.placeholder")}
           placeholderTextColor="#888"
           autoCapitalize="none"
           keyboardType="email-address"
@@ -48,35 +51,32 @@ export default function ForgotPasswordScreen() {
         />
 
         <TouchableOpacity style={styles.primaryButton} onPress={handleRecovery}>
-          <Text style={styles.primaryButtonText}>Enviar recuperación</Text>
+          <Text style={styles.primaryButtonText}>{t("forgot.button")}</Text>
         </TouchableOpacity>
 
-        {/* separador */}
         <View style={styles.separator}>
           <View style={styles.line} />
-          <Text style={styles.separatorText}>o</Text>
+          <Text style={styles.separatorText}>{t("forgot.or")}</Text>
           <View style={styles.line} />
         </View>
 
         <Text style={styles.linkText}>
-          ¿Aún no tienes cuenta?{" "}
-          <Text
-            style={styles.pink}
-            onPress={() => router.push("/register")}
-          >
-            Regístrate aquí
+          {t("forgot.noAccount")}{" "}
+          <Text style={styles.pink} onPress={() => router.push("/register")}>
+            {t("forgot.register")}
           </Text>
         </Text>
 
         <Text style={styles.terms}>
-          Al continuar aceptas nuestros{" "}
-          <Text style={styles.linkBlue}>Términos de servicio</Text> y{" "}
-          <Text style={styles.linkBlue}>Política de privacidad</Text>.
+          {t("forgot.terms1")}{" "}
+          <Text style={styles.linkBlue}>{t("forgot.termsLink")}</Text> {t("forgot.and")}{" "}
+          <Text style={styles.linkBlue}>{t("forgot.privacyLink")}</Text>.
         </Text>
       </View>
     </FondoLayout>
   );
 }
+
 
 /* —— estilos sin cambios —— */
 const styles = StyleSheet.create({
