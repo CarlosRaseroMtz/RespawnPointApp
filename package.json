@@ -10,7 +10,7 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "test": "jest",
-    "docs": "typedoc --entryPoints src --out docs"
+    "docs": "typedoc --entryPointStrategy expand"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",

@@ -1,0 +1,11 @@
+{
+  "entryPoints": ["src"],
+  "out": "docs",
+  "includeVersion": true,
+  "excludePrivate": true,
+  "excludeExternals": true,
+  "excludeInternal": true,
+  "tsconfig": "./tsconfig.json",
+  "name": "RespawnPoint App - Documentación",
+  "theme": "default"
+}
