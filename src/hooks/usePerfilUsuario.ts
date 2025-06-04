@@ -4,6 +4,9 @@ import { firestore } from "../services/config/firebase-config";
 import { Usuario } from "../types/usuario"; // Asegúrate de tenerlo creado
 import { useAuth } from "./useAuth";
 
+
+// Custom hook para obtener el perfil del usuario autenticado
+// Escucha en tiempo real los cambios en el documento del usuario en Firestore
 export function usePerfilUsuario() {
   const { user } = useAuth();
   const [perfil, setPerfil] = useState<Usuario | null>(null);

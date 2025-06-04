@@ -10,16 +10,19 @@ import {
   StyleSheet,
   View
 } from "react-native";
-import { useAuth } from "../src/hooks/useAuth"; // ← importar tu hook
+import { useAuth } from "../src/hooks/useAuth";
 
 const { width, height } = Dimensions.get("window");
 
 export default function Splash() {
   const router = useRouter();
-  const { user, loading } = useAuth(); // ← usar estado de auth
+  const { user, loading } = useAuth(); 
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;
+
+  // Animación de entrada
+  // Al cargar la pantalla, se anima el logo para que aparezca suavemente
 
   useEffect(() => {
     Animated.parallel([
@@ -53,6 +56,7 @@ export default function Splash() {
   }, [loading, user]);
 
   return (
+    // Componente principal de la pantalla de inicio
     <View style={styles.container}>
       <Image
         source={require("../assets/images/fondoSplashScreen.png")}
@@ -68,6 +72,7 @@ export default function Splash() {
   );
 }
 
+// Estilos para la pantalla de inicio
 const styles = StyleSheet.create({
   container: {
     flex: 1

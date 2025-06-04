@@ -53,6 +53,7 @@ export default function RegisterScreen() {
   const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
   const [passwordFocused, setPasswordFocused] = useState(false);
 
+  // Validación de criterios de contraseña
   const criterios = {
     longitud: password.length >= 8,
     mayuscula: /[A-Z]/.test(password),
@@ -60,6 +61,7 @@ export default function RegisterScreen() {
     numero: /\d/.test(password),
   };
 
+  // Evaluación de la fuerza de la contraseña
   const evaluarFuerza = (pass: string) => {
     let f = 0;
     if (pass.length >= 8) f++;
@@ -72,6 +74,7 @@ export default function RegisterScreen() {
 
   const fuerza = evaluarFuerza(password);
 
+  // Función para alternar selección de géneros
   const toggleGenre = (genre: string) => {
     if (selectedGenres.includes(genre))
       setSelectedGenres(selectedGenres.filter((g) => g !== genre));
@@ -118,6 +121,7 @@ export default function RegisterScreen() {
   };
 
   return (
+    // —— interfaz principal —— */
     <FondoLayout>
       <ScrollView contentContainerStyle={styles.container}>
         <Image source={require("../../assets/images/logo.png")} style={styles.logo} />
@@ -201,8 +205,8 @@ export default function RegisterScreen() {
 }
 
 
-/* —— estilos idénticos … —— */
-const styles = StyleSheet.create({ /* ↓ mantenidos como los tuyos */
+/* —— estilos … —— */
+const styles = StyleSheet.create({ 
 
   container: { padding: 20, paddingBottom: 40},
   logo: {

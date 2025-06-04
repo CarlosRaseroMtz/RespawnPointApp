@@ -36,6 +36,7 @@ const ChatItem = ({
   const displayMessage = lastMessage?.trim() || t("chatItem.noMessages");
 
   return (
+    //* —— componente de item de chat —— */
     <TouchableOpacity
       key={id}
       style={styles.chatItem}
@@ -60,6 +61,7 @@ const ChatItem = ({
 
 export default ChatItem;
 
+////* —— estilos —— */
 const styles = StyleSheet.create({
   chatItem: { marginBottom: 20 },
   chatRow: { flexDirection: "row", alignItems: "center" },

@@ -17,6 +17,7 @@ else if (deviceLocale.startsWith("fr")) language = "fr";
 else if (deviceLocale.startsWith("it")) language = "it";
 else if (deviceLocale.startsWith("de")) language = "de";
 
+// Inicializar i18n con los recursos de traducción
 i18n
   .use(initReactI18next)
   .init({

@@ -2,6 +2,9 @@ import { doc, getDoc } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { firestore } from "../services/config/firebase-config";
 
+
+// Custom hook para obtener el perfil de un usuario por su UID
+// Utiliza getDoc para obtener el documento del usuario en Firestore
 export const usePerfil = (uid: string | undefined) => {
   const [perfil, setPerfil] = useState<any>(null);
 

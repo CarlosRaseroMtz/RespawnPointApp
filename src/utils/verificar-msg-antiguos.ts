@@ -2,6 +2,7 @@
 import { collectionGroup, getDocs } from "firebase/firestore";
 import { firestore } from "../services/config/firebase-config";
 
+// Verifica si hay mensajes antiguos que usan el campo "texto" en lugar de "contenido"
 export const verificarMensajesAntiguos = async () => {
   console.log("🔍 Verificando mensajes antiguos...");
 

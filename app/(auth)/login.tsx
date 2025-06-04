@@ -17,6 +17,12 @@ import { loginWithEmail } from "../../src/utils/auth-login";
 
 const { width } = Dimensions.get("window");
 
+/**
+ * Pantalla de inicio de sesión
+ * Permite al usuario ingresar su email y contraseña para acceder a la aplicación
+ * Utiliza el layout FondoLayout para el fondo y estilo general
+ */
+
 export default function LoginScreen() {
   const router = useRouter();
   const { t } = useTranslation();
@@ -47,6 +53,7 @@ export default function LoginScreen() {
   };
 
   return (
+    // —— interfaz principal —— */
     <FondoLayout>
       <View style={styles.container}>
         <View style={styles.background} />
@@ -154,7 +161,7 @@ export default function LoginScreen() {
 }
 
 
-/* ——— estilos idénticos ——— */
+/* ——— estilos ——— */
 const styles = StyleSheet.create({
   container: { flex: 1, position: "relative"},
   background: {

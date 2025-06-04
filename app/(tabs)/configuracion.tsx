@@ -16,6 +16,9 @@ import { useAuth } from "../../src/hooks/useAuth";
 import { usePerfilUsuario } from "../../src/hooks/usePerfilUsuario";
 import { cerrarSesion, eliminarCuenta } from "../../src/utils/auth-actions";
 
+/**
+ * Pantalla de configuración
+ */
 export default function ConfiguracionScreen() {
   const router = useRouter();
   const { t } = useTranslation();
@@ -23,6 +26,7 @@ export default function ConfiguracionScreen() {
   const perfil = usePerfilUsuario();
 
   return (
+    // —— interfaz principal —— */
     <FondoLayout>
       <SafeAreaView style={styles.container}>
         <ScrollView>
@@ -102,8 +106,9 @@ export default function ConfiguracionScreen() {
   );
 }
 
+// /* —— estilos —— */
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", paddingHorizontal: 16 },
+  container: { flex: 1, paddingHorizontal: 16 },
   sectionTitle: {
     fontWeight: "600",
     fontSize: 15,

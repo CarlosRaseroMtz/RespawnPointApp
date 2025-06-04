@@ -3,6 +3,7 @@ import { deleteDoc, doc } from "firebase/firestore";
 import { Alert } from "react-native";
 import { auth, firestore } from "../services/config/firebase-config";
 
+// Funciones para manejar acciones de autenticación
 export async function cerrarSesion(router: any) {
   try {
     await signOut(auth);
@@ -13,6 +14,7 @@ export async function cerrarSesion(router: any) {
   }
 }
 
+// Función para eliminar la cuenta del usuario
 export async function eliminarCuenta(uid: string | undefined, router: any) {
   if (!uid) return;
 

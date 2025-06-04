@@ -31,7 +31,7 @@ import { firestore } from "../../../src/services/config/firebase-config";
 export default function ChatScreen() {
   const { t } = useTranslation();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const { chatId } = useLocalSearchParams(); // si usas expo-router
+  const { chatId } = useLocalSearchParams(); 
   const { user } = useAuth();
   const { marcarMensajesComoLeidos } = useMarcarMensajesLeidos();
 
@@ -39,6 +39,8 @@ export default function ChatScreen() {
   const [texto, setTexto] = useState("");
   const flatListRef = useRef<FlatList>(null);
 
+  // Marcar mensajes como leídos al entrar al chat
+  // Se usa useFocusEffect para asegurarse de que se ejecute al entrar en el chat
   useFocusEffect(
     useCallback(() => {
       if (user?.uid && typeof chatId === "string") {
@@ -99,6 +101,7 @@ export default function ChatScreen() {
   };
 
   return (
+      // Renderiza el layout del chat
     <FondoLayout>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
@@ -147,6 +150,7 @@ export default function ChatScreen() {
   );
 }
 
+//* —— estilos —— */
 const styles = StyleSheet.create({
   burbuja: {
     maxWidth: "75%",

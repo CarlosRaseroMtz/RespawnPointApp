@@ -31,6 +31,9 @@ export default function OtherProfile() {
   const [yoSigo, setYoSigo] = useState(false);
   const [seguidoresCnt, setSeguidoresCnt] = useState(0);
 
+  // Cargar información del usuario
+  // Se usa onSnapshot para escuchar cambios en tiempo real
+
   useEffect(() => {
     if (!uid) return;
     const ref = doc(firestore, "usuarios", uid);
@@ -82,6 +85,7 @@ export default function OtherProfile() {
   const siguiendo = info.siguiendo?.length ?? 0;
 
   return (
+    //* ——— interfaz principal —— */
     <SafeAreaView style={s.container}>
       <View style={s.topPadding} />
       <Text style={s.nameTxt}>{info.username}</Text>
@@ -165,8 +169,8 @@ const s = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 14,     // ⬅️ menos hueco
-    gap: 16,              // ⬅️ un poco más compacto
+    marginBottom: 14,  
+    gap: 16,           
   },
   row: { flexDirection: "row", alignItems: "center", marginBottom: 14 },
   avatar: { width: C.PHOTO, height: C.PHOTO, borderRadius: C.PHOTO / 2, borderWidth: 1, borderColor: "#FF66C4", },

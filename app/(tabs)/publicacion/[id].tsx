@@ -64,6 +64,7 @@ export default function PublicacionDetalle() {
 
   const flatRef = useRef<FlatList>(null);
 
+  // Redirigir al usuario si no hay ID de publicación
   useEffect(() => {
     if (!id) return;
     const ref = doc(firestore, "publicaciones", id);
@@ -139,6 +140,7 @@ export default function PublicacionDetalle() {
   if (loading) return <ActivityIndicator style={{ flex: 1 }} />;
 
   return (
+    //* ——— interfaz principal —— */
     <FondoLayout>
       <FlatList
         ref={flatRef}
@@ -218,6 +220,7 @@ export default function PublicacionDetalle() {
   );
 }
 
+////* —— estilos —— */
 const styles = StyleSheet.create({
   coment: {
     maxWidth: "75%",

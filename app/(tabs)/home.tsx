@@ -22,6 +22,8 @@ export default function HomeScreen() {
   const { user } = useAuth();
 
   const allPosts = usePublicacionesFeed();
+  // Filtrar publicaciones según la pestaña activa
+  // "foryou" muestra todas, "games" filtra por videojuegos, "memes" por memes
 
   const posts = allPosts.filter((post) => {
     const categoria = post.categoria?.toLowerCase?.() || "";
@@ -57,6 +59,7 @@ export default function HomeScreen() {
   );
 
   return (
+    // —— interfaz principal —— */
     <FondoLayout>
       <SafeAreaView style={styles.container}>
         {/* pestañas */}
@@ -88,6 +91,7 @@ export default function HomeScreen() {
   );
 }
 
+//* —— estilos —— */
 const styles = StyleSheet.create({
   container: { flex: 1, paddingTop: 16 },
   tabs: {

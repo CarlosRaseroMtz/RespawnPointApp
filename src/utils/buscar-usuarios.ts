@@ -2,6 +2,7 @@ import { collection, getDocs } from "firebase/firestore";
 import { firestore } from "../services/config/firebase-config";
 import { UsuarioPreview } from "../types/usuario";
 
+// Función para buscar usuarios por nombre de usuario
 export async function buscarUsuarios(nombre: string, actualUid: string): Promise<UsuarioPreview[]> {
   const snap = await getDocs(collection(firestore, "usuarios"));
 

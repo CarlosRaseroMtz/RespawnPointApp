@@ -7,6 +7,7 @@ import {
 } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
 
+// Custom hook para obtener contadores de notificaciones y chats no leídos
 export function useUnreadCounters(uid: string | undefined) {
   const [unreadNotis, setUnreadNotis] = useState(0);
   const [unreadChats, setUnreadChats] = useState(0);

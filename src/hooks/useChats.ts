@@ -12,10 +12,14 @@ import { firestore } from "../services/config/firebase-config";
 import { ChatPreview } from "../types/chats";
 import { useAuth } from "./useAuth";
 
+// Custom hook para obtener los chats del usuario autenticado
+// Escucha en tiempo real los cambios en la colección "chats"
 export function useChats() {
     const { user } = useAuth();
     const [chats, setChats] = useState<ChatPreview[]>([]);
 
+    // Efecto para suscribirse a los cambios en la colección "chats"
+    // Filtra los chats donde el usuario es participante y ordena por timestamp
     useEffect(() => {
         if (!user) return;
 

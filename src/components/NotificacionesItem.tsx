@@ -11,6 +11,8 @@ import {
 } from "react-native";
 import { Notificacion } from "../types/notificacion";
 
+// Definición de las propiedades del componente NotificationItem
+
 interface NotificationItemProps extends Notificacion {
   seguido?: boolean;
   onToggleSeguir?: (id: string) => void;
@@ -30,6 +32,7 @@ const NotificationItem = ({
   const { t } = useTranslation();
 
   return (
+    //* —— componente de notificación —— */
     <View style={[styles.notification, { position: "relative" }]}>
       {!leida && <View style={styles.unreadDot} />}
       <Image source={{ uri: avatar }} style={styles.avatar} />
@@ -69,6 +72,7 @@ const NotificationItem = ({
 
 export default NotificationItem;
 
+// estilos
 const styles = StyleSheet.create({
   notification: {
     flexDirection: "row",

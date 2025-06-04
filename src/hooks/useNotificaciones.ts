@@ -9,6 +9,9 @@ import { useEffect, useState } from "react";
 import { app } from "../services/config/firebase-config";
 import { Notificacion } from "../types/notificacion";
 
+
+// Custom hook para obtener las notificaciones del usuario autenticado
+// Escucha en tiempo real los cambios en la colección "notificaciones"
 export function useNotificaciones(categoriaActiva: string) {
   const [notifications, setNotifications] = useState<Notificacion[]>([]);
 
@@ -16,6 +19,8 @@ export function useNotificaciones(categoriaActiva: string) {
   const auth = getAuth(app);
   const user = auth.currentUser;
 
+  // Efecto para suscribirse a los cambios en la colección "notificaciones"
+  // Filtra las notificaciones por categoría y marca como leídas
   useEffect(() => {
     
     if (!user) return;

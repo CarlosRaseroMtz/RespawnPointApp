@@ -1,4 +1,3 @@
-// components/FondoLayout.tsx
 import React from "react";
 import { Image, StyleSheet, View } from "react-native";
 
@@ -17,6 +16,7 @@ export default function FondoLayout({ children }: { children: React.ReactNode })
   );
 }
 
+// estilos
 const styles = StyleSheet.create({
   container: { flex: 1 },
   background: {

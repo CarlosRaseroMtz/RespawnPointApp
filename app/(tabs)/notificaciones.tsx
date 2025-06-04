@@ -17,6 +17,11 @@ import { app } from "../../src/services/config/firebase-config";
 
 const tabKeys = ["usuarios", "comunidades", "torneos"];
 
+/**
+ * Pantalla de notificaciones
+ * Muestra las notificaciones del usuario organizadas por pestañas
+ * Utiliza el layout FondoLayout para el fondo y estilo general
+ */
 export default function NotificacionesScreen() {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("usuarios");
@@ -38,6 +43,7 @@ export default function NotificacionesScreen() {
   );
 
   return (
+    //* ——— interfaz principal —— */
     <FondoLayout>
       <SafeAreaView style={{ flex: 1 }}>
         <View style={styles.container}>
@@ -97,6 +103,7 @@ export default function NotificacionesScreen() {
   );
 }
 
+//* ——— estilos ——— */
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 16,

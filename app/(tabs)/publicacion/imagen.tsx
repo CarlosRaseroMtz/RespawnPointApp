@@ -25,6 +25,9 @@ export default function ImagenScreen() {
   const opacity = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(0.95)).current;
 
+  // animación de entrada
+  // al cargar la pantalla, se anima la imagen para que aparezca suavemente
+
   useEffect(() => {
     Animated.parallel([
       Animated.timing(opacity, {
@@ -66,6 +69,7 @@ export default function ImagenScreen() {
   };
 
   return (
+    // pantalla principal
     <SafeAreaView style={styles.container}>
       <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
         <Ionicons name="close" size={30} color="#fff" />
@@ -88,7 +92,7 @@ export default function ImagenScreen() {
     </SafeAreaView>
   );
 }
-
+// estilos
 const styles = StyleSheet.create({
   container: {
     flex: 1,

@@ -1,15 +1,17 @@
 import {
-    collection,
-    onSnapshot,
-    orderBy,
-    query,
-    where,
+  collection,
+  onSnapshot,
+  orderBy,
+  query,
+  where,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { firestore } from "../services/config/firebase-config";
 import { Publicacion } from "../types/publicacion"; // Lo creamos en el siguiente paso
 import { useAuth } from "./useAuth";
 
+// Custom hook para obtener las publicaciones del usuario autenticado
+// Escucha en tiempo real los cambios en la colección "publicaciones"
 export function useMisPublicaciones() {
   const { user } = useAuth();
   const [posts, setPosts] = useState<Publicacion[]>([]);

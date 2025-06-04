@@ -7,6 +7,8 @@ interface UserHeaderProps {
   avatarUrl: string;
 }
 
+// Componente UserHeader que muestra el encabezado del usuario
+
 const UserHeader = ({ username, plataforma, avatarUrl }: UserHeaderProps) => {
   return (
     <View style={styles.header}>
@@ -20,6 +22,8 @@ const UserHeader = ({ username, plataforma, avatarUrl }: UserHeaderProps) => {
 };
 
 export default UserHeader;
+
+// Estilos para el componente UserHeader
 
 const styles = StyleSheet.create({
   header: {

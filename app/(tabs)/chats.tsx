@@ -43,6 +43,8 @@ export default function ChatsScreen() {
 
   const chats = useChats();
 
+  // Función para buscar usuarios
+  // Se filtran los usuarios por el texto ingresado y el ID del usuario actual
   const handleBuscarUsuarios = async (text: string) => {
     setBusqueda(text);
     if (text.length >= 2 && user?.uid) {
@@ -52,6 +54,7 @@ export default function ChatsScreen() {
       setResultados([]);
     }
   };
+  // Función para iniciar un chat con un usuario
 
   const iniciarChatCon = async (usuario: any) => {
     if (!user) return;
@@ -90,6 +93,9 @@ export default function ChatsScreen() {
     activeTab === "Comunidades" ? groupChats :
     [];
 
+
+  // Función para crear un nuevo grupo
+  // Se crea un nuevo chat con los participantes seleccionados
   const crearGrupo = async () => {
     if (!user || participantesGrupo.length < 1) return;
 
@@ -98,8 +104,8 @@ export default function ChatsScreen() {
       tipo: "grupo",
       timestamp: new Date(),
       lastMessage: "",
-      //nombreC: nombreGrupo || "Nuevo Grupo",
-      //avatarC: avatarGrupo || "https://i.pravatar.cc/150?img=1",
+      //nombreC: nombreGrupo || "Nuevo Grupo", -- no me funca :(
+      //avatarC: avatarGrupo || "https://i.pravatar.cc/150?img=1", -- no me funca :(
     });
 
     setModoCrearGrupo(false);
@@ -120,6 +126,7 @@ export default function ChatsScreen() {
   };
 
   return (
+    // Renderizado del componente principal
     <FondoLayout>
       <SafeAreaView style={styles.container}>
         <Text style={styles.title}>{t("chats.title")}</Text>

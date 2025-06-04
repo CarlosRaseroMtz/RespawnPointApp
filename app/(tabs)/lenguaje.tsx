@@ -15,6 +15,11 @@ const LANGUAGES = [
   { code: "de" },
 ];
 
+/**
+ * Pantalla de configuración de accesibilidad y preferencias
+ * Permite al usuario seleccionar idioma, privacidad y modo oscuro
+ * Utiliza el layout FondoLayout para el fondo y estilo general
+ */
 export default function AccessibilityLanguageScreen() {
   const { t } = useTranslation();
   const router = useRouter();
@@ -54,6 +59,7 @@ export default function AccessibilityLanguageScreen() {
   };
 
   return (
+    // —— interfaz principal —— */
     <FondoLayout>
       <ScrollView style={[styles.container, { backgroundColor: isDark ? "#121212" : "#ffffff" }]}>
         <Text style={[styles.title, { color: isDark ? "#FF66C4" : "#000" }]}>
@@ -132,6 +138,7 @@ export default function AccessibilityLanguageScreen() {
   );
 }
 
+// /* —— estilos —— */
 const styles = StyleSheet.create({
   container: {
     flex: 1,

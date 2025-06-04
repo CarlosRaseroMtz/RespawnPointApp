@@ -18,6 +18,7 @@ const IMG = (width - 36) / 2;
 const truncate = (t: string, n = 26) =>
   t.length > n ? t.slice(0, n - 1) + "…" : t;
 
+//* ——— pantalla de perfil del usuario ——— */
 export default function MyProfile() {
   const router = useRouter();
   const { t } = useTranslation();
@@ -35,6 +36,7 @@ export default function MyProfile() {
   const sigo = info.siguiendo?.length ?? 0;
 
   return (
+    //* ——— interfaz principal —— */
     <FondoLayout>
       <SafeAreaView style={styles.container}>
         <TouchableOpacity
@@ -90,6 +92,7 @@ function Counter({ n, label }: { n: number; label: string }) {
   );
 }
 
+//* ——— estilos ——— */
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 16 },
   center: { flex: 1, justifyContent: "center", alignItems: "center" },

@@ -31,6 +31,9 @@ import { normalizarNombreArchivo } from "../../../src/utils/normalizar-nombre-ar
 const { width } = Dimensions.get("window");
 const CATEGORIAS = ["Videojuego", "Meme"];
 
+//* —— pantalla de creación de publicaciones —— */
+// Esta pantalla permite a los usuarios crear una nueva publicación con texto, imagen y categoría
+
 export default function CreatePostScreen() {
   const { t } = useTranslation();
   const { user, loading } = useAuth();
@@ -95,6 +98,7 @@ export default function CreatePostScreen() {
   };
 
   return (
+    //* —— UI —— */
     <FondoLayout>
       <View style={styles.container}>
         <View style={styles.box}>
@@ -149,6 +153,7 @@ export default function CreatePostScreen() {
   );
 }
 
+////* —— estilos —— */
 const styles = StyleSheet.create({
   container: {
     flex: 1,

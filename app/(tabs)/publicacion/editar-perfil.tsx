@@ -31,6 +31,9 @@ const genres = [
   "Survival", "Battle Royale", "Sigilo", "Construcción", "Educativo", "Otro"
 ];
 
+// * —— pantalla de edición de perfil —— */
+// Esta pantalla permite a los usuarios editar su perfil, incluyendo nombre de usuario, foto de perfil,
+
 export default function EditarPerfilScreen() {
   const router = useRouter();
   const { user } = useAuth();
@@ -101,6 +104,7 @@ export default function EditarPerfilScreen() {
   };
 
   return (
+    //* —— interfaz principal —— */
     <FondoLayout>
       <ScrollView contentContainerStyle={styles.container}>
         <Text style={styles.title}>{t("editProfile.title")}</Text>
@@ -164,7 +168,7 @@ export default function EditarPerfilScreen() {
   );
 }
 
-
+////* —— estilos —— */
 const styles = StyleSheet.create({
   container: {
     padding: 20,

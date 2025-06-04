@@ -2,6 +2,8 @@
 import { collection, getDocs, getFirestore, writeBatch } from "firebase/firestore";
 import { useCallback } from "react";
 
+// Custom hook para marcar mensajes como leídos en un chat específico
+// Utiliza Firestore para actualizar los mensajes y agregar el UID del usuario que los ha leído
 export function useMarcarMensajesLeidos() {
   const marcarMensajesComoLeidos = useCallback(async (chatId: string, uid: string) => {
     const db = getFirestore();

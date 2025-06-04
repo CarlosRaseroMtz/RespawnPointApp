@@ -10,6 +10,7 @@ interface CrearNotificacionParams {
   tipo: TipoNoti;
 }
 
+// Función para crear una notificación en Firestore
 export const crearNotificacion = async ({
   paraUid,
   deUid,

@@ -1,10 +1,10 @@
 import {
-    collection,
-    doc,
-    getDoc,
-    onSnapshot,
-    orderBy,
-    query,
+  collection,
+  doc,
+  getDoc,
+  onSnapshot,
+  orderBy,
+  query,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { firestore } from "../services/config/firebase-config";
@@ -14,6 +14,9 @@ import { Publicacion } from "../types/publicacion";
 interface PostConAutor extends Publicacion {
   autor: Autor;
 }
+
+// Custom hook para obtener el feed de publicaciones
+// Escucha en tiempo real las publicaciones ordenadas por timestamp
 
 export function usePublicacionesFeed() {
   const [posts, setPosts] = useState<PostConAutor[]>([]);

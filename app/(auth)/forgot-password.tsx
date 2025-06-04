@@ -13,6 +13,12 @@ import {
 } from "react-native";
 import { sendResetLink } from "../../src/utils/auth-reset-password";
 
+/**
+ * Pantalla de recuperación de contraseña
+ * Permite al usuario ingresar su email para recibir un enlace de restablecimiento
+ * Utiliza el layout FondoLayout para el fondo y estilo general
+ */
+
 export default function ForgotPasswordScreen() {
   const router = useRouter();
   const { t } = useTranslation();
@@ -30,6 +36,8 @@ export default function ForgotPasswordScreen() {
   };
 
   return (
+
+  // —— interfaz principal —— */
     <FondoLayout>
       <View style={styles.container}>
         <Image
@@ -77,7 +85,7 @@ export default function ForgotPasswordScreen() {
 }
 
 
-/* —— estilos sin cambios —— */
+/* —— estilos —— */
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, justifyContent: "center" },
   logo: {

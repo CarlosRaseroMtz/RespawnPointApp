@@ -4,6 +4,9 @@ import { firestore } from "../services/config/firebase-config";
 import { Usuario } from "../types/usuario"; // Lo crearemos en el siguiente paso
 import { useAuth } from "./useAuth";
 
+
+// Custom hook para obtener la información del perfil del usuario autenticado
+// Escucha en tiempo real los cambios en el documento del usuario en Firestore
 export function useMiPerfil() {
   const { user } = useAuth();
   const [info, setInfo] = useState<Usuario | null>(null);

@@ -11,6 +11,7 @@ const PostGridItem = ({ id, mediaUrl }: PostGridItemProps) => {
   const router = useRouter();
 
   return (
+    //* —— componente de item de cuadrícula de post —— */
     <TouchableOpacity
       activeOpacity={0.8}
       onPress={() =>
@@ -25,6 +26,7 @@ const PostGridItem = ({ id, mediaUrl }: PostGridItemProps) => {
   );
 };
 
+// Estilos para el componente PostGridItem
 const styles = StyleSheet.create({
   gridImg: {
     width: (Dimensions.get("window").width - 36) / 2,

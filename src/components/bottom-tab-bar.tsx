@@ -1,4 +1,3 @@
-// app/components/BottomTabBar.tsx (si no tienes carpetas, ponlo en app/)
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { usePathname, useRouter } from "expo-router";
 import { getAuth } from "firebase/auth";
@@ -7,6 +6,7 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useUnreadCounters } from "../hooks/useUnreadCounters";
 
+// Importa los hooks personalizados para obtener contadores de notificaciones y chats
 export default function BottomTabBar() {
   const router = useRouter();
   const pathname = usePathname();
@@ -16,6 +16,9 @@ export default function BottomTabBar() {
   const { unreadNotis, unreadChats } = useUnreadCounters(getAuth().currentUser?.uid);
 
   return (
+
+    // Componente de barra de navegación inferior
+    // Utiliza iconos de AntDesign e Ionicons
     <View style={[styles.bottomTabBar, { paddingBottom: insets.bottom || 10 }]}>
       <TouchableOpacity onPress={() => router.push("../home")}>
         <AntDesign name="home" size={24} color={isActive("/home") ? "#000" : "#999"} />
@@ -60,7 +63,7 @@ export default function BottomTabBar() {
     </View>
   );
 }
-
+// styles.js
 const styles = StyleSheet.create({
   bottomTabBar: {
     flexDirection: "row",

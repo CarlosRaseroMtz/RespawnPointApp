@@ -1,6 +1,6 @@
 import {
-    createUserWithEmailAndPassword,
-    updateProfile,
+  createUserWithEmailAndPassword,
+  updateProfile,
 } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { auth, firestore } from "../services/config/firebase-config";
@@ -20,6 +20,7 @@ export async function registerUser({
   platform: string;
   selectedGenres: string[];
 }) {
+  // Validaciones simples
   const { user } = await createUserWithEmailAndPassword(auth, email, password);
   await updateProfile(user, { displayName: fullName });
 

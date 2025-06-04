@@ -45,6 +45,7 @@ export default function PostCard({
   const { t } = useTranslation();
 
   return (
+    //* —— componente de tarjeta de post —— */
     <View style={styles.card}>
       <TouchableOpacity
         style={styles.header}
