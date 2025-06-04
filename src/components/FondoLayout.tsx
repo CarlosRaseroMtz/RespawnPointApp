@@ -1,7 +1,16 @@
-import React from "react";
+import React, { JSX } from "react";
 import { Image, StyleSheet, View } from "react-native";
 
-export default function FondoLayout({ children }: { children: React.ReactNode }) {
+/**
+ * Componente de layout que renderiza un fondo de pantalla completo con una imagen,
+ * y coloca los elementos hijos (`children`) encima.
+ *
+ * Útil para pantallas como splash screens, formularios o pantallas de bienvenida.
+ *
+ * @param props.children Elementos React que se renderizan sobre el fondo.
+ * @returns {JSX.Element} Un layout con fondo de imagen y contenido superpuesto.
+ */
+export default function FondoLayout({ children }: { children: React.ReactNode }): JSX.Element {
   return (
     <View style={styles.container}>
       <Image

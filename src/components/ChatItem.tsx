@@ -1,5 +1,5 @@
 import { router } from "expo-router";
-import React from "react";
+import React, { JSX } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Image,
@@ -9,17 +9,37 @@ import {
   View,
 } from "react-native";
 
+/**
+ * Props para el componente ChatItem.
+ */
 interface ChatItemProps {
+  /** ID único del chat. */
   id: string;
+  /** URL del avatar del contacto. */
   avatar?: string;
+  /** Nombre del contacto. */
   nombre?: string;
+  /** Último mensaje enviado o recibido. */
   lastMessage?: string;
+  /** Timestamp del último mensaje. */
   timestamp?: string;
+  /** Función personalizada al hacer click (opcional). */
   onPress?: () => void;
+  /** Avatar alternativo (no usado en este componente). */
   avatarC?: string;
+  /** Nombre alternativo (no usado en este componente). */
   nombreC?: string;
 }
 
+/**
+ * Muestra un ítem de la lista de chats con avatar, nombre, último mensaje y hora.
+ * Si no se pasa una función `onPress`, redirige automáticamente a `/chats/{id}`.
+ *
+ * Usa traducciones `i18next` para mostrar valores predeterminados si faltan datos.
+ *
+ * @param {ChatItemProps} props Propiedades del componente.
+ * @returns {JSX.Element} Elemento renderizado del chat.
+ */
 const ChatItem = ({
   id,
   avatar,
@@ -27,7 +47,7 @@ const ChatItem = ({
   lastMessage,
   timestamp,
   onPress,
-}: ChatItemProps) => {
+}: ChatItemProps): JSX.Element => {
   const { t } = useTranslation();
 
   const defaultAvatar = "https://i.pravatar.cc/150?img=12";
@@ -60,6 +80,7 @@ const ChatItem = ({
 };
 
 export default ChatItem;
+
 
 ////* —— estilos —— */
 const styles = StyleSheet.create({

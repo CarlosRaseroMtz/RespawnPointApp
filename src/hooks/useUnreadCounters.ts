@@ -7,8 +7,21 @@ import {
 } from "firebase/firestore";
 import { useEffect, useRef, useState } from "react";
 
-// Custom hook para obtener contadores de notificaciones y chats no leídos
-export function useUnreadCounters(uid: string | undefined) {
+/**
+ * Hook personalizado para contar en tiempo real:
+ * - Notificaciones no leídas
+ * - Chats con mensajes no leídos
+ *
+ * Escucha la colección de notificaciones del usuario y cada subcolección de mensajes
+ * dentro de los chats en los que participa.
+ *
+ * @param {string | undefined} uid UID del usuario autenticado.
+ * @returns {{ unreadNotis: number; unreadChats: number }} Contadores de notificaciones y chats no leídos.
+ */
+export function useUnreadCounters(uid: string | undefined): {
+  unreadNotis: number;
+  unreadChats: number;
+} {
   const [unreadNotis, setUnreadNotis] = useState(0);
   const [unreadChats, setUnreadChats] = useState(0);
 
@@ -28,7 +41,11 @@ export function useUnreadCounters(uid: string | undefined) {
     });
 
     // 💬 Chats del usuario
-    const chatsRef = query(collection(db, "chats"), where("participantes", "array-contains", uid));
+    const chatsRef = query(
+      collection(db, "chats"),
+      where("participantes", "array-contains", uid)
+    );
+
     const unsubChats = onSnapshot(chatsRef, (chatsSnap) => {
       // 🧼 Limpia todos los listeners anteriores de mensajes
       mensajesUnsubsRef.current.forEach((unsub) => unsub());
@@ -52,12 +69,10 @@ export function useUnreadCounters(uid: string | undefined) {
             return data.userId !== uid && !data.leidoPor?.includes(uid);
           });
 
-          // Actualiza el contador por cada cambio en mensajes
+          mensajesUnsubsRef.current.set(chatId, unsubMensajes);
+
           if (hayNoLeidos) {
-            mensajesUnsubsRef.current.set(chatId, unsubMensajes);
             totalNoLeidos++;
-          } else {
-            mensajesUnsubsRef.current.set(chatId, unsubMensajes);
           }
 
           procesados++;
@@ -71,7 +86,6 @@ export function useUnreadCounters(uid: string | undefined) {
     return () => {
       unsubNotis();
       unsubChats();
-      // Limpia todos los listeners de mensajes al desmontar
       mensajesUnsubsRef.current.forEach((unsub) => unsub());
       mensajesUnsubsRef.current.clear();
     };

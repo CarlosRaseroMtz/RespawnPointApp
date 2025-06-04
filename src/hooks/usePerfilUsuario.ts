@@ -1,13 +1,18 @@
 import { doc, onSnapshot } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { firestore } from "../services/config/firebase-config";
-import { Usuario } from "../types/usuario"; // Asegúrate de tenerlo creado
+import { Usuario } from "../types/usuario";
 import { useAuth } from "./useAuth";
 
-
-// Custom hook para obtener el perfil del usuario autenticado
-// Escucha en tiempo real los cambios en el documento del usuario en Firestore
-export function usePerfilUsuario() {
+/**
+ * Hook personalizado que obtiene en tiempo real el perfil del usuario autenticado desde Firestore.
+ *
+ * Se suscribe al documento del usuario en la colección `usuarios` y actualiza automáticamente
+ * el estado local al detectar cambios. También maneja errores de permisos.
+ *
+ * @returns {Usuario | null} Objeto con los datos del perfil o `null` si no hay usuario autenticado.
+ */
+export function usePerfilUsuario(): Usuario | null {
   const { user } = useAuth();
   const [perfil, setPerfil] = useState<Usuario | null>(null);
 

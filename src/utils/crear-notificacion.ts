@@ -1,22 +1,41 @@
 import { addDoc, collection, doc, getDoc, serverTimestamp } from "firebase/firestore";
 import { firestore } from "../services/config/firebase-config";
 
+/**
+ * Tipos de notificaciones disponibles.
+ */
 export type TipoNoti = "like" | "comentario" | "seguimiento" | "mensaje";
 
+/**
+ * Parámetros requeridos para crear una notificación.
+ */
 interface CrearNotificacionParams {
+  /** UID del usuario que recibirá la notificación. */
   paraUid: string;
+
+  /** UID del usuario que genera la notificación. */
   deUid: string;
+
+  /** Contenido o mensaje de la notificación. */
   contenido: string;
+
+  /** Tipo de la notificación (like, comentario, seguimiento o mensaje). */
   tipo: TipoNoti;
 }
 
-// Función para crear una notificación en Firestore
+/**
+ * Crea una notificación en la subcolección `notificaciones/{paraUid}/items` de Firestore.
+ * Obtiene los datos del usuario emisor (`deUid`) y añade los metadatos correspondientes.
+ *
+ * @param {CrearNotificacionParams} params Objeto con los campos necesarios para la notificación.
+ * @returns {Promise<void>} Promesa que se resuelve al completar la operación o se ignora si faltan campos.
+ */
 export const crearNotificacion = async ({
   paraUid,
   deUid,
   contenido,
   tipo,
-}: CrearNotificacionParams) => {
+}: CrearNotificacionParams): Promise<void> => {
   if (!paraUid || !deUid || !contenido || !tipo) {
     console.warn("❌ No se ha creado notificación: faltan campos.");
     return;

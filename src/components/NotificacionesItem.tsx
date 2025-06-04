@@ -1,6 +1,6 @@
 import { formatDistanceToNow } from "date-fns";
 import { es } from "date-fns/locale";
-import React from "react";
+import React, { JSX } from "react";
 import { useTranslation } from "react-i18next";
 import {
   Image,
@@ -11,13 +11,26 @@ import {
 } from "react-native";
 import { Notificacion } from "../types/notificacion";
 
-// Definición de las propiedades del componente NotificationItem
-
+/**
+ * Props del componente NotificationItem.
+ * Extiende de la interfaz base `Notificacion` y agrega propiedades opcionales relacionadas con acciones sociales.
+ */
 interface NotificationItemProps extends Notificacion {
+  /** Indica si el usuario ya está seguido. */
   seguido?: boolean;
+  /** Función para alternar el estado de seguimiento. */
   onToggleSeguir?: (id: string) => void;
 }
 
+/**
+ * Componente para mostrar una notificación individual.
+ * Muestra avatar, nombre, mensaje, fecha y (si aplica) un botón para seguir/seguir de vuelta.
+ *
+ * Usa `date-fns` para formatear el tiempo relativo y `i18next` para traducciones.
+ *
+ * @param {NotificationItemProps} props Propiedades de la notificación.
+ * @returns {JSX.Element} Elemento visual representando una notificación.
+ */
 const NotificationItem = ({
   id,
   user,
@@ -28,13 +41,14 @@ const NotificationItem = ({
   action,
   seguido,
   onToggleSeguir,
-}: NotificationItemProps) => {
+}: NotificationItemProps): JSX.Element => {
   const { t } = useTranslation();
 
   return (
     //* —— componente de notificación —— */
     <View style={[styles.notification, { position: "relative" }]}>
       {!leida && <View style={styles.unreadDot} />}
+
       <Image source={{ uri: avatar }} style={styles.avatar} />
 
       <View style={{ flex: 1 }}>

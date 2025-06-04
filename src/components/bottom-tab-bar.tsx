@@ -1,24 +1,40 @@
 import { AntDesign, Ionicons } from "@expo/vector-icons";
 import { usePathname, useRouter } from "expo-router";
 import { getAuth } from "firebase/auth";
-import React from "react";
+import React, { JSX } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useUnreadCounters } from "../hooks/useUnreadCounters";
 
-// Importa los hooks personalizados para obtener contadores de notificaciones y chats
-export default function BottomTabBar() {
+/**
+ * Componente de barra de navegación inferior para la app.
+ * 
+ * Muestra iconos para navegación a: Home, Chats, Crear Publicación, Notificaciones y Perfil.
+ * 
+ * Integra:
+ * - Iconos con cambio de color según la ruta activa.
+ * - Contadores de mensajes no leídos y notificaciones no vistas.
+ * - Padding dinámico basado en el área segura del dispositivo.
+ * 
+ * @returns {JSX.Element} La barra de navegación inferior.
+ */
+export default function BottomTabBar(): JSX.Element {
   const router = useRouter();
   const pathname = usePathname();
-  const isActive = (route: string) => pathname === route;
-  const insets = useSafeAreaInsets(); // <- esto añade soporte para padding dinámico
 
+  /**
+   * Verifica si la ruta proporcionada es la ruta activa actual.
+   * @param route Ruta para verificar.
+   * @returns `true` si es la ruta activa.
+   */
+  const isActive = (route: string): boolean => pathname === route;
+
+  const insets = useSafeAreaInsets();
+
+  // Obtiene los contadores de mensajes y notificaciones no leídas para el usuario actual
   const { unreadNotis, unreadChats } = useUnreadCounters(getAuth().currentUser?.uid);
 
   return (
-
-    // Componente de barra de navegación inferior
-    // Utiliza iconos de AntDesign e Ionicons
     <View style={[styles.bottomTabBar, { paddingBottom: insets.bottom || 10 }]}>
       <TouchableOpacity onPress={() => router.push("../home")}>
         <AntDesign name="home" size={24} color={isActive("/home") ? "#000" : "#999"} />
@@ -34,7 +50,6 @@ export default function BottomTabBar() {
           )}
         </View>
       </TouchableOpacity>
-
 
       <TouchableOpacity onPress={() => router.push("../publicacion/create-post")}>
         <AntDesign
@@ -56,14 +71,14 @@ export default function BottomTabBar() {
         </View>
       </TouchableOpacity>
 
-
       <TouchableOpacity onPress={() => router.push("../profile")}>
         <Ionicons name="person-circle-outline" size={26} color={isActive("/profile") ? "#000" : "#999"} />
       </TouchableOpacity>
     </View>
   );
 }
-// styles.js
+
+// Estilos de la barra inferior y notificaciones
 const styles = StyleSheet.create({
   bottomTabBar: {
     flexDirection: "row",
@@ -77,7 +92,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: -5,
     right: -10,
-    backgroundColor: "#FF66C4", // rosa vibrante de tu app
+    backgroundColor: "#FF66C4",
     borderRadius: 8,
     minWidth: 16,
     paddingHorizontal: 4,
@@ -91,5 +106,4 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
   },
-
 });

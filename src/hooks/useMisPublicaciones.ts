@@ -7,12 +7,19 @@ import {
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { firestore } from "../services/config/firebase-config";
-import { Publicacion } from "../types/publicacion"; // Lo creamos en el siguiente paso
+import { Publicacion } from "../types/publicacion";
 import { useAuth } from "./useAuth";
 
-// Custom hook para obtener las publicaciones del usuario autenticado
-// Escucha en tiempo real los cambios en la colección "publicaciones"
-export function useMisPublicaciones() {
+/**
+ * Hook personalizado para obtener en tiempo real las publicaciones
+ * creadas por el usuario autenticado desde Firestore.
+ *
+ * Escucha la colección `publicaciones` y filtra por `userId` igual al UID del usuario actual.
+ * Los resultados se ordenan por `timestamp` descendente.
+ *
+ * @returns {Publicacion[]} Lista de objetos `Publicacion` creados por el usuario.
+ */
+export function useMisPublicaciones(): Publicacion[] {
   const { user } = useAuth();
   const [posts, setPosts] = useState<Publicacion[]>([]);
 

@@ -3,8 +3,12 @@ import { deleteDoc, doc } from "firebase/firestore";
 import { Alert } from "react-native";
 import { auth, firestore } from "../services/config/firebase-config";
 
-// Funciones para manejar acciones de autenticación
-export async function cerrarSesion(router: any) {
+/**
+ * Cierra la sesión del usuario autenticado y redirige a la pantalla de login.
+ *
+ * @param router Objeto de navegación (por ejemplo, `useRouter()` de `expo-router`).
+ */
+export async function cerrarSesion(router: any): Promise<void> {
   try {
     await signOut(auth);
     router.replace("/login");
@@ -14,8 +18,17 @@ export async function cerrarSesion(router: any) {
   }
 }
 
-// Función para eliminar la cuenta del usuario
-export async function eliminarCuenta(uid: string | undefined, router: any) {
+/**
+ * Elimina la cuenta del usuario actual, incluyendo su documento en Firestore
+ * y su cuenta de autenticación en Firebase Auth. Muestra una alerta de confirmación.
+ *
+ * @param uid UID del usuario a eliminar.
+ * @param router Objeto de navegación (por ejemplo, `useRouter()` de `expo-router`).
+ */
+export async function eliminarCuenta(
+  uid: string | undefined,
+  router: any
+): Promise<void> {
   if (!uid) return;
 
   Alert.alert(
