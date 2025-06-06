@@ -1,11 +1,11 @@
 import {
-    collection,
-    doc,
-    getDoc,
-    onSnapshot,
-    orderBy,
-    query,
-    where,
+  collection,
+  doc,
+  getDoc,
+  onSnapshot,
+  orderBy,
+  query,
+  where,
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { firestore } from "../services/config/firebase-config";
@@ -39,6 +39,23 @@ export function useChats(): ChatPreview[] {
       const res = await Promise.all(
         snap.docs.map(async (d) => {
           const data = d.data();
+
+          if (data.tipo === "grupo") {
+            return {
+              id: d.id,
+              tipo: "grupo",
+              nombre: data.nombreC || "Grupo",
+              avatar: data.avatarC || "https://i.pravatar.cc/150?img=1",
+              lastMessage: data.lastMessage ?? "",
+              timestamp:
+                data.timestamp?.toDate().toLocaleTimeString("es-ES", {
+                  hour: "2-digit",
+                  minute: "2-digit",
+                }) ?? "",
+            } as ChatPreview;
+          }
+
+
           const otroUid = data.participantes.find(
             (uid: string) => uid !== user.uid
           );
@@ -47,17 +64,16 @@ export function useChats(): ChatPreview[] {
 
           return {
             id: d.id,
-            tipo: data.tipo ?? "usuario",
+            tipo: "usuario",
             nombre: userInfo.username ?? "Usuario",
-            avatar:
-              userInfo.fotoPerfil ?? "https://i.pravatar.cc/150?img=2",
+            avatar: userInfo.fotoPerfil ?? "https://i.pravatar.cc/150?img=2",
             lastMessage: data.lastMessage ?? "",
             timestamp:
               data.timestamp?.toDate().toLocaleTimeString("es-ES", {
                 hour: "2-digit",
                 minute: "2-digit",
               }) ?? "",
-          };
+          }as ChatPreview;
         })
       );
       setChats(res);

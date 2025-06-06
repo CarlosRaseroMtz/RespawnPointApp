@@ -230,6 +230,7 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 15,
     paddingRight: 40,
+    color: "#000",
   },
   passwordContainer: {
     position: "relative",

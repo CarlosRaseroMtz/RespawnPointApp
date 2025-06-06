@@ -129,11 +129,11 @@ export async function toggleSeguir({
 
     if (!desdeSnap.exists() || !haciaSnap.exists()) return;
 
-    const seguidos = desdeSnap.data().seguidos || [];
-    const yaSigue = seguidos.includes(haciaUid);
+    const siguiendo = desdeSnap.data().siguiendo || [];
+    const yaSigue = siguiendo.includes(haciaUid);
 
     tx.update(desdeRef, {
-      seguidos: yaSigue ? arrayRemove(haciaUid) : arrayUnion(haciaUid),
+      siguiendo: yaSigue ? arrayRemove(haciaUid) : arrayUnion(haciaUid),
     });
 
     tx.update(haciaRef, {

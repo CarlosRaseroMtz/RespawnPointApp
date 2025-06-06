@@ -1,8 +1,10 @@
 import FondoLayout from "@/src/components/FondoLayout";
+import { normalizarNombreArchivo } from "@/src/utils/normalizar-nombre-archivo";
 import { Picker } from "@react-native-picker/picker";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
+import { getDownloadURL, getStorage, ref as storageRef, uploadBytes } from "firebase/storage";
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -87,10 +89,22 @@ export default function EditarPerfilScreen() {
   const guardarCambios = async () => {
     if (!user) return;
     try {
+      let avatarUrl = fotoPerfil;
+      if (fotoPerfil && !fotoPerfil.startsWith("http")) {
+        const ts = Date.now();
+        const nombreBase = fotoPerfil.split("/").pop() || `avatar_${ts}.jpg`;
+        const nombreLimpio = normalizarNombreArchivo(nombreBase);
+        const ruta = `avatars/${user.uid}/${ts}-${nombreLimpio}`;
+        const blob = await (await fetch(fotoPerfil)).blob();
+        const avatarStorageRef = storageRef(getStorage(), ruta);
+        await uploadBytes(avatarStorageRef, blob);
+        avatarUrl = await getDownloadURL(avatarStorageRef);
+      }
+
       const ref = doc(firestore, "usuarios", user.uid);
       await updateDoc(ref, {
         username,
-        fotoPerfil,
+        fotoPerfil: avatarUrl,
         plataformaFav: plataforma,
         generoFav: generos.join(", "),
         descripcion: bio,

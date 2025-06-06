@@ -187,6 +187,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 12,
     paddingRight: 40,
+    color: "#000",
   },
   eyeIcon: { position: "absolute", right: 12, top: 14 },
   linkText: { fontSize: 13, textAlign: "center", color: "#000", marginBottom: 20 },

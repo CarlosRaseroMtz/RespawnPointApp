@@ -2,6 +2,7 @@ import FondoLayout from "@/src/components/FondoLayout";
 import * as ImagePicker from "expo-image-picker";
 import { useRouter } from "expo-router";
 import { addDoc, collection, doc, getDocs, query, setDoc, Timestamp, where } from "firebase/firestore";
+import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
@@ -19,6 +20,7 @@ import { useAuth } from "../../src/hooks/useAuth";
 import { useChats } from "../../src/hooks/useChats";
 import { firestore } from "../../src/services/config/firebase-config";
 import { buscarUsuarios } from "../../src/utils/buscar-usuarios";
+import { normalizarNombreArchivo } from "../../src/utils/normalizar-nombre-archivo";
 
 const tabs = ["Usuarios", "Comunidades", "Torneos"];
 
@@ -90,8 +92,8 @@ export default function ChatsScreen() {
 
   const chatsToShow =
     activeTab === "Usuarios" ? userChats :
-    activeTab === "Comunidades" ? groupChats :
-    [];
+      activeTab === "Comunidades" ? groupChats :
+        [];
 
 
   // Función para crear un nuevo grupo
@@ -99,17 +101,32 @@ export default function ChatsScreen() {
   const crearGrupo = async () => {
     if (!user || participantesGrupo.length < 1) return;
 
+    let avatarUrl = avatarGrupo;
+    if (avatarGrupo && !avatarGrupo.startsWith("http")) {
+      const ts = Date.now();
+      const nombreBase = avatarGrupo.split("/").pop() || `img_${ts}.jpg`;
+      const nombreLimpio = normalizarNombreArchivo(nombreBase);
+      const ruta = `grupos/${user.uid}/${ts}-${nombreLimpio}`;
+      const blob = await (await fetch(avatarGrupo)).blob();
+      const storageRef = ref(getStorage(), ruta);
+      await uploadBytes(storageRef, blob);
+      avatarUrl = await getDownloadURL(storageRef);
+    }
+
+
     const nuevoChatRef = await addDoc(collection(firestore, "chats"), {
       participantes: [user.uid, ...participantesGrupo],
       tipo: "grupo",
       timestamp: new Date(),
       lastMessage: "",
-      //nombreC: nombreGrupo || "Nuevo Grupo", -- no me funca :(
-      //avatarC: avatarGrupo || "https://i.pravatar.cc/150?img=1", -- no me funca :(
+      nombreC: nombreGrupo || "Nuevo Grupo",
+      avatarC: avatarUrl || "https://i.pravatar.cc/150?img=1",
     });
 
     setModoCrearGrupo(false);
     setParticipantesGrupo([]);
+    setNombreGrupo("");
+    setAvatarGrupo(null);
     router.push(`/chats/${nuevoChatRef.id}`);
   };
 

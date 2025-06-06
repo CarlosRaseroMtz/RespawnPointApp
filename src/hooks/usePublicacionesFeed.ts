@@ -40,9 +40,7 @@ export function usePublicacionesFeed(): PostConAutor[] {
       const arr = await Promise.all(
         snap.docs.map(async (d) => {
           const data = d.data();
-          console.log("📄 Post leído:", data);
           const usnap = await getDoc(doc(firestore, "usuarios", data.userId));
-          console.log("👤 Autor cargado:", usnap.data());
           const autor = usnap.exists() ? usnap.data() : {};
 
           return {
@@ -52,7 +50,8 @@ export function usePublicacionesFeed(): PostConAutor[] {
               uid: data.userId,
               username: autor.username ?? "Player",
               fotoPerfil:
-                autor.fotoPerfil ?? "../../assets/images/foto-perfil-isi.png",
+                autor.fotoPerfil ??
+                `https://i.pravatar.cc/100?u=${data.userId}`,
             },
           } as PostConAutor;
         })
