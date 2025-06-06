@@ -49,7 +49,10 @@ const NotificationItem = ({
     <View style={[styles.notification, { position: "relative" }]}>
       {!leida && <View style={styles.unreadDot} />}
 
-      <Image source={{ uri: avatar }} style={styles.avatar} />
+      <Image
+        source={{ uri: avatar || "https://i.pravatar.cc/150?img=3" }}
+        style={styles.avatar}
+      />
 
       <View style={{ flex: 1 }}>
         <Text style={styles.user}>
@@ -57,9 +60,9 @@ const NotificationItem = ({
           <Text style={styles.time}>
             {time?.toDate
               ? formatDistanceToNow(time.toDate(), {
-                  locale: es,
-                  addSuffix: true,
-                })
+                locale: es,
+                addSuffix: true,
+              })
               : t("notification.noDate")}
           </Text>
         </Text>

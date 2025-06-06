@@ -1,9 +1,12 @@
 import { getAuth } from "firebase/auth";
 import {
   collection,
+  getDocs,
   getFirestore,
   onSnapshot,
+  query,
   updateDoc,
+  where
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { app } from "../services/config/firebase-config";
@@ -30,16 +33,30 @@ export function useNotificaciones(categoriaActiva: string): Notificacion[] {
 
     const itemsRef = collection(db, "notificaciones", user.uid, "items");
 
-    const unsubscribe = onSnapshot(itemsRef, (snapshot) => {
-      const notifList = snapshot.docs
-        .map((doc) => {
+    const unsubscribe = onSnapshot(itemsRef, async (snapshot) => {
+      const notifList = await Promise.all(
+        snapshot.docs.map(async (doc) => {
           const data = doc.data();
+                    let avatar = data.avatar;
+          if (!avatar) {
+            const q = query(
+              collection(db, "usuarios"),
+              where("username", "==", data.user)
+            );
+            const res = await getDocs(q);
+            if (!res.empty) {
+              avatar = res.docs[0].data().fotoPerfil || avatar;
+            }
+          }
           return {
             id: doc.id,
             ...data,
+            avatar,
             seconds: data.time?.seconds || 0,
-          } as unknown as Notificacion;
+          } as Notificacion;
         })
+      );
+      const filtered = notifList
         .filter(
           (n) =>
             n.message &&
@@ -47,7 +64,7 @@ export function useNotificaciones(categoriaActiva: string): Notificacion[] {
         )
         .sort((a, b) => b.seconds - a.seconds);
 
-      setNotifications(notifList);
+      setNotifications(filtered);
 
       // Marcar como leídas
       snapshot.docs.forEach((doc) => {

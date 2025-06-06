@@ -250,6 +250,7 @@ const styles = StyleSheet.create({
   picker: {
     height: 50,
     paddingHorizontal: 10,
+    color: "#000",
   },
   label: {
     fontWeight: "500",
